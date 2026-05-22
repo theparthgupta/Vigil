@@ -1,0 +1,33 @@
+# Environment
+.env
+*.env
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Data (generated, not source)
+data/cases/*.json
+data/cases/*.jsonl
+
+# Chroma DB (generated vector store)
+rag/chroma_db/
+
+# Regs (PDFs — large binary files, commit only if small)
+regs/*.pdf
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
