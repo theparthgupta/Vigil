@@ -1,0 +1,5482 @@
+[
+  {
+    "case_id": "case_str_040",
+    "customer": {
+      "id": "cust_str_040",
+      "name": "Jain Traders",
+      "business_type": "retail",
+      "account_open_date": "2022-06-14T00:00:00",
+      "stated_monthly_turnover_inr": 16000000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_0c3838a5",
+        "customer_id": "cust_str_040",
+        "amount_inr": 142454.0,
+        "timestamp": "2024-09-16T09:00:00",
+        "counterparty_name": "Radha Chauhan",
+        "counterparty_account": "17490753998935",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_4b425bba",
+        "customer_id": "cust_str_040",
+        "amount_inr": 147042.0,
+        "timestamp": "2024-09-18T10:00:00",
+        "counterparty_name": "Radha Rao",
+        "counterparty_account": "70229604432701",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c4f5b03e",
+        "customer_id": "cust_str_040",
+        "amount_inr": 917586.0,
+        "timestamp": "2024-09-19T14:00:00",
+        "counterparty_name": "Cash Deposit – Ahmedabad-CG Road Branch",
+        "counterparty_account": "08428910771199",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_1af026df",
+        "customer_id": "cust_str_040",
+        "amount_inr": 88433.0,
+        "timestamp": "2024-09-27T18:00:00",
+        "counterparty_name": "Vijay Mehta",
+        "counterparty_account": "58935712661106",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_26cffe04",
+        "customer_id": "cust_str_040",
+        "amount_inr": 944540.0,
+        "timestamp": "2024-09-29T12:00:00",
+        "counterparty_name": "Cash Deposit – Mumbai-Andheri Branch",
+        "counterparty_account": "86326667850720",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_17c305fc",
+        "customer_id": "cust_str_040",
+        "amount_inr": 97685.0,
+        "timestamp": "2024-10-03T11:00:00",
+        "counterparty_name": "Kiran Srivastava",
+        "counterparty_account": "88485200894346",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1f7bd82f",
+        "customer_id": "cust_str_040",
+        "amount_inr": 937715.0,
+        "timestamp": "2024-10-05T11:00:00",
+        "counterparty_name": "Cash Deposit – Delhi-Connaught Place Branch",
+        "counterparty_account": "37603754821456",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_0abe8257",
+        "customer_id": "cust_str_040",
+        "amount_inr": 876704.0,
+        "timestamp": "2024-10-05T17:00:00",
+        "counterparty_name": "Cash Deposit – Visakhapatnam-Dwaraka Branch",
+        "counterparty_account": "81213524787125",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_5b673a25",
+        "customer_id": "cust_str_040",
+        "amount_inr": 944053.0,
+        "timestamp": "2024-10-07T13:00:00",
+        "counterparty_name": "Cash Deposit – Kolkata-Park Street Branch",
+        "counterparty_account": "22801561931837",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_9696dc6c",
+        "customer_id": "cust_str_040",
+        "amount_inr": 44095.0,
+        "timestamp": "2024-10-09T12:00:00",
+        "counterparty_name": "Paresh Singh",
+        "counterparty_account": "88649767762282",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7497375c",
+        "customer_id": "cust_str_040",
+        "amount_inr": 137078.0,
+        "timestamp": "2024-10-24T16:00:00",
+        "counterparty_name": "Anita Choudhury",
+        "counterparty_account": "70285196115940",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_b3468999",
+        "customer_id": "cust_str_040",
+        "amount_inr": 199150.0,
+        "timestamp": "2024-10-26T14:00:00",
+        "counterparty_name": "Sita Sharma",
+        "counterparty_account": "67389975634108",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_fb60be1c",
+        "customer_id": "cust_str_040",
+        "amount_inr": 145619.0,
+        "timestamp": "2024-11-08T10:00:00",
+        "counterparty_name": "Dinesh Pillai",
+        "counterparty_account": "26060290846684",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "5 cash deposits totalling ₹46.2L across 5 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_041",
+    "customer": {
+      "id": "cust_str_041",
+      "name": "Singh Jewellers",
+      "business_type": "jewelry",
+      "account_open_date": "2020-05-05T00:00:00",
+      "stated_monthly_turnover_inr": 9400000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_7bf2aa06",
+        "customer_id": "cust_str_041",
+        "amount_inr": 80592.0,
+        "timestamp": "2024-06-10T14:00:00",
+        "counterparty_name": "Yogesh Kapoor",
+        "counterparty_account": "06304891382496",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c832b3f0",
+        "customer_id": "cust_str_041",
+        "amount_inr": 126911.0,
+        "timestamp": "2024-06-12T17:00:00",
+        "counterparty_name": "Sumit Joshi",
+        "counterparty_account": "38687007942007",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_80acefb5",
+        "customer_id": "cust_str_041",
+        "amount_inr": 986774.0,
+        "timestamp": "2024-06-13T16:00:00",
+        "counterparty_name": "Cash Deposit – Kochi-MG Road Branch",
+        "counterparty_account": "01820433971895",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_2ec36411",
+        "customer_id": "cust_str_041",
+        "amount_inr": 894081.0,
+        "timestamp": "2024-06-16T11:00:00",
+        "counterparty_name": "Cash Deposit – Coimbatore-RS Puram Branch",
+        "counterparty_account": "41246209520046",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_69aec17b",
+        "customer_id": "cust_str_041",
+        "amount_inr": 875885.0,
+        "timestamp": "2024-06-17T11:00:00",
+        "counterparty_name": "Cash Deposit – Jaipur-MI Road Branch",
+        "counterparty_account": "54610339937886",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_7dd12d57",
+        "customer_id": "cust_str_041",
+        "amount_inr": 955328.0,
+        "timestamp": "2024-06-25T09:00:00",
+        "counterparty_name": "Cash Deposit – Hyderabad-Banjara Hills Branch",
+        "counterparty_account": "05626085641118",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_ddaf2233",
+        "customer_id": "cust_str_041",
+        "amount_inr": 922712.0,
+        "timestamp": "2024-06-27T10:00:00",
+        "counterparty_name": "Cash Deposit – Nagpur-Dharampeth Branch",
+        "counterparty_account": "20948181398909",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_aacefa98",
+        "customer_id": "cust_str_041",
+        "amount_inr": 970831.0,
+        "timestamp": "2024-07-01T16:00:00",
+        "counterparty_name": "Cash Deposit – Chandigarh-Sector 17 Branch",
+        "counterparty_account": "72519966365807",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_95ccfda2",
+        "customer_id": "cust_str_041",
+        "amount_inr": 81644.0,
+        "timestamp": "2024-07-15T13:00:00",
+        "counterparty_name": "Vijay Banerjee",
+        "counterparty_account": "84028914161284",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "6 cash deposits totalling ₹56.1L across 6 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_042",
+    "customer": {
+      "id": "cust_str_042",
+      "name": "Choudhury Works",
+      "business_type": "sme",
+      "account_open_date": "2022-12-16T00:00:00",
+      "stated_monthly_turnover_inr": 5800000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_fbf8b1fe",
+        "customer_id": "cust_str_042",
+        "amount_inr": 904810.0,
+        "timestamp": "2024-06-24T12:00:00",
+        "counterparty_name": "Cash Deposit – Chandigarh-Sector 17 Branch",
+        "counterparty_account": "61498728399921",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_f530c98d",
+        "customer_id": "cust_str_042",
+        "amount_inr": 112723.0,
+        "timestamp": "2024-07-06T14:00:00",
+        "counterparty_name": "Dinesh Verma",
+        "counterparty_account": "13325411076095",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_04105bd1",
+        "customer_id": "cust_str_042",
+        "amount_inr": 905213.0,
+        "timestamp": "2024-07-08T14:00:00",
+        "counterparty_name": "Cash Deposit – Bhopal-MP Nagar Branch",
+        "counterparty_account": "20970026876811",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_d25697ad",
+        "customer_id": "cust_str_042",
+        "amount_inr": 75643.0,
+        "timestamp": "2024-07-09T10:00:00",
+        "counterparty_name": "Arun Yadav",
+        "counterparty_account": "58319971791100",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_4d2d3557",
+        "customer_id": "cust_str_042",
+        "amount_inr": 108931.0,
+        "timestamp": "2024-07-14T10:00:00",
+        "counterparty_name": "Anita Agarwal",
+        "counterparty_account": "96110804661963",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_30799b56",
+        "customer_id": "cust_str_042",
+        "amount_inr": 120640.0,
+        "timestamp": "2024-07-16T12:00:00",
+        "counterparty_name": "Amit Pandey",
+        "counterparty_account": "77959959465217",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c227e0f2",
+        "customer_id": "cust_str_042",
+        "amount_inr": 908070.0,
+        "timestamp": "2024-07-17T09:00:00",
+        "counterparty_name": "Cash Deposit – Kolkata-Park Street Branch",
+        "counterparty_account": "45319433750479",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_209f4ff2",
+        "customer_id": "cust_str_042",
+        "amount_inr": 883619.0,
+        "timestamp": "2024-07-17T10:00:00",
+        "counterparty_name": "Cash Deposit – Coimbatore-RS Puram Branch",
+        "counterparty_account": "49384308948706",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_ac184ef9",
+        "customer_id": "cust_str_042",
+        "amount_inr": 858112.0,
+        "timestamp": "2024-07-22T16:00:00",
+        "counterparty_name": "Cash Deposit – Jaipur-MI Road Branch",
+        "counterparty_account": "15695620175370",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_5afaeb32",
+        "customer_id": "cust_str_042",
+        "amount_inr": 166021.0,
+        "timestamp": "2024-08-08T10:00:00",
+        "counterparty_name": "Seema Pandey",
+        "counterparty_account": "67972320024968",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7832b59c",
+        "customer_id": "cust_str_042",
+        "amount_inr": 180840.0,
+        "timestamp": "2024-08-11T14:00:00",
+        "counterparty_name": "Neha Srivastava",
+        "counterparty_account": "49545089203880",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_cb8fe981",
+        "customer_id": "cust_str_042",
+        "amount_inr": 167175.0,
+        "timestamp": "2024-08-13T18:00:00",
+        "counterparty_name": "Rajesh Sen",
+        "counterparty_account": "69915078593110",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_1f28e417",
+        "customer_id": "cust_str_042",
+        "amount_inr": 186449.0,
+        "timestamp": "2024-08-23T09:00:00",
+        "counterparty_name": "Asha Bose",
+        "counterparty_account": "87758030468750",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "5 cash deposits totalling ₹44.6L across 5 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_043",
+    "customer": {
+      "id": "cust_str_043",
+      "name": "Dubey Traders",
+      "business_type": "retail",
+      "account_open_date": "2021-08-01T00:00:00",
+      "stated_monthly_turnover_inr": 13100000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_32a4a8a4",
+        "customer_id": "cust_str_043",
+        "amount_inr": 861509.0,
+        "timestamp": "2024-04-27T12:00:00",
+        "counterparty_name": "Cash Deposit – Ahmedabad-CG Road Branch",
+        "counterparty_account": "42342583230241",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_2f2aa5e8",
+        "customer_id": "cust_str_043",
+        "amount_inr": 948543.0,
+        "timestamp": "2024-05-03T15:00:00",
+        "counterparty_name": "Cash Deposit – Ranchi-Main Road Branch",
+        "counterparty_account": "05015081247395",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_37f5c238",
+        "customer_id": "cust_str_043",
+        "amount_inr": 19595.0,
+        "timestamp": "2024-05-10T12:00:00",
+        "counterparty_name": "Amit Das",
+        "counterparty_account": "46692548121478",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_5735773c",
+        "customer_id": "cust_str_043",
+        "amount_inr": 134371.0,
+        "timestamp": "2024-05-11T17:00:00",
+        "counterparty_name": "Seema Kapoor",
+        "counterparty_account": "15366377805292",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_737ea52f",
+        "customer_id": "cust_str_043",
+        "amount_inr": 102163.0,
+        "timestamp": "2024-05-11T18:00:00",
+        "counterparty_name": "Mukesh Sen",
+        "counterparty_account": "76657546027341",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_5fcfe711",
+        "customer_id": "cust_str_043",
+        "amount_inr": 951742.0,
+        "timestamp": "2024-05-21T17:00:00",
+        "counterparty_name": "Cash Deposit – Nagpur-Dharampeth Branch",
+        "counterparty_account": "78725587774969",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_53e2e047",
+        "customer_id": "cust_str_043",
+        "amount_inr": 927118.0,
+        "timestamp": "2024-05-22T11:00:00",
+        "counterparty_name": "Cash Deposit – Chandigarh-Sector 17 Branch",
+        "counterparty_account": "30428973179128",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_610114f4",
+        "customer_id": "cust_str_043",
+        "amount_inr": 855503.0,
+        "timestamp": "2024-05-23T11:00:00",
+        "counterparty_name": "Cash Deposit – Kolkata-Park Street Branch",
+        "counterparty_account": "15347355289611",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_cb7e717c",
+        "customer_id": "cust_str_043",
+        "amount_inr": 887862.0,
+        "timestamp": "2024-05-25T11:00:00",
+        "counterparty_name": "Cash Deposit – Kochi-MG Road Branch",
+        "counterparty_account": "33865596309938",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_88d45ff4",
+        "customer_id": "cust_str_043",
+        "amount_inr": 169340.0,
+        "timestamp": "2024-06-02T15:00:00",
+        "counterparty_name": "Harish Shukla",
+        "counterparty_account": "63715974121820",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e94ded1e",
+        "customer_id": "cust_str_043",
+        "amount_inr": 190623.0,
+        "timestamp": "2024-06-04T16:00:00",
+        "counterparty_name": "Suresh Tiwari",
+        "counterparty_account": "64334817058025",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c523b4e9",
+        "customer_id": "cust_str_043",
+        "amount_inr": 59975.0,
+        "timestamp": "2024-06-11T18:00:00",
+        "counterparty_name": "Anita Srivastava",
+        "counterparty_account": "44566907826333",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ed360bb7",
+        "customer_id": "cust_str_043",
+        "amount_inr": 104134.0,
+        "timestamp": "2024-06-23T10:00:00",
+        "counterparty_name": "Pooja Choudhury",
+        "counterparty_account": "31115083535444",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6b4d3d1a",
+        "customer_id": "cust_str_043",
+        "amount_inr": 90103.0,
+        "timestamp": "2024-06-26T09:00:00",
+        "counterparty_name": "Varun Menon",
+        "counterparty_account": "66845909022599",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "6 cash deposits totalling ₹54.3L across 6 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_044",
+    "customer": {
+      "id": "cust_str_044",
+      "name": "Mishra Enterprises",
+      "business_type": "sme",
+      "account_open_date": "2018-09-22T00:00:00",
+      "stated_monthly_turnover_inr": 10500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_bef7110a",
+        "customer_id": "cust_str_044",
+        "amount_inr": 131154.0,
+        "timestamp": "2024-09-02T10:00:00",
+        "counterparty_name": "Usha Sen",
+        "counterparty_account": "63600412577711",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_d161a381",
+        "customer_id": "cust_str_044",
+        "amount_inr": 903916.0,
+        "timestamp": "2024-09-10T15:00:00",
+        "counterparty_name": "Cash Deposit – Nagpur-Dharampeth Branch",
+        "counterparty_account": "72994938743027",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_0b3f953a",
+        "customer_id": "cust_str_044",
+        "amount_inr": 112022.0,
+        "timestamp": "2024-09-14T16:00:00",
+        "counterparty_name": "Rohit Singh",
+        "counterparty_account": "13649718924195",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_b6e3b91b",
+        "customer_id": "cust_str_044",
+        "amount_inr": 187571.0,
+        "timestamp": "2024-09-18T11:00:00",
+        "counterparty_name": "Paresh Menon",
+        "counterparty_account": "08370816470900",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_fe0d40b4",
+        "customer_id": "cust_str_044",
+        "amount_inr": 150964.0,
+        "timestamp": "2024-09-19T10:00:00",
+        "counterparty_name": "Sanjay Shukla",
+        "counterparty_account": "81511856724380",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6a40e5cc",
+        "customer_id": "cust_str_044",
+        "amount_inr": 952521.0,
+        "timestamp": "2024-09-20T11:00:00",
+        "counterparty_name": "Cash Deposit – Hyderabad-Banjara Hills Branch",
+        "counterparty_account": "32967629160324",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_9ad75b94",
+        "customer_id": "cust_str_044",
+        "amount_inr": 866769.0,
+        "timestamp": "2024-09-27T15:00:00",
+        "counterparty_name": "Cash Deposit – Ahmedabad-CG Road Branch",
+        "counterparty_account": "38597779014754",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_d2077bc4",
+        "customer_id": "cust_str_044",
+        "amount_inr": 153767.0,
+        "timestamp": "2024-10-13T12:00:00",
+        "counterparty_name": "Manoj Das",
+        "counterparty_account": "42209124186210",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_a2a6861a",
+        "customer_id": "cust_str_044",
+        "amount_inr": 175379.0,
+        "timestamp": "2024-10-15T15:00:00",
+        "counterparty_name": "Vijay Mehta",
+        "counterparty_account": "57150997683890",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_176519e7",
+        "customer_id": "cust_str_044",
+        "amount_inr": 108931.0,
+        "timestamp": "2024-10-20T12:00:00",
+        "counterparty_name": "Mohit Iyer",
+        "counterparty_account": "06005313122068",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ef30141d",
+        "customer_id": "cust_str_044",
+        "amount_inr": 38228.0,
+        "timestamp": "2024-10-23T14:00:00",
+        "counterparty_name": "Asha Kapoor",
+        "counterparty_account": "86613315520650",
+        "direction": "credit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "3 cash deposits totalling ₹27.2L across 3 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_045",
+    "customer": {
+      "id": "cust_str_045",
+      "name": "Shah Mart",
+      "business_type": "retail",
+      "account_open_date": "2019-04-30T00:00:00",
+      "stated_monthly_turnover_inr": 1000000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_0d56e000",
+        "customer_id": "cust_str_045",
+        "amount_inr": 978881.0,
+        "timestamp": "2024-05-06T12:00:00",
+        "counterparty_name": "Cash Deposit – Surat-Ring Road Branch",
+        "counterparty_account": "23212983381674",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_57bd0ca8",
+        "customer_id": "cust_str_045",
+        "amount_inr": 856211.0,
+        "timestamp": "2024-05-11T14:00:00",
+        "counterparty_name": "Cash Deposit – Hyderabad-Banjara Hills Branch",
+        "counterparty_account": "33803396852701",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_26d3e222",
+        "customer_id": "cust_str_045",
+        "amount_inr": 980738.0,
+        "timestamp": "2024-05-13T12:00:00",
+        "counterparty_name": "Cash Deposit – Delhi-Connaught Place Branch",
+        "counterparty_account": "63039752450864",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_490ce315",
+        "customer_id": "cust_str_045",
+        "amount_inr": 199182.0,
+        "timestamp": "2024-05-16T12:00:00",
+        "counterparty_name": "Naresh Tiwari",
+        "counterparty_account": "97347156627768",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_eea00af9",
+        "customer_id": "cust_str_045",
+        "amount_inr": 178047.0,
+        "timestamp": "2024-06-10T10:00:00",
+        "counterparty_name": "Manish Gupta",
+        "counterparty_account": "92364587506633",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_321a6d71",
+        "customer_id": "cust_str_045",
+        "amount_inr": 157362.0,
+        "timestamp": "2024-06-11T16:00:00",
+        "counterparty_name": "Mahesh Pillai",
+        "counterparty_account": "23008576665674",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6d69e88c",
+        "customer_id": "cust_str_045",
+        "amount_inr": 169749.0,
+        "timestamp": "2024-06-20T15:00:00",
+        "counterparty_name": "Kavita Desai",
+        "counterparty_account": "14982824674746",
+        "direction": "credit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "3 cash deposits totalling ₹28.2L across 3 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_046",
+    "customer": {
+      "id": "cust_str_046",
+      "name": "Iyer Enterprises",
+      "business_type": "sme",
+      "account_open_date": "2021-11-29T00:00:00",
+      "stated_monthly_turnover_inr": 1300000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_c55e6efb",
+        "customer_id": "cust_str_046",
+        "amount_inr": 892317.0,
+        "timestamp": "2024-03-16T10:00:00",
+        "counterparty_name": "Cash Deposit – Ranchi-Main Road Branch",
+        "counterparty_account": "16691836264488",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_8663e8bb",
+        "customer_id": "cust_str_046",
+        "amount_inr": 875394.0,
+        "timestamp": "2024-03-18T15:00:00",
+        "counterparty_name": "Cash Deposit – Hyderabad-Banjara Hills Branch",
+        "counterparty_account": "64622522372817",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_92a593c8",
+        "customer_id": "cust_str_046",
+        "amount_inr": 86277.0,
+        "timestamp": "2024-03-21T10:00:00",
+        "counterparty_name": "Dinesh Pillai",
+        "counterparty_account": "52569040983665",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_0f1972db",
+        "customer_id": "cust_str_046",
+        "amount_inr": 905724.0,
+        "timestamp": "2024-03-21T12:00:00",
+        "counterparty_name": "Cash Deposit – Jaipur-MI Road Branch",
+        "counterparty_account": "23467912141614",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_95ecec2c",
+        "customer_id": "cust_str_046",
+        "amount_inr": 866846.0,
+        "timestamp": "2024-03-26T09:00:00",
+        "counterparty_name": "Cash Deposit – Kolkata-Park Street Branch",
+        "counterparty_account": "37710040901380",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_172730d8",
+        "customer_id": "cust_str_046",
+        "amount_inr": 198527.0,
+        "timestamp": "2024-04-01T16:00:00",
+        "counterparty_name": "Ajay Shah",
+        "counterparty_account": "53991566863341",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_bbe30fd2",
+        "customer_id": "cust_str_046",
+        "amount_inr": 950345.0,
+        "timestamp": "2024-04-03T13:00:00",
+        "counterparty_name": "Cash Deposit – Bhopal-MP Nagar Branch",
+        "counterparty_account": "61195243640270",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_5e516bf8",
+        "customer_id": "cust_str_046",
+        "amount_inr": 193057.0,
+        "timestamp": "2024-04-10T11:00:00",
+        "counterparty_name": "Suresh Shah",
+        "counterparty_account": "79786305050573",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f067dba1",
+        "customer_id": "cust_str_046",
+        "amount_inr": 169059.0,
+        "timestamp": "2024-04-16T15:00:00",
+        "counterparty_name": "Pankaj Kumar",
+        "counterparty_account": "71649328980271",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_56282768",
+        "customer_id": "cust_str_046",
+        "amount_inr": 168068.0,
+        "timestamp": "2024-04-18T13:00:00",
+        "counterparty_name": "Varun Desai",
+        "counterparty_account": "55535669055107",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7b6f65df",
+        "customer_id": "cust_str_046",
+        "amount_inr": 88996.0,
+        "timestamp": "2024-05-08T17:00:00",
+        "counterparty_name": "Yogesh Mishra",
+        "counterparty_account": "83332116025643",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "5 cash deposits totalling ₹44.9L across 5 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_047",
+    "customer": {
+      "id": "cust_str_047",
+      "name": "Mehta Industries",
+      "business_type": "sme",
+      "account_open_date": "2018-08-07T00:00:00",
+      "stated_monthly_turnover_inr": 17800000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_84d6b400",
+        "customer_id": "cust_str_047",
+        "amount_inr": 193695.0,
+        "timestamp": "2024-10-03T15:00:00",
+        "counterparty_name": "Nitin Srivastava",
+        "counterparty_account": "98131292087510",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d91b1cb6",
+        "customer_id": "cust_str_047",
+        "amount_inr": 937331.0,
+        "timestamp": "2024-10-06T12:00:00",
+        "counterparty_name": "Cash Deposit – Hyderabad-Banjara Hills Branch",
+        "counterparty_account": "30276420865675",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_2557c82c",
+        "customer_id": "cust_str_047",
+        "amount_inr": 969481.0,
+        "timestamp": "2024-10-06T13:00:00",
+        "counterparty_name": "Cash Deposit – Chandigarh-Sector 17 Branch",
+        "counterparty_account": "09548149737460",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_8720d00f",
+        "customer_id": "cust_str_047",
+        "amount_inr": 952593.0,
+        "timestamp": "2024-10-14T10:00:00",
+        "counterparty_name": "Cash Deposit – Lucknow-Hazratganj Branch",
+        "counterparty_account": "44386125904729",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_4a84525f",
+        "customer_id": "cust_str_047",
+        "amount_inr": 886060.0,
+        "timestamp": "2024-10-16T16:00:00",
+        "counterparty_name": "Cash Deposit – Kolkata-Park Street Branch",
+        "counterparty_account": "23330591266201",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_f1efa963",
+        "customer_id": "cust_str_047",
+        "amount_inr": 943214.0,
+        "timestamp": "2024-10-17T11:00:00",
+        "counterparty_name": "Cash Deposit – Kochi-MG Road Branch",
+        "counterparty_account": "01859626301367",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_a71db3a6",
+        "customer_id": "cust_str_047",
+        "amount_inr": 929348.0,
+        "timestamp": "2024-10-24T11:00:00",
+        "counterparty_name": "Cash Deposit – Ranchi-Main Road Branch",
+        "counterparty_account": "61764750111178",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_d9f8a24e",
+        "customer_id": "cust_str_047",
+        "amount_inr": 43768.0,
+        "timestamp": "2024-11-07T12:00:00",
+        "counterparty_name": "Sudha Mishra",
+        "counterparty_account": "01184582603408",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_cb5a1c0e",
+        "customer_id": "cust_str_047",
+        "amount_inr": 16036.0,
+        "timestamp": "2024-11-08T18:00:00",
+        "counterparty_name": "Deepa Desai",
+        "counterparty_account": "92676492151826",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_85cd74bf",
+        "customer_id": "cust_str_047",
+        "amount_inr": 86912.0,
+        "timestamp": "2024-11-13T17:00:00",
+        "counterparty_name": "Paresh Mehta",
+        "counterparty_account": "59883103032432",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "6 cash deposits totalling ₹56.2L across 6 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_048",
+    "customer": {
+      "id": "cust_str_048",
+      "name": "Shukla Gold House",
+      "business_type": "jewelry",
+      "account_open_date": "2020-01-06T00:00:00",
+      "stated_monthly_turnover_inr": 14600000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_e585a0a5",
+        "customer_id": "cust_str_048",
+        "amount_inr": 138350.0,
+        "timestamp": "2024-08-10T17:00:00",
+        "counterparty_name": "Sita Reddy",
+        "counterparty_account": "02562588967924",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c72fa86e",
+        "customer_id": "cust_str_048",
+        "amount_inr": 873324.0,
+        "timestamp": "2024-08-15T14:00:00",
+        "counterparty_name": "Cash Deposit – Patna-Fraser Road Branch",
+        "counterparty_account": "42340163611284",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_50fcfdaa",
+        "customer_id": "cust_str_048",
+        "amount_inr": 893002.0,
+        "timestamp": "2024-08-17T11:00:00",
+        "counterparty_name": "Cash Deposit – Jaipur-MI Road Branch",
+        "counterparty_account": "66093141818615",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_00926d61",
+        "customer_id": "cust_str_048",
+        "amount_inr": 40897.0,
+        "timestamp": "2024-08-22T13:00:00",
+        "counterparty_name": "Arun Reddy",
+        "counterparty_account": "96348079705097",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_66edef30",
+        "customer_id": "cust_str_048",
+        "amount_inr": 96127.0,
+        "timestamp": "2024-08-23T14:00:00",
+        "counterparty_name": "Priya Sharma",
+        "counterparty_account": "50167318826170",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_666a4a82",
+        "customer_id": "cust_str_048",
+        "amount_inr": 950081.0,
+        "timestamp": "2024-08-24T11:00:00",
+        "counterparty_name": "Cash Deposit – Visakhapatnam-Dwaraka Branch",
+        "counterparty_account": "71462831435989",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_133b385e",
+        "customer_id": "cust_str_048",
+        "amount_inr": 21103.0,
+        "timestamp": "2024-09-11T16:00:00",
+        "counterparty_name": "Geeta Saxena",
+        "counterparty_account": "52850676251538",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_60f91495",
+        "customer_id": "cust_str_048",
+        "amount_inr": 12489.0,
+        "timestamp": "2024-09-16T17:00:00",
+        "counterparty_name": "Manoj Joshi",
+        "counterparty_account": "94053967275784",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_7f702973",
+        "customer_id": "cust_str_048",
+        "amount_inr": 139197.0,
+        "timestamp": "2024-09-24T09:00:00",
+        "counterparty_name": "Naresh Choudhury",
+        "counterparty_account": "88160930685389",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_f28c635f",
+        "customer_id": "cust_str_048",
+        "amount_inr": 82305.0,
+        "timestamp": "2024-10-03T15:00:00",
+        "counterparty_name": "Kiran Dubey",
+        "counterparty_account": "46511131290148",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "3 cash deposits totalling ₹27.2L across 3 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_str_049",
+    "customer": {
+      "id": "cust_str_049",
+      "name": "Chauhan General Store",
+      "business_type": "retail",
+      "account_open_date": "2020-08-21T00:00:00",
+      "stated_monthly_turnover_inr": 17300000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_78d8cdd6",
+        "customer_id": "cust_str_049",
+        "amount_inr": 20718.0,
+        "timestamp": "2024-06-02T09:00:00",
+        "counterparty_name": "Ajay Nair",
+        "counterparty_account": "49162475541108",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_3f6c5de5",
+        "customer_id": "cust_str_049",
+        "amount_inr": 977383.0,
+        "timestamp": "2024-06-04T15:00:00",
+        "counterparty_name": "Cash Deposit – Jaipur-MI Road Branch",
+        "counterparty_account": "92823414363718",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_99622263",
+        "customer_id": "cust_str_049",
+        "amount_inr": 124327.0,
+        "timestamp": "2024-06-06T16:00:00",
+        "counterparty_name": "Manish Saxena",
+        "counterparty_account": "42409036788127",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_fd595978",
+        "customer_id": "cust_str_049",
+        "amount_inr": 35857.0,
+        "timestamp": "2024-06-06T17:00:00",
+        "counterparty_name": "Nisha Pillai",
+        "counterparty_account": "38202368485571",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_f2c8c25e",
+        "customer_id": "cust_str_049",
+        "amount_inr": 858285.0,
+        "timestamp": "2024-06-07T12:00:00",
+        "counterparty_name": "Cash Deposit – Pune-Kothrud Branch",
+        "counterparty_account": "74167872568621",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_3ab8ec3f",
+        "customer_id": "cust_str_049",
+        "amount_inr": 897497.0,
+        "timestamp": "2024-06-08T11:00:00",
+        "counterparty_name": "Cash Deposit – Chennai-T Nagar Branch",
+        "counterparty_account": "12604326093106",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_0fb49d98",
+        "customer_id": "cust_str_049",
+        "amount_inr": 147618.0,
+        "timestamp": "2024-06-21T12:00:00",
+        "counterparty_name": "Rohit Pillai",
+        "counterparty_account": "86041454563502",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_a676ace1",
+        "customer_id": "cust_str_049",
+        "amount_inr": 44159.0,
+        "timestamp": "2024-06-23T14:00:00",
+        "counterparty_name": "Pankaj Iyer",
+        "counterparty_account": "43961129109337",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_296df91f",
+        "customer_id": "cust_str_049",
+        "amount_inr": 964969.0,
+        "timestamp": "2024-06-23T16:00:00",
+        "counterparty_name": "Cash Deposit – Indore-Vijay Nagar Branch",
+        "counterparty_account": "25605313402665",
+        "direction": "credit",
+        "channel": "cash"
+      },
+      {
+        "id": "txn_2f1ef8dc",
+        "customer_id": "cust_str_049",
+        "amount_inr": 143504.0,
+        "timestamp": "2024-06-26T17:00:00",
+        "counterparty_name": "Harish Chatterjee",
+        "counterparty_account": "02939087884434",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2049a289",
+        "customer_id": "cust_str_049",
+        "amount_inr": 878279.0,
+        "timestamp": "2024-06-27T09:00:00",
+        "counterparty_name": "Cash Deposit – Visakhapatnam-Dwaraka Branch",
+        "counterparty_account": "25803056906744",
+        "direction": "credit",
+        "channel": "cash"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "structuring",
+    "notes": "5 cash deposits totalling ₹45.8L across 5 branches within 30 days. Each deposit below ₹10L CTR threshold (PMLA s.12)."
+  },
+  {
+    "case_id": "case_san_040",
+    "customer": {
+      "id": "cust_san_040",
+      "name": "Thakur Logistics",
+      "business_type": "logistics",
+      "account_open_date": "2018-04-30T00:00:00",
+      "stated_monthly_turnover_inr": 18900000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_97f9580e",
+        "customer_id": "cust_san_040",
+        "amount_inr": 141960.0,
+        "timestamp": "2024-09-24T16:00:00",
+        "counterparty_name": "Omar Sheikh Qureshi",
+        "counterparty_account": "50074189485432",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_22e142fc",
+        "customer_id": "cust_san_040",
+        "amount_inr": 1494617.0,
+        "timestamp": "2024-10-01T16:00:00",
+        "counterparty_name": "Bashir Ahmad Zahed",
+        "counterparty_account": "61685071058011",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_e2cae78d",
+        "customer_id": "cust_san_040",
+        "amount_inr": 1254522.0,
+        "timestamp": "2024-10-04T09:00:00",
+        "counterparty_name": "Sergei Volkov",
+        "counterparty_account": "11526105370923",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_b552f386",
+        "customer_id": "cust_san_040",
+        "amount_inr": 374195.0,
+        "timestamp": "2024-10-05T11:00:00",
+        "counterparty_name": "Yogesh Kapoor",
+        "counterparty_account": "95031006493403",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_61f3b780",
+        "customer_id": "cust_san_040",
+        "amount_inr": 268916.0,
+        "timestamp": "2024-10-05T17:00:00",
+        "counterparty_name": "Neha Tiwari",
+        "counterparty_account": "46280550774065",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c28d1433",
+        "customer_id": "cust_san_040",
+        "amount_inr": 347853.0,
+        "timestamp": "2024-10-14T18:00:00",
+        "counterparty_name": "Nisha Tiwari",
+        "counterparty_account": "35952056100679",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_50278ec2",
+        "customer_id": "cust_san_040",
+        "amount_inr": 336813.0,
+        "timestamp": "2024-10-15T09:00:00",
+        "counterparty_name": "Mahesh Jain",
+        "counterparty_account": "42624178429029",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_58389bc7",
+        "customer_id": "cust_san_040",
+        "amount_inr": 278627.0,
+        "timestamp": "2024-10-22T15:00:00",
+        "counterparty_name": "Seema Kapoor",
+        "counterparty_account": "29447161982734",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_0f7b5245",
+        "customer_id": "cust_san_040",
+        "amount_inr": 139235.0,
+        "timestamp": "2024-10-26T12:00:00",
+        "counterparty_name": "Rekha Joshi",
+        "counterparty_account": "64860673983448",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_5510f786",
+        "customer_id": "cust_san_040",
+        "amount_inr": 430164.0,
+        "timestamp": "2024-10-27T10:00:00",
+        "counterparty_name": "Sumit Singh",
+        "counterparty_account": "02589632174357",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6db06ad8",
+        "customer_id": "cust_san_040",
+        "amount_inr": 498129.0,
+        "timestamp": "2024-10-29T09:00:00",
+        "counterparty_name": "Sudha Verma",
+        "counterparty_account": "80186774037842",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_76737d16",
+        "customer_id": "cust_san_040",
+        "amount_inr": 354219.0,
+        "timestamp": "2024-10-31T10:00:00",
+        "counterparty_name": "Rohit Patel",
+        "counterparty_account": "86190254760220",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_28d217d6",
+        "customer_id": "cust_san_040",
+        "amount_inr": 240397.0,
+        "timestamp": "2024-11-01T14:00:00",
+        "counterparty_name": "Sita Kumar",
+        "counterparty_account": "39209085510740",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_b2d995fa",
+        "customer_id": "cust_san_040",
+        "amount_inr": 217925.0,
+        "timestamp": "2024-11-07T18:00:00",
+        "counterparty_name": "Radha Dubey",
+        "counterparty_account": "12012275950026",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_36eff201",
+        "customer_id": "cust_san_040",
+        "amount_inr": 403221.0,
+        "timestamp": "2024-11-13T09:00:00",
+        "counterparty_name": "Dinesh Nair",
+        "counterparty_account": "25947950740717",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_94bfe660",
+        "customer_id": "cust_san_040",
+        "amount_inr": 380734.0,
+        "timestamp": "2024-11-18T12:00:00",
+        "counterparty_name": "Ajay Pandey",
+        "counterparty_account": "53006776255032",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_20453d2d",
+        "customer_id": "cust_san_040",
+        "amount_inr": 366774.0,
+        "timestamp": "2024-11-19T18:00:00",
+        "counterparty_name": "Sunita Sharma",
+        "counterparty_account": "03608941184913",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Bashir Ahmad Zahed, Sergei Volkov, Omar Sheikh Qureshi."
+  },
+  {
+    "case_id": "case_san_041",
+    "customer": {
+      "id": "cust_san_041",
+      "name": "Rekha Patel",
+      "business_type": "individual",
+      "account_open_date": "2018-05-23T00:00:00",
+      "stated_monthly_turnover_inr": 6100000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_40d6c0ac",
+        "customer_id": "cust_san_041",
+        "amount_inr": 796941.0,
+        "timestamp": "2024-01-24T09:00:00",
+        "counterparty_name": "Khalid Al-Rashidi",
+        "counterparty_account": "30211667329045",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f20d3aea",
+        "customer_id": "cust_san_041",
+        "amount_inr": 327459.0,
+        "timestamp": "2024-02-04T17:00:00",
+        "counterparty_name": "Anita Dubey",
+        "counterparty_account": "20414474328116",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_8e75b4bd",
+        "customer_id": "cust_san_041",
+        "amount_inr": 1986781.0,
+        "timestamp": "2024-02-15T16:00:00",
+        "counterparty_name": "Tariq Mahmood Chaudhry",
+        "counterparty_account": "87592129964260",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_cdd9f251",
+        "customer_id": "cust_san_041",
+        "amount_inr": 534327.0,
+        "timestamp": "2024-02-16T12:00:00",
+        "counterparty_name": "Pavlo Kovalenko",
+        "counterparty_account": "20275582147709",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2064774f",
+        "customer_id": "cust_san_041",
+        "amount_inr": 193692.0,
+        "timestamp": "2024-02-22T18:00:00",
+        "counterparty_name": "Manoj Pandey",
+        "counterparty_account": "02030423227752",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_46af357c",
+        "customer_id": "cust_san_041",
+        "amount_inr": 201837.0,
+        "timestamp": "2024-02-24T11:00:00",
+        "counterparty_name": "Tarun Desai",
+        "counterparty_account": "54018227200283",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_b0d3ce6f",
+        "customer_id": "cust_san_041",
+        "amount_inr": 303306.0,
+        "timestamp": "2024-03-04T16:00:00",
+        "counterparty_name": "Sanjay Desai",
+        "counterparty_account": "16880053789318",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_e604d38c",
+        "customer_id": "cust_san_041",
+        "amount_inr": 369617.0,
+        "timestamp": "2024-03-13T10:00:00",
+        "counterparty_name": "Mohit Iyer",
+        "counterparty_account": "28165064630059",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_39c42eed",
+        "customer_id": "cust_san_041",
+        "amount_inr": 5575.0,
+        "timestamp": "2024-03-15T16:00:00",
+        "counterparty_name": "Sunita Kumar",
+        "counterparty_account": "80236219215818",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_182ebfd2",
+        "customer_id": "cust_san_041",
+        "amount_inr": 305338.0,
+        "timestamp": "2024-03-15T16:00:00",
+        "counterparty_name": "Saroj Sharma",
+        "counterparty_account": "61186385588195",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Khalid Al-Rashidi, Tariq Mahmood Chaudhry, Pavlo Kovalenko."
+  },
+  {
+    "case_id": "case_san_042",
+    "customer": {
+      "id": "cust_san_042",
+      "name": "Sen Realtors",
+      "business_type": "real_estate",
+      "account_open_date": "2019-12-30T00:00:00",
+      "stated_monthly_turnover_inr": 11700000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_05ddf023",
+        "customer_id": "cust_san_042",
+        "amount_inr": 1176734.0,
+        "timestamp": "2024-11-02T11:00:00",
+        "counterparty_name": "Pavlo Kovalenko",
+        "counterparty_account": "29161746902983",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_0ebf1523",
+        "customer_id": "cust_san_042",
+        "amount_inr": 470233.0,
+        "timestamp": "2024-11-03T13:00:00",
+        "counterparty_name": "Yogesh Tiwari",
+        "counterparty_account": "58333430311587",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_62171534",
+        "customer_id": "cust_san_042",
+        "amount_inr": 217788.0,
+        "timestamp": "2024-11-30T14:00:00",
+        "counterparty_name": "Manish Chatterjee",
+        "counterparty_account": "36219865504944",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_af52d77c",
+        "customer_id": "cust_san_042",
+        "amount_inr": 162550.0,
+        "timestamp": "2024-12-06T09:00:00",
+        "counterparty_name": "Paresh Bose",
+        "counterparty_account": "49339650496273",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9ebe22d3",
+        "customer_id": "cust_san_042",
+        "amount_inr": 499986.0,
+        "timestamp": "2024-12-15T09:00:00",
+        "counterparty_name": "Ankit Yadav",
+        "counterparty_account": "66229131670805",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_16a54aa0",
+        "customer_id": "cust_san_042",
+        "amount_inr": 72882.0,
+        "timestamp": "2024-12-19T11:00:00",
+        "counterparty_name": "Harish Mehta",
+        "counterparty_account": "42436258542188",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9f6e292a",
+        "customer_id": "cust_san_042",
+        "amount_inr": 338568.0,
+        "timestamp": "2024-12-21T09:00:00",
+        "counterparty_name": "Milan Jain",
+        "counterparty_account": "62341996433853",
+        "direction": "credit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Pavlo Kovalenko."
+  },
+  {
+    "case_id": "case_san_043",
+    "customer": {
+      "id": "cust_san_043",
+      "name": "Iyer Garments",
+      "business_type": "textile",
+      "account_open_date": "2019-07-01T00:00:00",
+      "stated_monthly_turnover_inr": 1200000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_988fd26b",
+        "customer_id": "cust_san_043",
+        "amount_inr": 1115448.0,
+        "timestamp": "2024-08-29T14:00:00",
+        "counterparty_name": "Mohammad Aziz Karimov",
+        "counterparty_account": "25596647213074",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_d04cc4db",
+        "customer_id": "cust_san_043",
+        "amount_inr": 6785.0,
+        "timestamp": "2024-09-03T13:00:00",
+        "counterparty_name": "Ramesh Gupta",
+        "counterparty_account": "78105580002722",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e01473df",
+        "customer_id": "cust_san_043",
+        "amount_inr": 342020.0,
+        "timestamp": "2024-09-06T09:00:00",
+        "counterparty_name": "Sanjay Saxena",
+        "counterparty_account": "23777296656337",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_b64c99ed",
+        "customer_id": "cust_san_043",
+        "amount_inr": 1097274.0,
+        "timestamp": "2024-09-06T16:00:00",
+        "counterparty_name": "Nikolai Gromov",
+        "counterparty_account": "45353659746698",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2777fe38",
+        "customer_id": "cust_san_043",
+        "amount_inr": 68765.0,
+        "timestamp": "2024-09-08T15:00:00",
+        "counterparty_name": "Nisha Menon",
+        "counterparty_account": "86209297352595",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_6ce87f51",
+        "customer_id": "cust_san_043",
+        "amount_inr": 39452.0,
+        "timestamp": "2024-09-15T11:00:00",
+        "counterparty_name": "Asha Sen",
+        "counterparty_account": "09439136817203",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1f5ec4d2",
+        "customer_id": "cust_san_043",
+        "amount_inr": 130618.0,
+        "timestamp": "2024-09-19T18:00:00",
+        "counterparty_name": "Sunita Thakur",
+        "counterparty_account": "40489332614543",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_e7ebff3f",
+        "customer_id": "cust_san_043",
+        "amount_inr": 851757.0,
+        "timestamp": "2024-09-26T10:00:00",
+        "counterparty_name": "Omar Sheikh Qureshi",
+        "counterparty_account": "42125450809594",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_280b0996",
+        "customer_id": "cust_san_043",
+        "amount_inr": 198126.0,
+        "timestamp": "2024-10-12T17:00:00",
+        "counterparty_name": "Paresh Kumar",
+        "counterparty_account": "35426874470173",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c533af2d",
+        "customer_id": "cust_san_043",
+        "amount_inr": 381645.0,
+        "timestamp": "2024-10-17T09:00:00",
+        "counterparty_name": "Paresh Mukherjee",
+        "counterparty_account": "73100817852211",
+        "direction": "credit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Nikolai Gromov, Omar Sheikh Qureshi, Mohammad Aziz Karimov."
+  },
+  {
+    "case_id": "case_san_044",
+    "customer": {
+      "id": "cust_san_044",
+      "name": "Joshi Properties",
+      "business_type": "real_estate",
+      "account_open_date": "2018-11-05T00:00:00",
+      "stated_monthly_turnover_inr": 6500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_a7f57ee0",
+        "customer_id": "cust_san_044",
+        "amount_inr": 217350.0,
+        "timestamp": "2024-08-17T15:00:00",
+        "counterparty_name": "Meena Pillai",
+        "counterparty_account": "06373118046741",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_ad8264e3",
+        "customer_id": "cust_san_044",
+        "amount_inr": 212841.0,
+        "timestamp": "2024-08-20T14:00:00",
+        "counterparty_name": "Sudha Kapoor",
+        "counterparty_account": "82176484673574",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_eb6db35f",
+        "customer_id": "cust_san_044",
+        "amount_inr": 73694.0,
+        "timestamp": "2024-08-23T12:00:00",
+        "counterparty_name": "Sumit Joshi",
+        "counterparty_account": "80194425892225",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f324a4fd",
+        "customer_id": "cust_san_044",
+        "amount_inr": 438939.0,
+        "timestamp": "2024-08-29T09:00:00",
+        "counterparty_name": "Varun Nair",
+        "counterparty_account": "41852013626084",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_4588d5c7",
+        "customer_id": "cust_san_044",
+        "amount_inr": 382686.0,
+        "timestamp": "2024-08-31T10:00:00",
+        "counterparty_name": "Mahesh Pillai",
+        "counterparty_account": "09196939578752",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_1031a582",
+        "customer_id": "cust_san_044",
+        "amount_inr": 353111.0,
+        "timestamp": "2024-09-08T12:00:00",
+        "counterparty_name": "Deepa Desai",
+        "counterparty_account": "54705549121516",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_498e6ba4",
+        "customer_id": "cust_san_044",
+        "amount_inr": 448677.0,
+        "timestamp": "2024-09-11T17:00:00",
+        "counterparty_name": "Pavlo Kovalenko",
+        "counterparty_account": "57353236618507",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6f41bc23",
+        "customer_id": "cust_san_044",
+        "amount_inr": 36561.0,
+        "timestamp": "2024-09-13T09:00:00",
+        "counterparty_name": "Anita Verma",
+        "counterparty_account": "20197121241393",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c3bf7d44",
+        "customer_id": "cust_san_044",
+        "amount_inr": 423324.0,
+        "timestamp": "2024-09-21T11:00:00",
+        "counterparty_name": "Anita Das",
+        "counterparty_account": "07598897865339",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_910813b5",
+        "customer_id": "cust_san_044",
+        "amount_inr": 399210.0,
+        "timestamp": "2024-09-28T15:00:00",
+        "counterparty_name": "Nisha Chatterjee",
+        "counterparty_account": "76098731267731",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_2ffbe857",
+        "customer_id": "cust_san_044",
+        "amount_inr": 53044.0,
+        "timestamp": "2024-10-11T09:00:00",
+        "counterparty_name": "Nitin Sen",
+        "counterparty_account": "69718236010712",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_c51c5229",
+        "customer_id": "cust_san_044",
+        "amount_inr": 476916.0,
+        "timestamp": "2024-10-11T13:00:00",
+        "counterparty_name": "Amit Shah",
+        "counterparty_account": "65430895231202",
+        "direction": "credit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Pavlo Kovalenko."
+  },
+  {
+    "case_id": "case_san_045",
+    "customer": {
+      "id": "cust_san_045",
+      "name": "Singh Works",
+      "business_type": "sme",
+      "account_open_date": "2022-09-21T00:00:00",
+      "stated_monthly_turnover_inr": 15500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_edcc6a95",
+        "customer_id": "cust_san_045",
+        "amount_inr": 10327.0,
+        "timestamp": "2024-06-29T13:00:00",
+        "counterparty_name": "Vikas Bose",
+        "counterparty_account": "12939002512137",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_53aab43a",
+        "customer_id": "cust_san_045",
+        "amount_inr": 72679.0,
+        "timestamp": "2024-06-30T11:00:00",
+        "counterparty_name": "Sunita Desai",
+        "counterparty_account": "48534655792203",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_5e35b247",
+        "customer_id": "cust_san_045",
+        "amount_inr": 112944.0,
+        "timestamp": "2024-06-30T14:00:00",
+        "counterparty_name": "Seema Sen",
+        "counterparty_account": "51282763643159",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f1db228c",
+        "customer_id": "cust_san_045",
+        "amount_inr": 325857.0,
+        "timestamp": "2024-07-04T15:00:00",
+        "counterparty_name": "Deepa Yadav",
+        "counterparty_account": "44974394640882",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_38a6484c",
+        "customer_id": "cust_san_045",
+        "amount_inr": 161418.0,
+        "timestamp": "2024-07-09T13:00:00",
+        "counterparty_name": "Sanjay Nair",
+        "counterparty_account": "11388503423622",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_9afe08a7",
+        "customer_id": "cust_san_045",
+        "amount_inr": 81600.0,
+        "timestamp": "2024-07-11T09:00:00",
+        "counterparty_name": "Seema Pillai",
+        "counterparty_account": "73988941321097",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_90a6dffe",
+        "customer_id": "cust_san_045",
+        "amount_inr": 371493.0,
+        "timestamp": "2024-07-11T16:00:00",
+        "counterparty_name": "Amit Gupta",
+        "counterparty_account": "69277119529635",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_e2832379",
+        "customer_id": "cust_san_045",
+        "amount_inr": 1250401.0,
+        "timestamp": "2024-07-11T18:00:00",
+        "counterparty_name": "Mohammad Aziz Karimov",
+        "counterparty_account": "16365604500635",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_01c363cd",
+        "customer_id": "cust_san_045",
+        "amount_inr": 643050.0,
+        "timestamp": "2024-07-15T16:00:00",
+        "counterparty_name": "Nikolai Gromov",
+        "counterparty_account": "00268764486764",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_2ee066ca",
+        "customer_id": "cust_san_045",
+        "amount_inr": 22556.0,
+        "timestamp": "2024-08-20T12:00:00",
+        "counterparty_name": "Amit Rao",
+        "counterparty_account": "46310437968680",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_54ad2b86",
+        "customer_id": "cust_san_045",
+        "amount_inr": 179754.0,
+        "timestamp": "2024-08-20T15:00:00",
+        "counterparty_name": "Sita Saxena",
+        "counterparty_account": "95708619931458",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_64ba82bf",
+        "customer_id": "cust_san_045",
+        "amount_inr": 157033.0,
+        "timestamp": "2024-08-24T17:00:00",
+        "counterparty_name": "Nisha Kapoor",
+        "counterparty_account": "54663454434414",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Nikolai Gromov, Mohammad Aziz Karimov."
+  },
+  {
+    "case_id": "case_san_046",
+    "customer": {
+      "id": "cust_san_046",
+      "name": "Nair General Store",
+      "business_type": "retail",
+      "account_open_date": "2021-03-11T00:00:00",
+      "stated_monthly_turnover_inr": 14600000.0,
+      "prior_flags": 1
+    },
+    "transactions": [
+      {
+        "id": "txn_fdd35eea",
+        "customer_id": "cust_san_046",
+        "amount_inr": 84061.0,
+        "timestamp": "2024-07-18T14:00:00",
+        "counterparty_name": "Viktor Petrov",
+        "counterparty_account": "13303033467711",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_0abe20fe",
+        "customer_id": "cust_san_046",
+        "amount_inr": 73152.0,
+        "timestamp": "2024-07-19T10:00:00",
+        "counterparty_name": "Ramesh Shah",
+        "counterparty_account": "35869017074039",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_26d18922",
+        "customer_id": "cust_san_046",
+        "amount_inr": 154861.0,
+        "timestamp": "2024-07-21T10:00:00",
+        "counterparty_name": "Asha Mukherjee",
+        "counterparty_account": "95596363726294",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1cecb536",
+        "customer_id": "cust_san_046",
+        "amount_inr": 100309.0,
+        "timestamp": "2024-07-24T09:00:00",
+        "counterparty_name": "Radha Reddy",
+        "counterparty_account": "62654963308334",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e18e763b",
+        "customer_id": "cust_san_046",
+        "amount_inr": 381281.0,
+        "timestamp": "2024-07-24T11:00:00",
+        "counterparty_name": "Ajay Mehta",
+        "counterparty_account": "50764871775461",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3c282939",
+        "customer_id": "cust_san_046",
+        "amount_inr": 482225.0,
+        "timestamp": "2024-07-28T18:00:00",
+        "counterparty_name": "Nitin Chauhan",
+        "counterparty_account": "03420284719017",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_996680b3",
+        "customer_id": "cust_san_046",
+        "amount_inr": 159364.0,
+        "timestamp": "2024-08-02T16:00:00",
+        "counterparty_name": "Suresh Rao",
+        "counterparty_account": "95047020596851",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_107d4224",
+        "customer_id": "cust_san_046",
+        "amount_inr": 1406088.0,
+        "timestamp": "2024-08-04T16:00:00",
+        "counterparty_name": "Khalid Al-Rashidi",
+        "counterparty_account": "74304350238502",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_99222b37",
+        "customer_id": "cust_san_046",
+        "amount_inr": 84194.0,
+        "timestamp": "2024-08-05T10:00:00",
+        "counterparty_name": "Seema Chauhan",
+        "counterparty_account": "51712227643387",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_640e50e7",
+        "customer_id": "cust_san_046",
+        "amount_inr": 389711.0,
+        "timestamp": "2024-08-09T17:00:00",
+        "counterparty_name": "Farooq Ibrahim Siddiqui",
+        "counterparty_account": "52752332829302",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_2459bf96",
+        "customer_id": "cust_san_046",
+        "amount_inr": 477332.0,
+        "timestamp": "2024-08-10T16:00:00",
+        "counterparty_name": "Radha Sharma",
+        "counterparty_account": "79955302453012",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c379b61d",
+        "customer_id": "cust_san_046",
+        "amount_inr": 223710.0,
+        "timestamp": "2024-08-17T16:00:00",
+        "counterparty_name": "Girish Rao",
+        "counterparty_account": "91854880644200",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_156de288",
+        "customer_id": "cust_san_046",
+        "amount_inr": 147926.0,
+        "timestamp": "2024-08-19T17:00:00",
+        "counterparty_name": "Rohit Mishra",
+        "counterparty_account": "22121548158268",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_55d145d2",
+        "customer_id": "cust_san_046",
+        "amount_inr": 353169.0,
+        "timestamp": "2024-08-31T11:00:00",
+        "counterparty_name": "Mukesh Bose",
+        "counterparty_account": "49808513313800",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9fb8d4b8",
+        "customer_id": "cust_san_046",
+        "amount_inr": 325904.0,
+        "timestamp": "2024-09-01T14:00:00",
+        "counterparty_name": "Amit Das",
+        "counterparty_account": "26632956342777",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6b19b289",
+        "customer_id": "cust_san_046",
+        "amount_inr": 172198.0,
+        "timestamp": "2024-09-02T11:00:00",
+        "counterparty_name": "Geeta Menon",
+        "counterparty_account": "16581292059229",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_5c1947e1",
+        "customer_id": "cust_san_046",
+        "amount_inr": 331263.0,
+        "timestamp": "2024-09-02T18:00:00",
+        "counterparty_name": "Meena Chauhan",
+        "counterparty_account": "83872725812259",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c21ca2c1",
+        "customer_id": "cust_san_046",
+        "amount_inr": 26025.0,
+        "timestamp": "2024-09-03T18:00:00",
+        "counterparty_name": "Sanjay Pillai",
+        "counterparty_account": "84482373379121",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Khalid Al-Rashidi, Farooq Ibrahim Siddiqui, Viktor Petrov."
+  },
+  {
+    "case_id": "case_san_047",
+    "customer": {
+      "id": "cust_san_047",
+      "name": "Choudhury Fabrics",
+      "business_type": "textile",
+      "account_open_date": "2020-06-24T00:00:00",
+      "stated_monthly_turnover_inr": 5000000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_292faba1",
+        "customer_id": "cust_san_047",
+        "amount_inr": 239101.0,
+        "timestamp": "2024-09-11T15:00:00",
+        "counterparty_name": "Seema Thakur",
+        "counterparty_account": "83180036660200",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_f21b76e3",
+        "customer_id": "cust_san_047",
+        "amount_inr": 1142156.0,
+        "timestamp": "2024-09-12T15:00:00",
+        "counterparty_name": "Reza Tehrani Moghaddam",
+        "counterparty_account": "64196234219262",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_48c95572",
+        "customer_id": "cust_san_047",
+        "amount_inr": 44375.0,
+        "timestamp": "2024-09-14T11:00:00",
+        "counterparty_name": "Suresh Rao",
+        "counterparty_account": "29483147891179",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a9f05ec4",
+        "customer_id": "cust_san_047",
+        "amount_inr": 294485.0,
+        "timestamp": "2024-09-21T10:00:00",
+        "counterparty_name": "Rajesh Singh",
+        "counterparty_account": "82339218835279",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8b41bcd9",
+        "customer_id": "cust_san_047",
+        "amount_inr": 7822.0,
+        "timestamp": "2024-09-24T12:00:00",
+        "counterparty_name": "Pankaj Mishra",
+        "counterparty_account": "63105052438380",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2bc12824",
+        "customer_id": "cust_san_047",
+        "amount_inr": 495375.0,
+        "timestamp": "2024-09-24T17:00:00",
+        "counterparty_name": "Sanjay Mishra",
+        "counterparty_account": "99007686276332",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_d086d4d6",
+        "customer_id": "cust_san_047",
+        "amount_inr": 447413.0,
+        "timestamp": "2024-10-07T12:00:00",
+        "counterparty_name": "Tarun Banerjee",
+        "counterparty_account": "76185186267136",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f019eca2",
+        "customer_id": "cust_san_047",
+        "amount_inr": 386850.0,
+        "timestamp": "2024-10-26T10:00:00",
+        "counterparty_name": "Kiran Desai",
+        "counterparty_account": "06776106592088",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Reza Tehrani Moghaddam."
+  },
+  {
+    "case_id": "case_san_048",
+    "customer": {
+      "id": "cust_san_048",
+      "name": "Thakur Industries",
+      "business_type": "sme",
+      "account_open_date": "2022-04-27T00:00:00",
+      "stated_monthly_turnover_inr": 17200000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_9798b4e0",
+        "customer_id": "cust_san_048",
+        "amount_inr": 116596.0,
+        "timestamp": "2024-03-08T14:00:00",
+        "counterparty_name": "Saroj Banerjee",
+        "counterparty_account": "95305641849378",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f84dca4b",
+        "customer_id": "cust_san_048",
+        "amount_inr": 909311.0,
+        "timestamp": "2024-03-09T16:00:00",
+        "counterparty_name": "Pavlo Kovalenko",
+        "counterparty_account": "96983845720266",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_99f8d290",
+        "customer_id": "cust_san_048",
+        "amount_inr": 29958.0,
+        "timestamp": "2024-03-20T13:00:00",
+        "counterparty_name": "Pooja Rao",
+        "counterparty_account": "90674568652406",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9c9425d8",
+        "customer_id": "cust_san_048",
+        "amount_inr": 823092.0,
+        "timestamp": "2024-03-28T15:00:00",
+        "counterparty_name": "Ali Hassan Mousa",
+        "counterparty_account": "59125734989925",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_2ddc3792",
+        "customer_id": "cust_san_048",
+        "amount_inr": 212989.0,
+        "timestamp": "2024-03-31T13:00:00",
+        "counterparty_name": "Nitin Agarwal",
+        "counterparty_account": "48458130889830",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_98523535",
+        "customer_id": "cust_san_048",
+        "amount_inr": 177952.0,
+        "timestamp": "2024-04-05T13:00:00",
+        "counterparty_name": "Ajay Srivastava",
+        "counterparty_account": "74185630275000",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_69343f60",
+        "customer_id": "cust_san_048",
+        "amount_inr": 44462.0,
+        "timestamp": "2024-04-07T12:00:00",
+        "counterparty_name": "Reema Choudhury",
+        "counterparty_account": "73478536988164",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_02874139",
+        "customer_id": "cust_san_048",
+        "amount_inr": 412060.0,
+        "timestamp": "2024-04-12T17:00:00",
+        "counterparty_name": "Suresh Chauhan",
+        "counterparty_account": "92860521026270",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_bcf8fa8f",
+        "customer_id": "cust_san_048",
+        "amount_inr": 122186.0,
+        "timestamp": "2024-04-13T13:00:00",
+        "counterparty_name": "Ajay Bose",
+        "counterparty_account": "42990747296694",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_8ffbcc0f",
+        "customer_id": "cust_san_048",
+        "amount_inr": 37992.0,
+        "timestamp": "2024-04-23T16:00:00",
+        "counterparty_name": "Deepa Chatterjee",
+        "counterparty_account": "08974748599464",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_98ec5b6a",
+        "customer_id": "cust_san_048",
+        "amount_inr": 79324.0,
+        "timestamp": "2024-04-25T11:00:00",
+        "counterparty_name": "Sunita Nair",
+        "counterparty_account": "67256222190533",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_c2dc09c1",
+        "customer_id": "cust_san_048",
+        "amount_inr": 353633.0,
+        "timestamp": "2024-04-29T13:00:00",
+        "counterparty_name": "Naresh Das",
+        "counterparty_account": "70187260013651",
+        "direction": "credit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Pavlo Kovalenko, Ali Hassan Mousa."
+  },
+  {
+    "case_id": "case_san_049",
+    "customer": {
+      "id": "cust_san_049",
+      "name": "Verma Resorts",
+      "business_type": "hospitality",
+      "account_open_date": "2020-10-18T00:00:00",
+      "stated_monthly_turnover_inr": 11700000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_1583367e",
+        "customer_id": "cust_san_049",
+        "amount_inr": 217902.0,
+        "timestamp": "2024-07-25T17:00:00",
+        "counterparty_name": "Asha Jain",
+        "counterparty_account": "71050805491477",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_c5ba8420",
+        "customer_id": "cust_san_049",
+        "amount_inr": 166090.0,
+        "timestamp": "2024-08-04T16:00:00",
+        "counterparty_name": "Rohit Iyer",
+        "counterparty_account": "24784171594973",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7d033875",
+        "customer_id": "cust_san_049",
+        "amount_inr": 141292.0,
+        "timestamp": "2024-08-05T18:00:00",
+        "counterparty_name": "Sumit Gupta",
+        "counterparty_account": "88033183611338",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2a8daa45",
+        "customer_id": "cust_san_049",
+        "amount_inr": 748387.0,
+        "timestamp": "2024-08-10T14:00:00",
+        "counterparty_name": "Yusuf Bello Adeyemi",
+        "counterparty_account": "90036221173277",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_390bde0d",
+        "customer_id": "cust_san_049",
+        "amount_inr": 1485991.0,
+        "timestamp": "2024-08-12T14:00:00",
+        "counterparty_name": "Liang Xiaoming",
+        "counterparty_account": "96521383507124",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_88f25856",
+        "customer_id": "cust_san_049",
+        "amount_inr": 486529.0,
+        "timestamp": "2024-08-25T11:00:00",
+        "counterparty_name": "Naresh Gupta",
+        "counterparty_account": "28152787304862",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_b106c45a",
+        "customer_id": "cust_san_049",
+        "amount_inr": 170659.0,
+        "timestamp": "2024-08-30T10:00:00",
+        "counterparty_name": "Asha Tiwari",
+        "counterparty_account": "46535378018915",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7f1ed1ea",
+        "customer_id": "cust_san_049",
+        "amount_inr": 227746.0,
+        "timestamp": "2024-08-30T16:00:00",
+        "counterparty_name": "Amit Reddy",
+        "counterparty_account": "17762969143362",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_58b48e1d",
+        "customer_id": "cust_san_049",
+        "amount_inr": 228136.0,
+        "timestamp": "2024-09-05T13:00:00",
+        "counterparty_name": "Milan Srivastava",
+        "counterparty_account": "85585229425251",
+        "direction": "credit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "sanctions_hit",
+    "notes": "Transaction(s) with sanctioned counterpart(ies): Liang Xiaoming, Yusuf Bello Adeyemi."
+  },
+  {
+    "case_id": "case_rpt_040",
+    "customer": {
+      "id": "cust_rpt_040",
+      "name": "Jain Logistics",
+      "business_type": "logistics",
+      "account_open_date": "2019-09-29T00:00:00",
+      "stated_monthly_turnover_inr": 19500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_70d294b7",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 4524527.0,
+        "timestamp": "2024-06-17T10:00:00",
+        "counterparty_name": "Mehta Pvt Ltd",
+        "counterparty_account": "31234388804851",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_3ccfd7d2",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 232220.19,
+        "timestamp": "2024-06-17T22:58:30.001635",
+        "counterparty_name": "Kavita Kapoor",
+        "counterparty_account": "13427557672991",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_825d22b4",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 127677.06,
+        "timestamp": "2024-06-18T01:40:03.692075",
+        "counterparty_name": "Mahesh Das",
+        "counterparty_account": "16291087392219",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_bf9cd75c",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 1255159.37,
+        "timestamp": "2024-06-18T07:17:20.854676",
+        "counterparty_name": "Sunita Pillai",
+        "counterparty_account": "44318343695310",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c96ec149",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 1685976.27,
+        "timestamp": "2024-06-18T14:41:31.145913",
+        "counterparty_name": "Nitin Yadav",
+        "counterparty_account": "57376710529877",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d9b69c3f",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 175069.21,
+        "timestamp": "2024-06-19T08:11:10.758428",
+        "counterparty_name": "Rajesh Das",
+        "counterparty_account": "99153044500202",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7bdae7c8",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 12302.76,
+        "timestamp": "2024-06-19T09:40:39.157123",
+        "counterparty_name": "Vijay Mishra",
+        "counterparty_account": "71150629179265",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3e792193",
+        "customer_id": "cust_rpt_040",
+        "amount_inr": 572502.62,
+        "timestamp": "2024-06-19T15:12:37.760962",
+        "counterparty_name": "Sudha Banerjee",
+        "counterparty_account": "87890345029586",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹45.2L followed by 7 debits to new payees within 72h, totalling ₹40.6L (90% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_041",
+    "customer": {
+      "id": "cust_rpt_041",
+      "name": "Chatterjee Logistics",
+      "business_type": "logistics",
+      "account_open_date": "2019-05-02T00:00:00",
+      "stated_monthly_turnover_inr": 19900000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_af51f151",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 2641692.0,
+        "timestamp": "2024-01-25T09:00:00",
+        "counterparty_name": "Shukla Corp",
+        "counterparty_account": "75418236881013",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_891119e8",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 142865.46,
+        "timestamp": "2024-01-25T09:42:26.864909",
+        "counterparty_name": "Geeta Joshi",
+        "counterparty_account": "82532083168163",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_14aed155",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 408854.32,
+        "timestamp": "2024-01-25T11:08:33.245472",
+        "counterparty_name": "Mukesh Gupta",
+        "counterparty_account": "41070716348508",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d897de9a",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 235512.26,
+        "timestamp": "2024-01-25T16:29:22.690470",
+        "counterparty_name": "Sumit Sen",
+        "counterparty_account": "87402234614466",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7572765a",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 88260.26,
+        "timestamp": "2024-01-25T16:53:53.407495",
+        "counterparty_name": "Reema Nair",
+        "counterparty_account": "08511919445456",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_58180fb9",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 77854.03,
+        "timestamp": "2024-01-25T19:33:55.925088",
+        "counterparty_name": "Reema Desai",
+        "counterparty_account": "56192767137718",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_ad3e9fa2",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 27487.42,
+        "timestamp": "2024-01-26T02:22:00.086668",
+        "counterparty_name": "Manish Sharma",
+        "counterparty_account": "17369078947672",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_37e9df35",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 774517.61,
+        "timestamp": "2024-01-26T15:37:21.602367",
+        "counterparty_name": "Meena Jain",
+        "counterparty_account": "04117614215248",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_bcb4067d",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 305790.75,
+        "timestamp": "2024-01-27T04:10:06.778716",
+        "counterparty_name": "Rohit Shah",
+        "counterparty_account": "63647046568969",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3d9290f0",
+        "customer_id": "cust_rpt_041",
+        "amount_inr": 315732.47,
+        "timestamp": "2024-01-27T14:45:21.355856",
+        "counterparty_name": "Tarun Mukherjee",
+        "counterparty_account": "95612667830557",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹26.4L followed by 9 debits to new payees within 72h, totalling ₹23.8L (90% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_042",
+    "customer": {
+      "id": "cust_rpt_042",
+      "name": "Verma Properties",
+      "business_type": "real_estate",
+      "account_open_date": "2020-02-12T00:00:00",
+      "stated_monthly_turnover_inr": 12800000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_7c861c03",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 1512540.0,
+        "timestamp": "2024-04-28T09:00:00",
+        "counterparty_name": "Thakur Pvt Ltd",
+        "counterparty_account": "93631592291270",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_8bd959db",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 203831.22,
+        "timestamp": "2024-04-28T18:19:15.442317",
+        "counterparty_name": "Priya Jain",
+        "counterparty_account": "65658189810617",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_81d2645b",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 136943.18,
+        "timestamp": "2024-04-29T00:58:19.994364",
+        "counterparty_name": "Neha Mukherjee",
+        "counterparty_account": "11938999068201",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_c11aa7ba",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 212023.22,
+        "timestamp": "2024-04-29T04:30:39.680200",
+        "counterparty_name": "Kiran Pillai",
+        "counterparty_account": "04903729545858",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_183f1aa9",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 457354.15,
+        "timestamp": "2024-04-29T14:21:11.311797",
+        "counterparty_name": "Sumit Nair",
+        "counterparty_account": "63129755726169",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8378dd18",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 64088.49,
+        "timestamp": "2024-04-29T17:34:04.964703",
+        "counterparty_name": "Dinesh Srivastava",
+        "counterparty_account": "24718301817960",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_fdb94388",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 73539.92,
+        "timestamp": "2024-04-29T20:58:15.480791",
+        "counterparty_name": "Sumit Sharma",
+        "counterparty_account": "75321633613179",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_9ce1e6a5",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 18674.67,
+        "timestamp": "2024-04-30T09:34:38.309650",
+        "counterparty_name": "Arun Pillai",
+        "counterparty_account": "84974997990522",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_ae19e2b4",
+        "customer_id": "cust_rpt_042",
+        "amount_inr": 118409.44,
+        "timestamp": "2024-04-30T10:50:02.277658",
+        "counterparty_name": "Rohit Pillai",
+        "counterparty_account": "99812743922551",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹15.1L followed by 8 debits to new payees within 72h, totalling ₹12.8L (85% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_043",
+    "customer": {
+      "id": "cust_rpt_043",
+      "name": "Singh Transport",
+      "business_type": "logistics",
+      "account_open_date": "2021-12-05T00:00:00",
+      "stated_monthly_turnover_inr": 7400000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_e5e55049",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 3838959.0,
+        "timestamp": "2024-06-14T09:00:00",
+        "counterparty_name": "Chauhan Corp",
+        "counterparty_account": "21236018639945",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_990a74f1",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 650217.01,
+        "timestamp": "2024-06-14T10:06:57.831048",
+        "counterparty_name": "Ramesh Yadav",
+        "counterparty_account": "68590964598724",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_73ec1831",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 50432.97,
+        "timestamp": "2024-06-14T23:08:23.181186",
+        "counterparty_name": "Sumit Desai",
+        "counterparty_account": "07217340242224",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_df63b4e9",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 194719.18,
+        "timestamp": "2024-06-15T06:33:13.294385",
+        "counterparty_name": "Vikas Mishra",
+        "counterparty_account": "42024350947651",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_fad911e5",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 1434258.06,
+        "timestamp": "2024-06-15T15:43:53.632699",
+        "counterparty_name": "Sunita Choudhury",
+        "counterparty_account": "56409941475398",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9c7cc702",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 30394.84,
+        "timestamp": "2024-06-16T01:25:50.296505",
+        "counterparty_name": "Saroj Gupta",
+        "counterparty_account": "92177351668113",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3ac2bf85",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 56089.92,
+        "timestamp": "2024-06-16T23:56:55.292150",
+        "counterparty_name": "Priya Saxena",
+        "counterparty_account": "06323654018144",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_09f76898",
+        "customer_id": "cust_rpt_043",
+        "amount_inr": 711296.67,
+        "timestamp": "2024-06-17T01:12:18.344970",
+        "counterparty_name": "Nisha Singh",
+        "counterparty_account": "54245190826110",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹38.4L followed by 7 debits to new payees within 72h, totalling ₹31.3L (81% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_044",
+    "customer": {
+      "id": "cust_rpt_044",
+      "name": "Nair Realtors",
+      "business_type": "real_estate",
+      "account_open_date": "2019-10-17T00:00:00",
+      "stated_monthly_turnover_inr": 5600000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_3deaa9c7",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 4642997.0,
+        "timestamp": "2024-04-02T10:00:00",
+        "counterparty_name": "Gupta Pvt Ltd",
+        "counterparty_account": "76669692295338",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7afdc081",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 624484.38,
+        "timestamp": "2024-04-02T17:47:11.980265",
+        "counterparty_name": "Manoj Das",
+        "counterparty_account": "56650518860167",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_a233b665",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 253458.08,
+        "timestamp": "2024-04-02T22:04:45.603498",
+        "counterparty_name": "Deepa Menon",
+        "counterparty_account": "89594703969645",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_ba3ab69d",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 1102504.7,
+        "timestamp": "2024-04-02T22:58:36.043242",
+        "counterparty_name": "Radha Reddy",
+        "counterparty_account": "82692855074350",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_7523b4be",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 303367.48,
+        "timestamp": "2024-04-03T15:30:33.816212",
+        "counterparty_name": "Yogesh Verma",
+        "counterparty_account": "06901497110384",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3657197b",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 488981.35,
+        "timestamp": "2024-04-03T22:36:53.174971",
+        "counterparty_name": "Anita Kapoor",
+        "counterparty_account": "44966866798994",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_f3c818b7",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 883635.11,
+        "timestamp": "2024-04-04T00:45:16.757742",
+        "counterparty_name": "Vijay Saxena",
+        "counterparty_account": "34375186694086",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_67a4bf73",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 61538.18,
+        "timestamp": "2024-04-04T05:10:00.190933",
+        "counterparty_name": "Sumit Nair",
+        "counterparty_account": "50471883009954",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_20770cc9",
+        "customer_id": "cust_rpt_044",
+        "amount_inr": 61386.54,
+        "timestamp": "2024-04-04T18:07:27.684808",
+        "counterparty_name": "Nisha Dubey",
+        "counterparty_account": "42406628346334",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹46.4L followed by 8 debits to new payees within 72h, totalling ₹37.8L (81% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_045",
+    "customer": {
+      "id": "cust_rpt_045",
+      "name": "Chauhan Builders & Developers",
+      "business_type": "real_estate",
+      "account_open_date": "2022-12-22T00:00:00",
+      "stated_monthly_turnover_inr": 7900000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_9352e5e1",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 2357358.0,
+        "timestamp": "2024-04-02T11:00:00",
+        "counterparty_name": "Shukla Corp",
+        "counterparty_account": "85045056693754",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_059077ef",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 204596.45,
+        "timestamp": "2024-04-02T12:50:42.427436",
+        "counterparty_name": "Sita Dubey",
+        "counterparty_account": "12789695193048",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3616c37c",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 190987.52,
+        "timestamp": "2024-04-03T09:05:13.796441",
+        "counterparty_name": "Sumit Chauhan",
+        "counterparty_account": "94689633181233",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_897cb965",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 1376789.93,
+        "timestamp": "2024-04-03T20:59:08.338107",
+        "counterparty_name": "Naresh Singh",
+        "counterparty_account": "92571402503857",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_83a022e0",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 161423.92,
+        "timestamp": "2024-04-04T17:08:43.664637",
+        "counterparty_name": "Naresh Tiwari",
+        "counterparty_account": "16384936806358",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_7d5ea741",
+        "customer_id": "cust_rpt_045",
+        "amount_inr": 77.7,
+        "timestamp": "2024-04-05T03:51:54.495268",
+        "counterparty_name": "Radha Joshi",
+        "counterparty_account": "75867036562036",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹23.6L followed by 5 debits to new payees within 72h, totalling ₹19.3L (82% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_046",
+    "customer": {
+      "id": "cust_rpt_046",
+      "name": "Mukherjee Logistics",
+      "business_type": "logistics",
+      "account_open_date": "2020-09-03T00:00:00",
+      "stated_monthly_turnover_inr": 11700000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_47aa2d02",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 3381116.0,
+        "timestamp": "2024-01-25T10:00:00",
+        "counterparty_name": "Shah Corp",
+        "counterparty_account": "57762626367850",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_4a5e84b3",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 330775.57,
+        "timestamp": "2024-01-25T21:09:03.867853",
+        "counterparty_name": "Saroj Choudhury",
+        "counterparty_account": "45385653523266",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_ec5e7dae",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 288890.09,
+        "timestamp": "2024-01-26T19:53:50.107897",
+        "counterparty_name": "Saroj Rao",
+        "counterparty_account": "18687047966682",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_43e01c80",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 329899.04,
+        "timestamp": "2024-01-26T20:14:51.740217",
+        "counterparty_name": "Manish Kapoor",
+        "counterparty_account": "20767514975341",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_662b901c",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 121664.59,
+        "timestamp": "2024-01-27T02:48:23.258094",
+        "counterparty_name": "Sanjay Choudhury",
+        "counterparty_account": "51181583746614",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7f12bba4",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 256908.31,
+        "timestamp": "2024-01-27T03:16:18.694967",
+        "counterparty_name": "Rajesh Tiwari",
+        "counterparty_account": "64054739862214",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d6dd12af",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 799249.62,
+        "timestamp": "2024-01-27T08:39:16.162450",
+        "counterparty_name": "Vikas Reddy",
+        "counterparty_account": "85295377403767",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_22173f70",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 16108.76,
+        "timestamp": "2024-01-27T15:03:59.615772",
+        "counterparty_name": "Manoj Verma",
+        "counterparty_account": "56599508914233",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_a6d87a72",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 366379.09,
+        "timestamp": "2024-01-27T16:03:39.811413",
+        "counterparty_name": "Mahesh Nair",
+        "counterparty_account": "30990009406565",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_429e5407",
+        "customer_id": "cust_rpt_046",
+        "amount_inr": 506546.94,
+        "timestamp": "2024-01-27T23:40:50.761360",
+        "counterparty_name": "Mukesh Sharma",
+        "counterparty_account": "70911034956119",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹33.8L followed by 9 debits to new payees within 72h, totalling ₹30.2L (89% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_047",
+    "customer": {
+      "id": "cust_rpt_047",
+      "name": "Singh Industries",
+      "business_type": "sme",
+      "account_open_date": "2022-11-29T00:00:00",
+      "stated_monthly_turnover_inr": 9500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_73792444",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 3077462.0,
+        "timestamp": "2024-07-17T09:00:00",
+        "counterparty_name": "Rao Corp",
+        "counterparty_account": "33891478524744",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c3f32de9",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 452535.27,
+        "timestamp": "2024-07-19T00:23:20.210263",
+        "counterparty_name": "Milan Kumar",
+        "counterparty_account": "00381463429242",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_d757d743",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 172367.17,
+        "timestamp": "2024-07-19T02:16:14.026901",
+        "counterparty_name": "Priya Iyer",
+        "counterparty_account": "30912185273411",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_a3400266",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 159759.98,
+        "timestamp": "2024-07-19T16:34:59.643039",
+        "counterparty_name": "Nisha Saxena",
+        "counterparty_account": "21789559909841",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c878a7ad",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 253984.37,
+        "timestamp": "2024-07-20T02:33:32.392176",
+        "counterparty_name": "Vijay Mishra",
+        "counterparty_account": "87351866477413",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_81674d9b",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 392495.99,
+        "timestamp": "2024-07-20T02:43:32.882656",
+        "counterparty_name": "Dinesh Shukla",
+        "counterparty_account": "30258534658153",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_5c6ae28e",
+        "customer_id": "cust_rpt_047",
+        "amount_inr": 1032055.99,
+        "timestamp": "2024-07-20T07:01:25.083710",
+        "counterparty_name": "Geeta Kapoor",
+        "counterparty_account": "81675923831934",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹30.8L followed by 6 debits to new payees within 72h, totalling ₹24.6L (80% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_048",
+    "customer": {
+      "id": "cust_rpt_048",
+      "name": "Chatterjee Logistics",
+      "business_type": "logistics",
+      "account_open_date": "2019-02-07T00:00:00",
+      "stated_monthly_turnover_inr": 19000000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_f3c7f5f2",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 4189024.0,
+        "timestamp": "2024-06-19T11:00:00",
+        "counterparty_name": "Iyer Ltd",
+        "counterparty_account": "15303044077811",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_224daafa",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 772578.19,
+        "timestamp": "2024-06-19T22:51:45.533619",
+        "counterparty_name": "Usha Mehta",
+        "counterparty_account": "16826822175626",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6abef130",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 389525.99,
+        "timestamp": "2024-06-20T11:43:41.762212",
+        "counterparty_name": "Reema Thakur",
+        "counterparty_account": "41910616691008",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d6e3965f",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 1133118.0,
+        "timestamp": "2024-06-20T19:55:11.690074",
+        "counterparty_name": "Asha Nair",
+        "counterparty_account": "63454182991269",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_b415e6c8",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 418735.22,
+        "timestamp": "2024-06-21T08:02:17.182395",
+        "counterparty_name": "Anita Kapoor",
+        "counterparty_account": "32200748597243",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8771aa3b",
+        "customer_id": "cust_rpt_048",
+        "amount_inr": 1024729.09,
+        "timestamp": "2024-06-22T07:16:36.645526",
+        "counterparty_name": "Nisha Banerjee",
+        "counterparty_account": "34791005932572",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹41.9L followed by 5 debits to new payees within 72h, totalling ₹37.4L (89% pass-through)."
+  },
+  {
+    "case_id": "case_rpt_049",
+    "customer": {
+      "id": "cust_rpt_049",
+      "name": "Shah Properties",
+      "business_type": "real_estate",
+      "account_open_date": "2021-06-03T00:00:00",
+      "stated_monthly_turnover_inr": 12300000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_b4dcfd71",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 2903737.0,
+        "timestamp": "2024-05-31T10:00:00",
+        "counterparty_name": "Gupta Corp",
+        "counterparty_account": "28606048022406",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3512902b",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 183622.28,
+        "timestamp": "2024-06-01T01:42:59.950229",
+        "counterparty_name": "Deepa Sharma",
+        "counterparty_account": "51489538294419",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a272ceba",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 709314.0,
+        "timestamp": "2024-06-01T04:45:34.096960",
+        "counterparty_name": "Mukesh Verma",
+        "counterparty_account": "89856643016556",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_bb27dcbb",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 30741.59,
+        "timestamp": "2024-06-01T04:55:57.717793",
+        "counterparty_name": "Manoj Shah",
+        "counterparty_account": "05347283951673",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_87e555c1",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 365167.55,
+        "timestamp": "2024-06-01T23:03:08.842929",
+        "counterparty_name": "Anita Dubey",
+        "counterparty_account": "88765699313606",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_5e1868c9",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 54566.09,
+        "timestamp": "2024-06-02T04:36:11.103151",
+        "counterparty_name": "Sanjay Joshi",
+        "counterparty_account": "82282801832353",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ba8cecfc",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 36856.84,
+        "timestamp": "2024-06-02T20:43:30.778223",
+        "counterparty_name": "Usha Agarwal",
+        "counterparty_account": "32670848868656",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_d7e58438",
+        "customer_id": "cust_rpt_049",
+        "amount_inr": 1311727.43,
+        "timestamp": "2024-06-03T01:20:18.545308",
+        "counterparty_name": "Sudha Mehta",
+        "counterparty_account": "90113860479471",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "suspicious",
+    "typology": "rapid_passthrough",
+    "notes": "Credit of ₹29.0L followed by 7 debits to new payees within 72h, totalling ₹26.9L (93% pass-through)."
+  },
+  {
+    "case_id": "case_cln_040",
+    "customer": {
+      "id": "cust_cln_040",
+      "name": "Kumar Mart",
+      "business_type": "retail",
+      "account_open_date": "2020-01-25T00:00:00",
+      "stated_monthly_turnover_inr": 18300000.0,
+      "prior_flags": 2
+    },
+    "transactions": [
+      {
+        "id": "txn_7992ec61",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2489418.0,
+        "timestamp": "2024-05-11T11:00:00",
+        "counterparty_name": "Usha Nair",
+        "counterparty_account": "21793162505532",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_a9186b4a",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2200771.0,
+        "timestamp": "2024-05-16T09:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "49262189224006",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ec37a33a",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1604708.0,
+        "timestamp": "2024-05-16T14:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "11959602769347",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_171d0b42",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 928956.0,
+        "timestamp": "2024-05-17T17:00:00",
+        "counterparty_name": "Thakur Pvt Ltd",
+        "counterparty_account": "69599112946403",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3fd58b00",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2560242.0,
+        "timestamp": "2024-05-19T18:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "37026578149635",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_d3bc4c9b",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1997931.0,
+        "timestamp": "2024-05-20T12:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "38375428846377",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_be6038a7",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1780603.0,
+        "timestamp": "2024-05-22T13:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "57318020404107",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_b0e3a7dd",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2726108.0,
+        "timestamp": "2024-05-28T13:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "72687793889491",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_42225889",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 737425.0,
+        "timestamp": "2024-06-04T12:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "48455576633542",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7ae9993c",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2391584.0,
+        "timestamp": "2024-06-08T11:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "47869104076296",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_e7ba8e10",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2117301.0,
+        "timestamp": "2024-06-16T12:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "75607302173733",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_6f44f2e2",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 631701.0,
+        "timestamp": "2024-06-18T10:00:00",
+        "counterparty_name": "Kapoor Pvt Ltd",
+        "counterparty_account": "59511203390596",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_3549f420",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 442956.0,
+        "timestamp": "2024-06-19T17:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "07008133490237",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_786d806f",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1583749.0,
+        "timestamp": "2024-06-23T16:00:00",
+        "counterparty_name": "Suresh Pillai",
+        "counterparty_account": "72827695887089",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_5ad9e1b1",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1694454.0,
+        "timestamp": "2024-07-01T10:00:00",
+        "counterparty_name": "Desai Pvt Ltd",
+        "counterparty_account": "37778424716491",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3c18ebd9",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 843984.0,
+        "timestamp": "2024-07-02T15:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "66980276448294",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_07c50cba",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 514130.0,
+        "timestamp": "2024-07-07T10:00:00",
+        "counterparty_name": "Seema Shukla",
+        "counterparty_account": "15845673137001",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2bcb4c54",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 2381730.0,
+        "timestamp": "2024-07-09T15:00:00",
+        "counterparty_name": "Thakur Pvt Ltd",
+        "counterparty_account": "51435804711800",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_058e94d2",
+        "customer_id": "cust_cln_040",
+        "amount_inr": 1817063.0,
+        "timestamp": "2024-07-10T15:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "72592501691569",
+        "direction": "debit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal retail activity. 19 txns over ~60 days. Consistent with stated turnover ₹183.0L/month."
+  },
+  {
+    "case_id": "case_cln_041",
+    "customer": {
+      "id": "cust_cln_041",
+      "name": "Bose Resorts",
+      "business_type": "hospitality",
+      "account_open_date": "2018-04-12T00:00:00",
+      "stated_monthly_turnover_inr": 16000000.0,
+      "prior_flags": 1
+    },
+    "transactions": [
+      {
+        "id": "txn_3550cc71",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1995905.0,
+        "timestamp": "2024-05-11T14:00:00",
+        "counterparty_name": "Desai Pvt Ltd",
+        "counterparty_account": "91841805141200",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d6279611",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1320367.0,
+        "timestamp": "2024-05-14T12:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "60897064937590",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_03c71011",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 2120746.0,
+        "timestamp": "2024-05-14T13:00:00",
+        "counterparty_name": "Nisha Agarwal",
+        "counterparty_account": "27890276451300",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_f27efe6c",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 567423.0,
+        "timestamp": "2024-05-14T14:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "19755708267865",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_26d4122e",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1748738.0,
+        "timestamp": "2024-05-15T15:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "96586360253687",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_5ed5e6e7",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 171193.0,
+        "timestamp": "2024-05-25T11:00:00",
+        "counterparty_name": "Menon Pvt Ltd",
+        "counterparty_account": "28515501352471",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_35b23ce3",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 369435.0,
+        "timestamp": "2024-06-01T13:00:00",
+        "counterparty_name": "Nair Pvt Ltd",
+        "counterparty_account": "88084274062828",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_88e478d0",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 901157.0,
+        "timestamp": "2024-06-03T18:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "33674089120599",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_706b6138",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 183395.0,
+        "timestamp": "2024-06-04T17:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "00681436597239",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_50197df2",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 2120954.0,
+        "timestamp": "2024-06-06T10:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "41715007601751",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1731d542",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1361982.0,
+        "timestamp": "2024-06-09T15:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "22562083610880",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c1c2517e",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1458620.0,
+        "timestamp": "2024-06-17T13:00:00",
+        "counterparty_name": "Agarwal Pvt Ltd",
+        "counterparty_account": "17541827711488",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_cc62ac54",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 2207256.0,
+        "timestamp": "2024-06-24T10:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "28349143092152",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e6fdb144",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 1261647.0,
+        "timestamp": "2024-06-26T13:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "44294267088050",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_54cadef0",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 334963.0,
+        "timestamp": "2024-06-27T14:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "69933276926899",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_82856310",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 679502.0,
+        "timestamp": "2024-06-29T11:00:00",
+        "counterparty_name": "Choudhury Pvt Ltd",
+        "counterparty_account": "49704241698142",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_bc37aa1a",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 2218938.0,
+        "timestamp": "2024-07-05T11:00:00",
+        "counterparty_name": "Singh Pvt Ltd",
+        "counterparty_account": "63703559591516",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_0bc6b1c9",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 765210.0,
+        "timestamp": "2024-07-05T13:00:00",
+        "counterparty_name": "Tiwari Pvt Ltd",
+        "counterparty_account": "80694097873871",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c1320040",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 999236.0,
+        "timestamp": "2024-07-06T13:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "00066584843930",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8db8884f",
+        "customer_id": "cust_cln_041",
+        "amount_inr": 185025.0,
+        "timestamp": "2024-07-07T16:00:00",
+        "counterparty_name": "Reliance Retail Ltd",
+        "counterparty_account": "42845576186770",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal hospitality activity. 20 txns over ~60 days. Consistent with stated turnover ₹160.0L/month."
+  },
+  {
+    "case_id": "case_cln_042",
+    "customer": {
+      "id": "cust_cln_042",
+      "name": "Nisha Pandey",
+      "business_type": "individual",
+      "account_open_date": "2018-03-28T00:00:00",
+      "stated_monthly_turnover_inr": 11900000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_da803e84",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 931032.0,
+        "timestamp": "2024-03-18T15:00:00",
+        "counterparty_name": "BSNL Telecom",
+        "counterparty_account": "88127904252846",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_daad9bb9",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 771176.0,
+        "timestamp": "2024-03-24T16:00:00",
+        "counterparty_name": "Saroj Yadav",
+        "counterparty_account": "62742052258987",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_237bdb3a",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1097767.0,
+        "timestamp": "2024-03-24T17:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "10986367828168",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_9292e2ab",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 819659.0,
+        "timestamp": "2024-03-29T18:00:00",
+        "counterparty_name": "Chatterjee Pvt Ltd",
+        "counterparty_account": "90722679406015",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e4b87a71",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 870098.0,
+        "timestamp": "2024-03-29T18:00:00",
+        "counterparty_name": "Bose Pvt Ltd",
+        "counterparty_account": "61035657480843",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7033f898",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 663807.0,
+        "timestamp": "2024-04-01T17:00:00",
+        "counterparty_name": "BSNL Telecom",
+        "counterparty_account": "38688339238986",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_4c27ac78",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 935570.0,
+        "timestamp": "2024-04-05T12:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "36531459456815",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_1996e732",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1079221.0,
+        "timestamp": "2024-04-11T09:00:00",
+        "counterparty_name": "Municipal Water Board",
+        "counterparty_account": "31806664059974",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_88bb6a9c",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1257857.0,
+        "timestamp": "2024-04-11T12:00:00",
+        "counterparty_name": "Patel Pvt Ltd",
+        "counterparty_account": "79897633023042",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_4d3a360f",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 981910.0,
+        "timestamp": "2024-04-15T10:00:00",
+        "counterparty_name": "BSNL Telecom",
+        "counterparty_account": "13739491258193",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_68021f9e",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 959902.0,
+        "timestamp": "2024-04-15T16:00:00",
+        "counterparty_name": "Shah Pvt Ltd",
+        "counterparty_account": "62199785652554",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_a6fe4211",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1264610.0,
+        "timestamp": "2024-04-16T09:00:00",
+        "counterparty_name": "Bose Pvt Ltd",
+        "counterparty_account": "26027578966368",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_7317df60",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1634416.0,
+        "timestamp": "2024-04-18T17:00:00",
+        "counterparty_name": "Ankit Yadav",
+        "counterparty_account": "30597662084078",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a1b9b7ee",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 790158.0,
+        "timestamp": "2024-04-21T10:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "73142175624799",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a19c9d21",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 167732.0,
+        "timestamp": "2024-04-25T11:00:00",
+        "counterparty_name": "Singh Pvt Ltd",
+        "counterparty_account": "41997970310808",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_48e4ec7a",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 195285.0,
+        "timestamp": "2024-05-08T15:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "90910091665954",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1a887675",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 559802.0,
+        "timestamp": "2024-05-09T12:00:00",
+        "counterparty_name": "Municipal Water Board",
+        "counterparty_account": "96025092704004",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_86275aaa",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 169953.0,
+        "timestamp": "2024-05-10T12:00:00",
+        "counterparty_name": "Kiran Jain",
+        "counterparty_account": "25371268870415",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_3384f2f9",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 549249.0,
+        "timestamp": "2024-05-10T17:00:00",
+        "counterparty_name": "Varun Pandey",
+        "counterparty_account": "30970199824770",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_69113141",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 285098.0,
+        "timestamp": "2024-05-10T18:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "27350600126646",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e88839f8",
+        "customer_id": "cust_cln_042",
+        "amount_inr": 1290814.0,
+        "timestamp": "2024-05-13T13:00:00",
+        "counterparty_name": "Srivastava Pvt Ltd",
+        "counterparty_account": "87890483346586",
+        "direction": "credit",
+        "channel": "NEFT"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal individual activity. 21 txns over ~60 days. Consistent with stated turnover ₹119.0L/month."
+  },
+  {
+    "case_id": "case_cln_043",
+    "customer": {
+      "id": "cust_cln_043",
+      "name": "Jain Industries",
+      "business_type": "sme",
+      "account_open_date": "2018-11-20T00:00:00",
+      "stated_monthly_turnover_inr": 1900000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_5855427b",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 169610.0,
+        "timestamp": "2024-08-05T11:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "78674047724649",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c345f317",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 153865.0,
+        "timestamp": "2024-08-10T18:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "65265053477411",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_1cd0b2c8",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 262684.0,
+        "timestamp": "2024-08-14T09:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "00027864995870",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_316cda0a",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 278066.0,
+        "timestamp": "2024-08-14T14:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "31793134756196",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3a852ff6",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 198509.0,
+        "timestamp": "2024-08-14T17:00:00",
+        "counterparty_name": "Sudha Iyer",
+        "counterparty_account": "45651234344070",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_1f0087ca",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 148829.0,
+        "timestamp": "2024-08-15T13:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "28265859702489",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2725ef9e",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 124988.0,
+        "timestamp": "2024-08-18T14:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "07980470789379",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_ac851f75",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 21904.0,
+        "timestamp": "2024-08-19T09:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "18251103186720",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_db116042",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 257933.0,
+        "timestamp": "2024-08-22T09:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "07095062632762",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_71c8fb57",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 127216.0,
+        "timestamp": "2024-08-22T11:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "57931444941996",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3137073b",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 26798.0,
+        "timestamp": "2024-08-23T14:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "88755987592041",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_cefeaad5",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 136718.0,
+        "timestamp": "2024-08-24T11:00:00",
+        "counterparty_name": "Tarun Iyer",
+        "counterparty_account": "29016515995274",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_4977d084",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 264190.0,
+        "timestamp": "2024-08-27T11:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "62268975311524",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_a20bf4f6",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 184451.0,
+        "timestamp": "2024-08-27T15:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "43840927715736",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2eb78b1b",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 83755.0,
+        "timestamp": "2024-08-31T10:00:00",
+        "counterparty_name": "Kavita Saxena",
+        "counterparty_account": "64218154478893",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3a30a5da",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 203043.0,
+        "timestamp": "2024-08-31T11:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "80631905376932",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_b34b5f07",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 280492.0,
+        "timestamp": "2024-09-02T14:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "39996369184544",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_901b8db9",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 129671.0,
+        "timestamp": "2024-09-09T13:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "06710099784429",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_c34052fa",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 188422.0,
+        "timestamp": "2024-09-10T17:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "30164303297744",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f0a32953",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 29542.0,
+        "timestamp": "2024-09-14T12:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "39594357845907",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d052df1f",
+        "customer_id": "cust_cln_043",
+        "amount_inr": 230820.0,
+        "timestamp": "2024-09-18T10:00:00",
+        "counterparty_name": "Employee Salary Pool",
+        "counterparty_account": "71340250064227",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal sme activity. 21 txns over ~60 days. Consistent with stated turnover ₹19.0L/month."
+  },
+  {
+    "case_id": "case_cln_044",
+    "customer": {
+      "id": "cust_cln_044",
+      "name": "Patel Resorts",
+      "business_type": "hospitality",
+      "account_open_date": "2019-07-23T00:00:00",
+      "stated_monthly_turnover_inr": 9500000.0,
+      "prior_flags": 1
+    },
+    "transactions": [
+      {
+        "id": "txn_3b7eebe6",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 174479.0,
+        "timestamp": "2024-07-10T11:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "34922777085942",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_da1e5d07",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1333178.0,
+        "timestamp": "2024-07-11T10:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "36721156781408",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8a829f6d",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1167214.0,
+        "timestamp": "2024-07-11T17:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "84779888243759",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_f50c0361",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1216777.0,
+        "timestamp": "2024-07-13T09:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "06814416661177",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_d8ecdd55",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 928214.0,
+        "timestamp": "2024-07-13T12:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "70590411797796",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_541fbfad",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1001407.0,
+        "timestamp": "2024-07-13T14:00:00",
+        "counterparty_name": "Reddy Pvt Ltd",
+        "counterparty_account": "19394278911926",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e1c9e087",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1078949.0,
+        "timestamp": "2024-07-15T12:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "91518136900479",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_35f1d0a2",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 674787.0,
+        "timestamp": "2024-07-16T14:00:00",
+        "counterparty_name": "City Power Supply Co",
+        "counterparty_account": "98553237508397",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f8d25d63",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 379967.0,
+        "timestamp": "2024-07-19T12:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "67501153270341",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e379b8e2",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1372839.0,
+        "timestamp": "2024-07-20T09:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "70805858240497",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_48ed5838",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1331079.0,
+        "timestamp": "2024-07-30T16:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "00303151861759",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ff091a75",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1208648.0,
+        "timestamp": "2024-08-04T17:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "27482300971547",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_c573b901",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 508722.0,
+        "timestamp": "2024-08-05T13:00:00",
+        "counterparty_name": "Rohit Iyer",
+        "counterparty_account": "58048294078286",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_4f84b526",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 717779.0,
+        "timestamp": "2024-08-06T11:00:00",
+        "counterparty_name": "City Power Supply Co",
+        "counterparty_account": "70616537305342",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_7173388b",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 312913.0,
+        "timestamp": "2024-08-15T13:00:00",
+        "counterparty_name": "Cloud Services (AWS)",
+        "counterparty_account": "09960874961229",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_439037e8",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 456346.0,
+        "timestamp": "2024-08-18T14:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "34482138011557",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_475cd160",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1065657.0,
+        "timestamp": "2024-08-22T12:00:00",
+        "counterparty_name": "Asha Mishra",
+        "counterparty_account": "34213957965628",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_45a90cee",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 793129.0,
+        "timestamp": "2024-08-24T13:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "01026557647566",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a28bc59f",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 95146.0,
+        "timestamp": "2024-08-24T17:00:00",
+        "counterparty_name": "Housekeeping Crew",
+        "counterparty_account": "62930961507106",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_7acd3d7f",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1055456.0,
+        "timestamp": "2024-08-25T11:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "41050685902330",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_9c5b9c2c",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1007688.0,
+        "timestamp": "2024-08-28T11:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "47641949583251",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c4229325",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 823338.0,
+        "timestamp": "2024-09-03T16:00:00",
+        "counterparty_name": "Kiran Das",
+        "counterparty_account": "62587360805582",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a405bccd",
+        "customer_id": "cust_cln_044",
+        "amount_inr": 1216367.0,
+        "timestamp": "2024-09-08T18:00:00",
+        "counterparty_name": "Chatterjee Pvt Ltd",
+        "counterparty_account": "37165094231596",
+        "direction": "credit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal hospitality activity. 23 txns over ~60 days. Consistent with stated turnover ₹95.0L/month."
+  },
+  {
+    "case_id": "case_cln_045",
+    "customer": {
+      "id": "cust_cln_045",
+      "name": "Harish Srivastava",
+      "business_type": "individual",
+      "account_open_date": "2020-11-09T00:00:00",
+      "stated_monthly_turnover_inr": 11800000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_2192bc54",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 928437.0,
+        "timestamp": "2024-08-03T12:00:00",
+        "counterparty_name": "Rao Pvt Ltd",
+        "counterparty_account": "31217817042327",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_9aef37bd",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 237288.0,
+        "timestamp": "2024-08-05T15:00:00",
+        "counterparty_name": "Kapoor Pvt Ltd",
+        "counterparty_account": "94510683829216",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ea01992d",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 125603.0,
+        "timestamp": "2024-08-09T13:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "36036808588444",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2b095746",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 190481.0,
+        "timestamp": "2024-08-11T12:00:00",
+        "counterparty_name": "Vijay Banerjee",
+        "counterparty_account": "88899088860811",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_133dca47",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 474300.0,
+        "timestamp": "2024-08-15T17:00:00",
+        "counterparty_name": "LIC Premium Portal",
+        "counterparty_account": "37020981940146",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_07816638",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 879656.0,
+        "timestamp": "2024-08-16T12:00:00",
+        "counterparty_name": "Ajay Singh",
+        "counterparty_account": "96730924074135",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_06f80c33",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 853745.0,
+        "timestamp": "2024-08-18T12:00:00",
+        "counterparty_name": "LIC Premium Portal",
+        "counterparty_account": "16262510494617",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_8a24d2fe",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1565653.0,
+        "timestamp": "2024-08-24T12:00:00",
+        "counterparty_name": "EPF Contribution",
+        "counterparty_account": "98122396575376",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_3c8b59d9",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1544639.0,
+        "timestamp": "2024-08-29T14:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "90363857433919",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_da8aa86b",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1141356.0,
+        "timestamp": "2024-08-30T16:00:00",
+        "counterparty_name": "Anita Shah",
+        "counterparty_account": "63831918043843",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_1e03c243",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1357989.0,
+        "timestamp": "2024-09-04T13:00:00",
+        "counterparty_name": "Pillai Pvt Ltd",
+        "counterparty_account": "81801874729131",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8876c689",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1220856.0,
+        "timestamp": "2024-09-07T10:00:00",
+        "counterparty_name": "City Power Supply Co",
+        "counterparty_account": "59206304165272",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_81c0c81f",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 1338992.0,
+        "timestamp": "2024-09-16T11:00:00",
+        "counterparty_name": "Sharma Pvt Ltd",
+        "counterparty_account": "57103630569562",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_092dc699",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 290732.0,
+        "timestamp": "2024-09-17T12:00:00",
+        "counterparty_name": "EPF Contribution",
+        "counterparty_account": "77272045098063",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_027aa6b0",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 305550.0,
+        "timestamp": "2024-09-28T18:00:00",
+        "counterparty_name": "City Power Supply Co",
+        "counterparty_account": "95310017925136",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f077fa71",
+        "customer_id": "cust_cln_045",
+        "amount_inr": 722290.0,
+        "timestamp": "2024-10-01T15:00:00",
+        "counterparty_name": "Mishra Pvt Ltd",
+        "counterparty_account": "22083464429961",
+        "direction": "credit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal individual activity. 16 txns over ~60 days. Consistent with stated turnover ₹118.0L/month."
+  },
+  {
+    "case_id": "case_cln_046",
+    "customer": {
+      "id": "cust_cln_046",
+      "name": "Suresh Kapoor",
+      "business_type": "individual",
+      "account_open_date": "2019-09-04T00:00:00",
+      "stated_monthly_turnover_inr": 13400000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_94998ecc",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 840983.0,
+        "timestamp": "2024-03-17T13:00:00",
+        "counterparty_name": "Municipal Water Board",
+        "counterparty_account": "55080029069547",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_622a031d",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1996822.0,
+        "timestamp": "2024-03-18T09:00:00",
+        "counterparty_name": "Kapoor Pvt Ltd",
+        "counterparty_account": "53476414427197",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_eebf5afe",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1591876.0,
+        "timestamp": "2024-03-18T15:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "51917024236374",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2f87455b",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1242790.0,
+        "timestamp": "2024-03-22T09:00:00",
+        "counterparty_name": "Nair Pvt Ltd",
+        "counterparty_account": "86591819805283",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_113ffb99",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 584931.0,
+        "timestamp": "2024-03-28T17:00:00",
+        "counterparty_name": "Raw Materials Supplier",
+        "counterparty_account": "31843413571682",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e2a962ce",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1816783.0,
+        "timestamp": "2024-03-30T15:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "62284396568872",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_67ed805d",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 581970.0,
+        "timestamp": "2024-04-04T10:00:00",
+        "counterparty_name": "Patel Pvt Ltd",
+        "counterparty_account": "09175075192677",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_39a35cc3",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 696015.0,
+        "timestamp": "2024-04-05T09:00:00",
+        "counterparty_name": "Raw Materials Supplier",
+        "counterparty_account": "94558464201819",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_b23082d8",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1106907.0,
+        "timestamp": "2024-04-07T18:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "19105071970957",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d606a6e1",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1528635.0,
+        "timestamp": "2024-04-10T09:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "36074170602252",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_721395e1",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1075896.0,
+        "timestamp": "2024-04-17T11:00:00",
+        "counterparty_name": "Menon Pvt Ltd",
+        "counterparty_account": "39339691082965",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1fe42cdc",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1954699.0,
+        "timestamp": "2024-04-17T12:00:00",
+        "counterparty_name": "Sudha Saxena",
+        "counterparty_account": "48578165608804",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_902d9fe4",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1409662.0,
+        "timestamp": "2024-04-20T16:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "62632732437039",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_34003a99",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 794886.0,
+        "timestamp": "2024-04-26T11:00:00",
+        "counterparty_name": "Mehta Pvt Ltd",
+        "counterparty_account": "61090982450814",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6bd7cc06",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 557947.0,
+        "timestamp": "2024-04-29T10:00:00",
+        "counterparty_name": "Pandey Pvt Ltd",
+        "counterparty_account": "22809541754016",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_61ba802c",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 271110.0,
+        "timestamp": "2024-04-29T13:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "20734787354145",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_ec860956",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1532331.0,
+        "timestamp": "2024-04-30T14:00:00",
+        "counterparty_name": "Mukherjee Pvt Ltd",
+        "counterparty_account": "41343076832987",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_5b2ec13d",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 874276.0,
+        "timestamp": "2024-05-02T18:00:00",
+        "counterparty_name": "Ramesh Singh",
+        "counterparty_account": "70992861028551",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_48eea92b",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 362775.0,
+        "timestamp": "2024-05-03T09:00:00",
+        "counterparty_name": "Municipal Water Board",
+        "counterparty_account": "64676478562508",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_03de7033",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1751681.0,
+        "timestamp": "2024-05-06T14:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "67308303884016",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e3be9f35",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1726819.0,
+        "timestamp": "2024-05-06T15:00:00",
+        "counterparty_name": "Neha Menon",
+        "counterparty_account": "43876738431556",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e71836d0",
+        "customer_id": "cust_cln_046",
+        "amount_inr": 1798093.0,
+        "timestamp": "2024-05-07T13:00:00",
+        "counterparty_name": "Raw Materials Supplier",
+        "counterparty_account": "31168859266370",
+        "direction": "debit",
+        "channel": "RTGS"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal individual activity. 22 txns over ~60 days. Consistent with stated turnover ₹134.0L/month."
+  },
+  {
+    "case_id": "case_cln_047",
+    "customer": {
+      "id": "cust_cln_047",
+      "name": "Gupta General Store",
+      "business_type": "retail",
+      "account_open_date": "2019-07-31T00:00:00",
+      "stated_monthly_turnover_inr": 13500000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_3f88cdeb",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1583968.0,
+        "timestamp": "2024-07-24T14:00:00",
+        "counterparty_name": "Vijay Chauhan",
+        "counterparty_account": "91678128837939",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_b4293a81",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1559327.0,
+        "timestamp": "2024-07-26T10:00:00",
+        "counterparty_name": "Banerjee Pvt Ltd",
+        "counterparty_account": "12804471208362",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_80efb86d",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 268084.0,
+        "timestamp": "2024-07-27T12:00:00",
+        "counterparty_name": "Reliance Retail Ltd",
+        "counterparty_account": "41787602874907",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8b66de0c",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1071242.0,
+        "timestamp": "2024-08-04T12:00:00",
+        "counterparty_name": "Pillai Pvt Ltd",
+        "counterparty_account": "86173277606395",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_14046bcb",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1836893.0,
+        "timestamp": "2024-08-06T15:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "49318137229380",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_a78f69e1",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 149166.0,
+        "timestamp": "2024-08-10T18:00:00",
+        "counterparty_name": "Sudha Dubey",
+        "counterparty_account": "16476492738681",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_30aafd0b",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 289582.0,
+        "timestamp": "2024-08-11T13:00:00",
+        "counterparty_name": "Pandey Pvt Ltd",
+        "counterparty_account": "96042445025670",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_5a81f5cf",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1881491.0,
+        "timestamp": "2024-08-19T10:00:00",
+        "counterparty_name": "Gati Courier Services",
+        "counterparty_account": "35777785929458",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_6d38831d",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1615374.0,
+        "timestamp": "2024-08-19T17:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "57416984366337",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8333b0fe",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 323800.0,
+        "timestamp": "2024-08-20T18:00:00",
+        "counterparty_name": "Security Services Pvt Ltd",
+        "counterparty_account": "65510861997078",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2a9da558",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1793224.0,
+        "timestamp": "2024-09-01T13:00:00",
+        "counterparty_name": "Sumit Kumar",
+        "counterparty_account": "75942501657555",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8eea815a",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 625452.0,
+        "timestamp": "2024-09-02T16:00:00",
+        "counterparty_name": "Saroj Desai",
+        "counterparty_account": "15539258830213",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_b9292acb",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 1140351.0,
+        "timestamp": "2024-09-20T15:00:00",
+        "counterparty_name": "Kiran Tiwari",
+        "counterparty_account": "03763294038043",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_f72dbfbd",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 824827.0,
+        "timestamp": "2024-09-22T09:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "27814695395369",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_704cc131",
+        "customer_id": "cust_cln_047",
+        "amount_inr": 446730.0,
+        "timestamp": "2024-09-22T11:00:00",
+        "counterparty_name": "Office Depot India",
+        "counterparty_account": "24861156230678",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal retail activity. 15 txns over ~60 days. Consistent with stated turnover ₹135.0L/month."
+  },
+  {
+    "case_id": "case_cln_048",
+    "customer": {
+      "id": "cust_cln_048",
+      "name": "Saxena Resorts",
+      "business_type": "hospitality",
+      "account_open_date": "2019-03-11T00:00:00",
+      "stated_monthly_turnover_inr": 8200000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_3c479093",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 460868.0,
+        "timestamp": "2024-10-12T14:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "88249969660818",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_01b27838",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 789545.0,
+        "timestamp": "2024-10-18T09:00:00",
+        "counterparty_name": "Shukla Pvt Ltd",
+        "counterparty_account": "06616153176602",
+        "direction": "credit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_96dfdc16",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 885273.0,
+        "timestamp": "2024-10-24T16:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "67557912094540",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_2fae9530",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 680322.0,
+        "timestamp": "2024-10-27T16:00:00",
+        "counterparty_name": "Reddy Pvt Ltd",
+        "counterparty_account": "70725445278610",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_a3b1580b",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 753554.0,
+        "timestamp": "2024-10-29T10:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "03634874512619",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_c25778dd",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 867436.0,
+        "timestamp": "2024-10-29T12:00:00",
+        "counterparty_name": "Harish Sen",
+        "counterparty_account": "69757554606834",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_66acde8a",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 146078.0,
+        "timestamp": "2024-11-10T11:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "68723063657837",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_195aebeb",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 858553.0,
+        "timestamp": "2024-11-30T09:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "36777679593224",
+        "direction": "debit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_46fae30d",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 611625.0,
+        "timestamp": "2024-12-02T11:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "07519391460378",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_9a3efdc4",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 1174419.0,
+        "timestamp": "2024-12-03T17:00:00",
+        "counterparty_name": "Rent – Commercial Premises",
+        "counterparty_account": "08786391418359",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_a7ab1c27",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 1026106.0,
+        "timestamp": "2024-12-05T11:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "93094431213455",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_8f503719",
+        "customer_id": "cust_cln_048",
+        "amount_inr": 1210463.0,
+        "timestamp": "2024-12-07T13:00:00",
+        "counterparty_name": "Tata Communications",
+        "counterparty_account": "82697694136674",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal hospitality activity. 12 txns over ~60 days. Consistent with stated turnover ₹82.0L/month."
+  },
+  {
+    "case_id": "case_cln_049",
+    "customer": {
+      "id": "cust_cln_049",
+      "name": "Verma Industries",
+      "business_type": "sme",
+      "account_open_date": "2019-10-06T00:00:00",
+      "stated_monthly_turnover_inr": 14800000.0,
+      "prior_flags": 0
+    },
+    "transactions": [
+      {
+        "id": "txn_6703b075",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 1866120.0,
+        "timestamp": "2024-02-29T18:00:00",
+        "counterparty_name": "Mukherjee Pvt Ltd",
+        "counterparty_account": "65497705364434",
+        "direction": "credit",
+        "channel": "NEFT"
+      },
+      {
+        "id": "txn_b4928641",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 782839.0,
+        "timestamp": "2024-03-03T18:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "89143535425628",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_ce5fa3f6",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 2092871.0,
+        "timestamp": "2024-03-04T14:00:00",
+        "counterparty_name": "Dinesh Mishra",
+        "counterparty_account": "40415758427686",
+        "direction": "credit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_e25d212d",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 2167884.0,
+        "timestamp": "2024-03-04T15:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "95064103184173",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_1be34f1e",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 1510812.0,
+        "timestamp": "2024-03-17T10:00:00",
+        "counterparty_name": "City Power Supply Co",
+        "counterparty_account": "76208012893482",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_4171162d",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 1486906.0,
+        "timestamp": "2024-03-22T11:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "65546120384672",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_11eba1df",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 528205.0,
+        "timestamp": "2024-03-25T16:00:00",
+        "counterparty_name": "Internet Provider",
+        "counterparty_account": "63386381303262",
+        "direction": "debit",
+        "channel": "RTGS"
+      },
+      {
+        "id": "txn_cde86ca1",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 343445.0,
+        "timestamp": "2024-03-29T16:00:00",
+        "counterparty_name": "Professional Tax Dept",
+        "counterparty_account": "33356942018445",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d689b63b",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 370952.0,
+        "timestamp": "2024-04-04T18:00:00",
+        "counterparty_name": "Newspaper & Stationery",
+        "counterparty_account": "92567974631771",
+        "direction": "debit",
+        "channel": "UPI"
+      },
+      {
+        "id": "txn_d2a43f25",
+        "customer_id": "cust_cln_049",
+        "amount_inr": 2071346.0,
+        "timestamp": "2024-04-18T18:00:00",
+        "counterparty_name": "GST Payment Portal",
+        "counterparty_account": "05365045686969",
+        "direction": "debit",
+        "channel": "UPI"
+      }
+    ],
+    "ground_truth_label": "clean",
+    "typology": null,
+    "notes": "Normal sme activity. 10 txns over ~60 days. Consistent with stated turnover ₹148.0L/month."
+  }
+]
