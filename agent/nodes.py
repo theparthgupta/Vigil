@@ -185,6 +185,7 @@ def reasoner(state: PrahariState) -> dict:
         "retrieved_passages": passages,
         "decision": out.decision,
         "confidence": out.confidence,
+        "detected_typology": out.typology or "",
         "investigation_steps": state["investigation_steps"]
         + [f"Reasoner: {out.decision} (confidence={out.confidence:.2f}, "
            f"typology={out.typology}) — {out.reasoning[:160]}"],

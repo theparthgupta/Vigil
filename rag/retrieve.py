@@ -22,6 +22,27 @@ load_dotenv()
 _CHROMA_DIR = Path(__file__).parent / "chroma_db"
 _COLLECTION = "prahari_regs"
 
+# Cached singletons. chromadb.PersistentClient is NOT safe to instantiate
+# repeatedly / concurrently on the same path (tenant-connection errors under
+# threads). Build once and reuse across all retrieve() calls.
+_collection = None
+_embedder = None
+_init_lock = __import__("threading").Lock()
+
+
+def _get_clients():
+    global _collection, _embedder
+    if _collection is None or _embedder is None:
+        with _init_lock:
+            if _collection is None or _embedder is None:
+                import chromadb
+                from langchain_openai import OpenAIEmbeddings
+
+                client = chromadb.PersistentClient(path=str(_CHROMA_DIR))
+                _collection = client.get_collection(_COLLECTION)
+                _embedder = OpenAIEmbeddings(model="text-embedding-3-small")
+    return _collection, _embedder
+
 
 def retrieve(
     query: str,
@@ -44,12 +65,7 @@ def retrieve(
         page      int   — page number where the chunk starts
         score     float — cosine similarity, 0–1 (higher = more relevant)
     """
-    import chromadb
-    from langchain_openai import OpenAIEmbeddings
-
-    client     = chromadb.PersistentClient(path=str(_CHROMA_DIR))
-    collection = client.get_collection(_COLLECTION)
-    embedder   = OpenAIEmbeddings(model="text-embedding-3-small")
+    collection, embedder = _get_clients()
 
     query_vec = embedder.embed_query(query)
     where     = {"source": source_filter} if source_filter else None

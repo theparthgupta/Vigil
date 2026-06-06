@@ -23,6 +23,7 @@ class PrahariState(TypedDict):
     # Produced by Reasoner
     decision: str                    # "ESCALATE" | "DISMISS" | "" (empty until reasoned)
     confidence: float                # 0.0–1.0
+    detected_typology: str           # reasoner's typology label ("" if none / DISMISS)
 
     # Produced by Reporter
     report: str                      # FIU-IND STR-format report
@@ -43,6 +44,7 @@ def initial_state(case: dict) -> PrahariState:
         retrieved_passages=[],
         decision="",
         confidence=0.0,
+        detected_typology="",
         report="",
         investigation_steps=[],
         tool_plan=[],

@@ -61,11 +61,14 @@ Available tools:
                     or the customer warrants reputational scrutiny.
 
 Guidance:
-- Order matters: run cheap deterministic tools ("profile", "patterns") first; they reveal
-  signals that justify the slower "sanctions" and "adverse_media" checks.
-- Cash-heavy or near-threshold activity → prioritise "patterns".
-- Unfamiliar / foreign counterparties → include "sanctions".
-- Only skip a tool if it is clearly irrelevant to the case signals.
+- MANDATORY baseline — ALWAYS include "profile", "patterns", AND "sanctions" in every
+  plan. These are cheap and non-negotiable: you CANNOT know whether a counterparty is
+  sanctioned or a PEP without screening, so "sanctions" must run for every case regardless
+  of how domestic or benign the case looks. Omitting sanctions screening is a compliance
+  failure.
+- Order matters: run "profile" and "patterns" first, then "sanctions".
+- "adverse_media" is the only OPTIONAL tool — add it (last) when a counterparty or the
+  customer warrants reputational scrutiny (e.g. high-value or already-flagged names).
 
 Return the ordered list of tool names to run.
 """

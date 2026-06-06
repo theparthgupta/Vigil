@@ -1,0 +1,94 @@
+{
+  "dataset": "cases_train.json (160 cases, TRAIN split — holdout untouched)",
+  "experiment": {
+    "change": "Planner prompt: made profile+patterns+sanctions mandatory (sanctions screening can no longer be skipped); adverse_media remains the only optional tool.",
+    "change_type": "prompt",
+    "rationale": "Baseline sanctions_hit recall was 0.35 because the LLM planner skipped sanctions screening on domestic-looking cases, so the Reasoner never saw the hits."
+  },
+  "baseline": {
+    "total_cases": 160,
+    "precision": 1.0,
+    "recall": 0.7833,
+    "f1": 0.8785,
+    "accuracy": 0.8375,
+    "fpr_clean": 0.0,
+    "confusion_matrix": {
+      "tp": 94,
+      "fp": 0,
+      "fn": 26,
+      "tn": 40
+    },
+    "per_typology": {
+      "clean": {
+        "n": 40,
+        "false_positives": 0,
+        "fpr": 0.0
+      },
+      "rapid_passthrough": {
+        "n": 40,
+        "detected": 40,
+        "detection_rate": 1.0
+      },
+      "sanctions_hit": {
+        "n": 40,
+        "detected": 14,
+        "detection_rate": 0.35
+      },
+      "structuring": {
+        "n": 40,
+        "detected": 40,
+        "detection_rate": 1.0
+      }
+    },
+    "loop_fired_count": 0,
+    "avg_latency_s": 11.08,
+    "avg_confidence": 0.8859
+  },
+  "optimized": {
+    "total_cases": 160,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "accuracy": 1.0,
+    "fpr_clean": 0.0,
+    "confusion_matrix": {
+      "tp": 120,
+      "fp": 0,
+      "fn": 0,
+      "tn": 40
+    },
+    "per_typology": {
+      "clean": {
+        "n": 40,
+        "false_positives": 0,
+        "fpr": 0.0
+      },
+      "rapid_passthrough": {
+        "n": 40,
+        "detected": 40,
+        "detection_rate": 1.0
+      },
+      "sanctions_hit": {
+        "n": 40,
+        "detected": 40,
+        "detection_rate": 1.0
+      },
+      "structuring": {
+        "n": 40,
+        "detected": 40,
+        "detection_rate": 1.0
+      }
+    },
+    "loop_fired_count": 0,
+    "avg_latency_s": 11.18,
+    "avg_confidence": 0.88
+  },
+  "deltas": {
+    "precision": 0.0,
+    "recall": 0.2167,
+    "f1": 0.1215,
+    "accuracy": 0.1625,
+    "fpr_clean": 0.0,
+    "sanctions_hit_detection": 0.65
+  }
+}
