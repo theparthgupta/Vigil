@@ -51,6 +51,11 @@ _DOCS: list[dict] = [
         citation="APG Yearly Typologies Report 2024",
         max_pages=None,
     ),
+    dict(
+        filename="PMLA_Rules.pdf",
+        citation="PMLA (Maintenance of Records) Rules, 2005 (G.S.R. 444(E))",
+        max_pages=None,
+    ),
 ]
 
 # ── Section boundary patterns ─────────────────────────────────────────────────
@@ -77,6 +82,14 @@ _SECTION_PATTERNS = [
 _SECTION_RE = re.compile(
     r'(?m)^[ \t]*(?:' + '|'.join(_SECTION_PATTERNS) + r')'
 )
+
+# Some legal PDFs (e.g. the PMLA Rules gazette) extract as run-on text with no
+# line breaks, so the line-anchored _SECTION_RE finds no boundaries. For those,
+# detect numbered rule headers INLINE: end-of-clause punctuation, then "N." or
+# "NA." immediately followed by a Capitalised word (e.g. "...crime.8.Furnishing").
+_INLINE_RULE_RE = re.compile(r'(?<=[.\]\)])(\d{1,2}[A-Z]?\.\s?[A-Z][a-z]{3,})')
+# Apply inline splitting only when newline density is very low (run-on extraction)
+_RUNON_NEWLINE_RATIO = 0.005   # < 1 newline per 200 chars
 
 # Chunk size targets (chars, not tokens — ~4 chars ≈ 1 token)
 _MAX_CHUNK   = 1600   # ~400 tokens — keep chunks focused
@@ -203,9 +216,17 @@ def make_chunks(
     Split the corpus at section boundaries, then sub-split large sections.
     Return list of chunk dicts with full metadata.
     """
-    boundaries = [m.start() for m in _SECTION_RE.finditer(corpus)]
+    # Detect run-on extraction (no line breaks → line-anchored regex finds nothing)
+    newline_ratio = corpus.count("\n") / max(len(corpus), 1)
+    run_on = newline_ratio < _RUNON_NEWLINE_RATIO
+
+    if run_on:
+        boundaries = [m.start() for m in _INLINE_RULE_RE.finditer(corpus)]
+    else:
+        boundaries = [m.start() for m in _SECTION_RE.finditer(corpus)]
     if not boundaries:
         boundaries = [0]
+    boundaries = sorted(set(boundaries))
     boundaries.append(len(corpus))
 
     chunks     = []
@@ -215,7 +236,13 @@ def make_chunks(
         end          = boundaries[i + 1]
         section_text = corpus[start:end].strip()
         start_page   = pos_to_page(start, page_map)
-        section_hdr  = _first_section_header(section_text)
+        if run_on:
+            m = _INLINE_RULE_RE.match(section_text) or re.match(
+                r'\d{1,2}[A-Z]?\.\s?[A-Z][a-z][^.]{3,60}', section_text
+            )
+            section_hdr = (m.group().strip()[:140] if m else _first_section_header(section_text))
+        else:
+            section_hdr = _first_section_header(section_text)
 
         for part in _split_by_paragraphs(section_text, _MAX_CHUNK, _OVERLAP):
             # Drop TOC-dominated chunks and tiny stubs

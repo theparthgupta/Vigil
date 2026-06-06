@@ -9,7 +9,8 @@ human compliance officer does in 2 minutes what currently takes 40.
 1. **Eval-first.** The labeled dataset and the metric harness come BEFORE the final agent.
    Every design decision is justified by whether it moves precision / recall / F1 / FPR.
 2. **India-specific or it's worthless.** Cite exact PMLA sections, RBI circular numbers,
-   FIU-IND **STR** format (NOT US "SAR"). CTR threshold = ₹10 lakh. STR filed within 7 days.
+   FIU-IND **STR** format (NOT US "SAR"). CTR threshold = ₹10 lakh. STR filed
+   **promptly** (statutory, PMLA Rules 2005 Rule 8(2)); 7 working days = industry norm, NOT statute.
 3. **One phase per Claude Code session.** Use plan mode to design, `/clear` between phases,
    subagents for research, and log every real decision to DECISIONS.md.
 4. **Build the boring, deterministic parts as plain Python first.** The LLM orchestrates;
@@ -108,8 +109,12 @@ Use plan mode in Claude Code to design the state + graph before writing it.
 3. Honest failure-mode documentation.
 
 ## Things to get right (accuracy notes)
-- It's **STR** (Suspicious Transaction Report) in India, not SAR. CTR threshold ₹10 lakh;
-  STR filed within 7 days of detection.
+- It's **STR** (Suspicious Transaction Report) in India, not SAR. CTR threshold ₹10 lakh.
+  STR filing deadline is **"promptly"** — statutory, PMLA (Maintenance of Records) Rules
+  2005, Rule 8(2) (as amended 2015). The often-quoted "7 working days" is an **industry
+  norm / internal SLA, NOT the statutory deadline** — the original 7-day Rule 8(2) was
+  replaced by "promptly" in 2015. CTR is monthly, by the 15th of the succeeding month
+  (Rule 8(1)). The Reasoner must cite Rule 8(2) verbatim and state this distinction.
 - OpenSanctions is free for **non-commercial** use only; use the 30-day trial key or self-host
   yente. Don't imply a free commercial API in the README.
 - Keep arithmetic/feature computation in deterministic Python, not in the LLM.
