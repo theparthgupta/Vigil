@@ -1,5 +1,5 @@
 """
-Synthetic AML case generator for Prahari.
+Synthetic AML case generator for Vigil.
 
 Produces 200 deterministic cases (seed=42) across 4 typologies:
   - structuring (50): cash deposits just below ₹10L CTR threshold
@@ -438,7 +438,7 @@ def print_summary(train: list[Case], holdout: list[Case]) -> None:
 
     tr = counts(train)
     ho = counts(holdout)
-    print("\n--- Prahari dataset summary ---")
+    print("\n--- Vigil dataset summary ---")
     print(f"  Train  : {len(train)} cases")
     for k, v in tr["by_typology"].items():
         print(f"    {k:<22} {v}")

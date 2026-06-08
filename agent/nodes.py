@@ -1,11 +1,11 @@
 """
-LangGraph nodes for the Prahari agent (Phase 4).
+LangGraph nodes for the Vigil agent (Phase 4).
 
 Flow:  planner → investigator → reasoner → [conditional] → reporter
                       ↑__________________________|
                       (loop once if confidence < 0.6)
 
-Each node takes PrahariState and returns only the keys it updates.
+Each node takes VigilState and returns only the keys it updates.
 All LLM calls use gpt-4o-mini at temperature=0 for reproducibility.
 """
 
@@ -23,7 +23,7 @@ from agent.prompts import (
     REASONER_SYSTEM_PROMPT,
     REPORTER_SYSTEM_PROMPT,
 )
-from agent.state import PrahariState
+from agent.state import VigilState
 from rag.retrieve import retrieve
 from tools.media import search_adverse_media
 from tools.patterns import analyze_patterns
@@ -67,7 +67,7 @@ class ReasonerOutput(BaseModel):
 
 # ── 1. Planner ────────────────────────────────────────────────────────────────
 
-def planner(state: PrahariState) -> dict:
+def planner(state: VigilState) -> dict:
     case = state["case"]
     summary = _case_summary(case)
 
@@ -110,7 +110,7 @@ def _case_summary(case: dict) -> str:
 
 # ── 2. Investigator ───────────────────────────────────────────────────────────
 
-def investigator(state: PrahariState) -> dict:
+def investigator(state: VigilState) -> dict:
     case = state["case"]
     txns = case["transactions"]
     plan = state["tool_plan"] or list(ALL_TOOLS)
@@ -162,7 +162,7 @@ def investigator(state: PrahariState) -> dict:
 
 # ── 3. Reasoner ───────────────────────────────────────────────────────────────
 
-def reasoner(state: PrahariState) -> dict:
+def reasoner(state: VigilState) -> dict:
     evidence = state["evidence"]
     queries = _build_queries(evidence)
 
@@ -242,7 +242,7 @@ def _reasoner_user_message(case: dict, evidence: dict, passages: list[dict]) -> 
 
 # ── 4. Reporter ───────────────────────────────────────────────────────────────
 
-def reporter(state: PrahariState) -> dict:
+def reporter(state: VigilState) -> dict:
     user_msg = _reporter_user_message(state)
     out = _llm().invoke([
         {"role": "system", "content": REPORTER_SYSTEM_PROMPT},
@@ -256,7 +256,7 @@ def reporter(state: PrahariState) -> dict:
     }
 
 
-def _reporter_user_message(state: PrahariState) -> str:
+def _reporter_user_message(state: VigilState) -> str:
     case = state["case"]
     cust = case["customer"]
     evidence = state["evidence"]
@@ -289,7 +289,7 @@ def _reporter_user_message(state: PrahariState) -> str:
 
 # ── Conditional edge ──────────────────────────────────────────────────────────
 
-def route_after_reasoner(state: PrahariState) -> Literal["investigate", "report"]:
+def route_after_reasoner(state: VigilState) -> Literal["investigate", "report"]:
     """Loop back for one widened evidence pass if confidence is low."""
     if (
         state["confidence"] < _CONFIDENCE_THRESHOLD

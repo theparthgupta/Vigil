@@ -13,7 +13,7 @@ to keep the test suite fast and offline.
 import pytest
 
 from agent.nodes import investigator, route_after_reasoner, ALL_TOOLS
-from agent.state import initial_state, PrahariState
+from agent.state import initial_state, VigilState
 
 
 # ── Conditional edge truth table ──────────────────────────────────────────────

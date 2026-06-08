@@ -4,9 +4,7 @@ langchain-openai
 chromadb
 fastapi
 uvicorn
-streamlit
 pydantic
-pandas
 scikit-learn
 python-dotenv
 langsmith

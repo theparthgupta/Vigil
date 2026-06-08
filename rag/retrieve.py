@@ -1,5 +1,5 @@
 """
-RAG retrieve for Prahari.
+RAG retrieve for Vigil.
 
 Query the Chroma vector store; return passages with full citation metadata.
 
@@ -20,7 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 load_dotenv()
 
 _CHROMA_DIR = Path(__file__).parent / "chroma_db"
-_COLLECTION = "prahari_regs"
+_COLLECTION = "vigil_regs"
 
 # Cached singletons. chromadb.PersistentClient is NOT safe to instantiate
 # repeatedly / concurrently on the same path (tenant-connection errors under
@@ -117,7 +117,7 @@ if __name__ == "__main__":
         "politically exposed person definition enhanced due diligence",
     ]
 
-    print("=== Prahari RAG sanity test ===\n")
+    print("=== Vigil RAG sanity test ===\n")
     for query in QUERIES:
         print(f"QUERY: {query}")
         print("=" * 72)

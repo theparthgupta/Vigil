@@ -1,5 +1,5 @@
 """
-Prompt templates for the Prahari LangGraph agent (Phase 4).
+Prompt templates for the Vigil LangGraph agent (Phase 4).
 
 Central source of truth for the wording the LLM nodes use. Kept here (not inline
 in graph nodes) so regulatory guidance can be reviewed and corrected in one place.

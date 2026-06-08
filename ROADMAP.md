@@ -1,4 +1,4 @@
-# ROADMAP.md — Prahari - AML Compliance Agent
+# ROADMAP.md — Vigil - AML Compliance Agent
 
 **One-sentence pitch:** An AI compliance analyst that takes a flagged transaction case,
 autonomously investigates it using live sanctions data and Indian PMLA/RBI regulations,

@@ -46,8 +46,7 @@ node_modules/, dist/, build/, .next/, out/, vendor/, coverage/, *.lock, *.min.js
 
 ## Commands
 - Install: `pip install -r requirements.txt`
-- Run / dev: `uvicorn api.main:app --reload`
-- Streamlit: `streamlit run app/main.py`
+- Run / dev (API + UI): `uvicorn api.main:app --reload` (UI served at http://localhost:8000/)
 - Test (single file): `pytest tests/test_<module>.py -v`
 - Lint / format: `ruff check . && ruff format --check .`
 - Typecheck: `mypy . --ignore-missing-imports`

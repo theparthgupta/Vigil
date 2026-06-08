@@ -1,7 +1,10 @@
 """
-FastAPI backend for Prahari (Phase 6).
+FastAPI backend for Vigil (Phase 6).
+
+Serves the single-page UI (app/static) and the agent API.
 
 Endpoints:
+    GET  /            — Vigil web UI (static SPA)
     GET  /health      — liveness check
     GET  /sample      — one random case from the TRAIN split (for the UI to load)
     POST /investigate — run a case through the LangGraph agent, return the decision
@@ -21,6 +24,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from agent.graph import graph
@@ -29,13 +34,21 @@ from data.schema import Case
 
 load_dotenv()
 
-_TRAIN = Path(__file__).parent.parent / "data" / "cases_train.json"
+_ROOT = Path(__file__).parent.parent
+_TRAIN = _ROOT / "data" / "cases_train.json"
+_STATIC = _ROOT / "app" / "static"
 
 app = FastAPI(
-    title="Prahari AML Investigation API",
+    title="Vigil AML Investigation API",
     description="Autonomous AML triage agent for Indian financial institutions (PMLA/FIU-IND).",
     version="1.0.0",
 )
+
+
+@app.get("/")
+def index() -> FileResponse:
+    """Serve the Vigil single-page UI."""
+    return FileResponse(_STATIC / "index.html")
 
 
 class InvestigateResponse(BaseModel):
@@ -50,7 +63,7 @@ class InvestigateResponse(BaseModel):
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "service": "prahari-api"}
+    return {"status": "ok", "service": "vigil-api"}
 
 
 @app.get("/sample")
@@ -81,3 +94,7 @@ def investigate(case: Case) -> InvestigateResponse:
         investigation_steps=result["investigation_steps"],
         latency_seconds=round(latency, 2),
     )
+
+
+# Static assets (styles.css, app.js). Mounted last so it never shadows API routes.
+app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")

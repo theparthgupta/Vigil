@@ -1,4 +1,4 @@
-# Prahari
+# Vigil
 
 > An AI compliance analyst that takes a flagged transaction case, autonomously investigates it using live sanctions data and Indian PMLA/RBI regulations, and produces a legally-grounded STR-format report with a clear recommendation — so a human compliance officer does in 2 minutes what currently takes 40.
 
@@ -32,7 +32,7 @@
 ```bash
 # 1. Clone and enter the repo
 git clone <repo-url>
-cd prahari
+cd vigil
 
 # 2. Create and activate venv
 python -m venv venv

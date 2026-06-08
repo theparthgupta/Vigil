@@ -1,5 +1,5 @@
 """
-Evaluation harness for Prahari (Phase 5).
+Evaluation harness for Vigil (Phase 5).
 
 Runs every case in the TRAIN split through the agent, captures the decision and
 diagnostics, saves a results JSON, and prints the metric report. Each run is

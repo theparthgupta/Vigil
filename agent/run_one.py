@@ -1,5 +1,5 @@
 """
-Run the Prahari agent end-to-end on ONE case from the TRAIN split.
+Run the Vigil agent end-to-end on ONE case from the TRAIN split.
 
 Usage:
     python agent/run_one.py            # default: first structuring case

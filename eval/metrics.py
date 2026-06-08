@@ -1,5 +1,5 @@
 """
-Metrics for the Prahari evaluation harness (Phase 5).
+Metrics for the Vigil evaluation harness (Phase 5).
 
 Binary task: positive class = "suspicious" (agent should ESCALATE).
   - ground truth: case["ground_truth_label"] in {suspicious, clean}

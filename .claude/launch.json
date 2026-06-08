@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "streamlit",
+      "name": "vigil",
       "runtimeExecutable": "venv\\Scripts\\python.exe",
-      "runtimeArgs": ["-m", "streamlit", "run", "app/main.py", "--server.port", "8502", "--server.headless", "true"],
+      "runtimeArgs": ["-m", "uvicorn", "api.main:app", "--port", "8502"],
       "port": 8502
     }
   ]

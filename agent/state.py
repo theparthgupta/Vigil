@@ -1,5 +1,5 @@
 """
-Shared state for the Prahari LangGraph agent (Phase 4).
+Shared state for the Vigil LangGraph agent (Phase 4).
 
 LangGraph passes this dict between nodes. Each node returns a partial dict of
 the keys it updates; LangGraph merges them into the running state.
@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import TypedDict
 
 
-class PrahariState(TypedDict):
+class VigilState(TypedDict):
     # Input
     case: dict                       # loaded Case (customer + transactions + labels)
 
@@ -36,9 +36,9 @@ class PrahariState(TypedDict):
     investigation_passes: int        # bounds the conditional loop to ONE extra pass
 
 
-def initial_state(case: dict) -> PrahariState:
+def initial_state(case: dict) -> VigilState:
     """Build a fresh state for a single case."""
-    return PrahariState(
+    return VigilState(
         case=case,
         evidence={},
         retrieved_passages=[],

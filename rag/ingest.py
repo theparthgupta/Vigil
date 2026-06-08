@@ -1,5 +1,5 @@
 """
-RAG ingest for Prahari.
+RAG ingest for Vigil.
 
 Loads regulatory PDFs from regs/, chunks by section boundaries (not fixed size),
 embeds with OpenAI text-embedding-3-small, persists in Chroma.
@@ -26,7 +26,7 @@ load_dotenv()
 
 _REGS_DIR   = Path(__file__).parent.parent / "regs"
 _CHROMA_DIR = Path(__file__).parent / "chroma_db"
-_COLLECTION = "prahari_regs"
+_COLLECTION = "vigil_regs"
 
 # ── Document registry ─────────────────────────────────────────────────────────
 # max_pages: None = all pages. For FIU-IND, pages 1-10 are TOC, 11-50 substantive.

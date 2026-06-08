@@ -1,5 +1,5 @@
 """
-LangGraph assembly for the Prahari agent (Phase 4).
+LangGraph assembly for the Vigil agent (Phase 4).
 
     START → planner → investigator → reasoner → [conditional] → reporter → END
                            ↑__________________________|
@@ -17,12 +17,12 @@ from agent.nodes import (
     reporter,
     route_after_reasoner,
 )
-from agent.state import PrahariState
+from agent.state import VigilState
 
 
 def build_graph():
-    """Build and compile the Prahari investigation graph."""
-    g = StateGraph(PrahariState)
+    """Build and compile the Vigil investigation graph."""
+    g = StateGraph(VigilState)
 
     g.add_node("planner", planner)
     g.add_node("investigator", investigator)
