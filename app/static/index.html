@@ -72,35 +72,28 @@
 
   <!-- Loading overlay -->
   <div id="loadingOverlay" class="overlay hidden" aria-live="polite">
-    <div class="overlay-inner">
-      <div class="radar">
-        <div class="radar-sweep"></div>
-        <div class="radar-ring r1"></div>
-        <div class="radar-ring r2"></div>
-        <div class="radar-ring r3"></div>
-        <svg class="radar-core" viewBox="0 0 32 32" fill="none">
-          <path d="M16 2L4 7v8c0 7.5 5.1 13.1 12 15 6.9-1.9 12-7.5 12-15V7L16 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-          <circle cx="16" cy="14" r="3" stroke="currentColor" stroke-width="1.6"/>
+    <div class="loader">
+      <div class="loader-brand">
+        <svg class="logo" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2L4 7v8c0 7.5 5.1 13.1 12 15 6.9-1.9 12-7.5 12-15V7L16 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="16" cy="14" r="3.2" stroke="currentColor" stroke-width="2"/>
+          <path d="M16 17.2V23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
+        <span>Vigil</span>
       </div>
 
-      <h3 class="overlay-title">Investigating</h3>
+      <h3 class="loader-title">Investigating case…</h3>
 
-      <ol class="pipeline" id="pipeline">
-        <li data-stage="planner"><span class="dot"></span>Planning the investigation</li>
-        <li data-stage="investigator"><span class="dot"></span>Gathering evidence — sanctions, patterns, profile</li>
-        <li data-stage="reasoner"><span class="dot"></span>Reasoning against PMLA / RBI regulation</li>
-        <li data-stage="reporter"><span class="dot"></span>Drafting the STR</li>
+      <ol class="steps" id="pipeline">
+        <li data-stage="planner"><span class="step-ic"></span>Planning the investigation</li>
+        <li data-stage="investigator"><span class="step-ic"></span>Gathering evidence — sanctions, patterns, profile</li>
+        <li data-stage="reasoner"><span class="step-ic"></span>Reasoning against PMLA / RBI regulation</li>
+        <li data-stage="reporter"><span class="step-ic"></span>Drafting the report</li>
       </ol>
 
-      <p id="liveStatus" class="live-status" aria-live="polite"></p>
+      <p id="liveStatus" class="loader-status" aria-live="polite"></p>
 
-      <div class="fact-card">
-        <span class="fact-label">Did you know</span>
-        <p id="factText" class="fact-text"></p>
-      </div>
-
-      <div class="shimmer-bar"><span></span></div>
+      <div class="progress"><span></span></div>
     </div>
   </div>
 

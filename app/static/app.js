@@ -4,33 +4,9 @@
 
 const $ = (sel) => document.querySelector(sel);
 
-// ---- Finance / fincrime / AML / KYC facts (rotated during investigation) ----
-const FACTS = [
-  "The UN estimates 2–5% of global GDP — up to <b>$2 trillion</b> — is laundered every year.",
-  "In India, any cash transaction of <b>₹10 lakh or more</b> must be reported to FIU-IND as a CTR.",
-  "Under PMLA Rules 2005, Rule 8(2), a Suspicious Transaction Report must be filed <b>“promptly”</b> — not on a fixed 7-day clock.",
-  "<b>Structuring</b> (a.k.a. smurfing) splits a large sum into smaller deposits to slip under reporting thresholds.",
-  "The <b>FATF</b> sets the global AML standard through its 40 Recommendations, adopted by 200+ jurisdictions.",
-  "<b>Layering</b> is the money-laundering stage where illicit funds are moved rapidly to obscure their origin.",
-  "A <b>PEP</b> — Politically Exposed Person — triggers mandatory Enhanced Due Diligence under RBI KYC norms.",
-  "India’s <b>FIU-IND</b> received over 25 lakh STRs in a recent year — humans can’t triage that volume alone.",
-  "<b>KYC</b> (Know Your Customer) is the first line of defence: verify identity before money moves.",
-  "Trade-based money laundering hides value in <b>over- and under-invoiced</b> shipments of real goods.",
-  "‘<b>Placement</b>’ is the riskiest laundering stage — getting dirty cash into the financial system.",
-  "Sanctions screening must catch not just exact names but <b>aliases and fuzzy matches</b>.",
-  "A single missed sanctions hit can mean <b>multi-million-dollar fines</b> and criminal liability.",
-  "The PMLA, 2002 is India’s principal anti-money-laundering statute — enforced by the <b>Enforcement Directorate</b>.",
-  "<b>Rapid pass-through</b>: a large credit followed by many quick debits to new payees is a classic red flag.",
-  "Most AML alerts are <b>false positives</b> — the hard part is precision, not just catching everything.",
-  "Beneficial-ownership opacity via shell companies is the <b>#1 enabler</b> of cross-border laundering.",
-  "RBI requires banks to risk-categorise every customer as <b>low, medium, or high</b> risk.",
-];
-
-const PIPELINE_STAGES = ["planner", "investigator", "reasoner", "reporter"];
-
 let currentCase = null;
-let factTimer = null;
 let agentDecision = null;
+let lastReport = "";
 
 // ---- Theme ----
 function initTheme() {
@@ -106,28 +82,15 @@ function renderCase(c) {
 }
 
 // ---- Loading experience ----
-// The pipeline stages are driven by REAL Server-Sent Events from the agent
-// (see investigate()), not a cosmetic timer. Facts rotate independently.
+// The pipeline steps are driven by REAL Server-Sent Events from the agent
+// (see investigate()), so the UI shows exactly what the agent is doing.
 function startLoadingAnimation() {
   $("#loadingOverlay").classList.remove("hidden");
-  $("#liveStatus").textContent = "";
+  $("#liveStatus").textContent = "Initializing…";
   document.querySelectorAll("#pipeline li").forEach((li) => li.classList.remove("active", "done"));
-
-  let fi = Math.floor(Math.random() * FACTS.length);
-  const factEl = $("#factText");
-  factEl.innerHTML = FACTS[fi];
-  factTimer = setInterval(() => {
-    factEl.classList.add("fading");
-    setTimeout(() => {
-      fi = (fi + 1) % FACTS.length;
-      factEl.innerHTML = FACTS[fi];
-      factEl.classList.remove("fading");
-    }, 400);
-  }, 4200);
 }
 
 function stopLoadingAnimation() {
-  clearInterval(factTimer);
   document.querySelectorAll("#pipeline li").forEach((li) => { li.classList.remove("active"); li.classList.add("done"); });
   $("#loadingOverlay").classList.add("hidden");
 }
@@ -191,12 +154,47 @@ async function investigate() {
   }
 }
 
+// Render the STR markdown as a clean formatted document (no raw asterisks).
+function renderReportMarkdown(md) {
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  const lines = md.replace(/\r/g, "").split("\n");
+  let html = "", listOpen = false, firstHeading = true;
+  const closeList = () => { if (listOpen) { html += "</ul>"; listOpen = false; } };
+
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, "");
+    if (!line.trim()) { closeList(); continue; }
+
+    const headingMatch = line.match(/^\*\*(.+?)\*\*:?\s*$/);
+    if (headingMatch && !line.trim().startsWith("-")) {
+      closeList();
+      const text = headingMatch[1];
+      if (firstHeading) { html += `<div class="rd-title">${esc(text)}</div>`; firstHeading = false; }
+      else { html += `<div class="rd-h">${esc(text)}</div>`; }
+      continue;
+    }
+
+    if (/^\s*-\s+/.test(raw)) {
+      if (!listOpen) { html += '<ul class="rd-list">'; listOpen = true; }
+      const sub = /^\s{2,}-\s+/.test(raw) ? " rd-sub" : "";
+      html += `<li class="${sub.trim()}">${inline(raw.replace(/^\s*-\s+/, ""))}</li>`;
+      continue;
+    }
+
+    closeList();
+    html += `<p class="rd-p">${inline(line)}</p>`;
+  }
+  closeList();
+  return html;
+}
+
 function renderResult(data) {
   agentDecision = data.decision;
   const esc8 = data.decision === "ESCALATE";
   const pct = Math.round((data.confidence || 0) * 100);
-  const circ = 2 * Math.PI * 32;
+  const circ = 2 * Math.PI * 26;
   const offset = circ * (1 - (data.confidence || 0));
+  lastReport = data.report || "";
 
   const steps = (data.investigation_steps || []).map((s) => {
     const m = s.match(/^([^:]+):\s*(.*)$/);
@@ -225,12 +223,13 @@ function renderResult(data) {
           ${typChip}
         </div>
         <div class="conf-ring">
-          <svg width="76" height="76">
-            <circle class="track" cx="38" cy="38" r="32" fill="none" stroke-width="6"/>
-            <circle class="fill" cx="38" cy="38" r="32" fill="none" stroke-width="6"
+          <svg width="64" height="64">
+            <circle class="track" cx="32" cy="32" r="26" fill="none" stroke-width="5"/>
+            <circle class="fill" cx="32" cy="32" r="26" fill="none" stroke-width="5"
               stroke-dasharray="${circ}" stroke-dashoffset="${circ}" id="confFill"/>
           </svg>
           <div class="conf-val">${pct}%</div>
+          <div class="conf-cap">confidence</div>
         </div>
       </div>
     </div>
@@ -245,10 +244,16 @@ function renderResult(data) {
 
     <div class="card">
       <div class="report-head">
-        <h3><svg viewBox="0 0 24 24" fill="none" width="17" height="17"><path d="M14 3v5h5M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg> Suspicious Transaction Report</h3>
+        <div class="rh-left">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M14 3v5h5M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          <div>
+            <h3>Suspicious Transaction Report</h3>
+            <div class="rh-sub">FIU-IND · PMLA 2002</div>
+          </div>
+        </div>
         <button class="copy-btn" id="copyBtn"><svg viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" stroke-width="2"/></svg> Copy</button>
       </div>
-      <div class="report-body" id="reportBody">${esc(data.report)}</div>
+      <div class="report-doc" id="reportBody">${renderReportMarkdown(data.report || "")}</div>
     </div>
 
     <div class="card reviewer-card">
@@ -274,7 +279,7 @@ function renderResult(data) {
 function wireResult(esc8) {
   $('[data-card="auditCard"]').addEventListener("click", () => $("#auditCard").classList.toggle("open"));
   $("#copyBtn").addEventListener("click", async () => {
-    await navigator.clipboard.writeText($("#reportBody").innerText);
+    await navigator.clipboard.writeText(lastReport);
     showToast("STR report copied to clipboard");
   });
   let action = "approve";
