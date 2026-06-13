@@ -75,11 +75,14 @@ def _run_case(case: dict, tag: str) -> dict:
         }
 
 
-def run_eval(tag: str, out_path: Path, workers: int, limit: int | None) -> dict:
+def run_eval(tag: str, out_path: Path, workers: int, limit: int | None,
+             cases_path: Path | None = None) -> dict:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
-    cases = json.loads(_TRAIN.read_text(encoding="utf-8"))
+    src = cases_path or _TRAIN
+    cases = json.loads(src.read_text(encoding="utf-8"))
+    print(f"Source: {src.name}")
     if limit:
         cases = cases[:limit]
 
@@ -126,6 +129,9 @@ if __name__ == "__main__":
     parser.add_argument("--out", default="eval/results_baseline.json")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--limit", type=int, default=None)
+    parser.add_argument("--cases", default=None,
+                        help="Path to a cases JSON (defaults to cases_train.json)")
     args = parser.parse_args()
 
-    run_eval(args.tag, Path(args.out), args.workers, args.limit)
+    run_eval(args.tag, Path(args.out), args.workers, args.limit,
+             Path(args.cases) if args.cases else None)

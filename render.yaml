@@ -1,0 +1,24 @@
+# Render Blueprint — deploys the Vigil FastAPI app (API + UI in one service).
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Before this works you must make the vector store available at runtime
+# (see DEPLOY.md). Set the secret env vars in the Render dashboard.
+services:
+  - type: web
+    name: vigil
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: OPENAI_API_KEY
+        sync: false          # set in dashboard (secret)
+      - key: LANGSMITH_API_KEY
+        sync: false          # set in dashboard (secret)
+      - key: LANGSMITH_PROJECT
+        value: vigil
+      - key: LANGSMITH_TRACING
+        value: "true"
