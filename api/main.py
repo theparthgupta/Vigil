@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -94,6 +94,87 @@ def investigate(case: Case) -> InvestigateResponse:
         investigation_steps=result["investigation_steps"],
         latency_seconds=round(latency, 2),
     )
+
+
+# ── Streaming investigation (Server-Sent Events) ──────────────────────────────
+# Emits per-node progress as the LangGraph agent runs, so the UI can show each
+# node firing in real time instead of freezing on a ~25s synchronous call.
+
+_RUNNING_MSG = {
+    "planner": "Planning the investigation…",
+    "investigator": "Gathering evidence — sanctions, patterns, profile…",
+    "reasoner": "Reasoning against PMLA / RBI regulation…",
+    "reporter": "Drafting the Suspicious Transaction Report…",
+}
+_ORDER = ["planner", "investigator", "reasoner", "reporter"]
+
+
+def _sse(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+
+def _done_message(node: str, delta: dict, final: dict) -> str:
+    """Human-readable 'what this node just did' line, built from the state delta."""
+    if node == "planner":
+        return "Planner selected tools: " + ", ".join(delta.get("tool_plan", []))
+    if node == "investigator":
+        san = final.get("evidence", {}).get("sanctions", {})
+        hits = len(san.get("hits", []))
+        ran = list(final.get("evidence", {}).keys())
+        return (f"Evidence gathered — sanctions: {hits} hit(s) of "
+                f"{san.get('checked', 0)} screened; ran {', '.join(ran)}")
+    if node == "reasoner":
+        # name the regulatory sources actually read
+        srcs, seen = [], set()
+        for p in final.get("retrieved_passages", []):
+            short = p["citation"].split(" (")[0]
+            if short not in seen:
+                seen.add(short)
+                srcs.append(short)
+        src_str = "; ".join(srcs[:3]) if srcs else "regulatory corpus"
+        conf = int(round(delta.get("confidence", 0.0) * 100))
+        return f"Read {src_str} → {delta.get('decision', '?')} ({conf}% confidence)"
+    if node == "reporter":
+        return f"STR drafted ({len(delta.get('report', ''))} characters)"
+    return node
+
+
+@app.post("/investigate/stream")
+def investigate_stream(case: Case) -> StreamingResponse:
+    """Run the agent and stream per-node progress as SSE, ending with the result."""
+    case_dict = json.loads(case.model_dump_json())
+
+    def gen():
+        t0 = time.perf_counter()
+        final: dict = {}
+        # announce the first node as "running"
+        yield _sse("status", {"stage": "planner", "message": _RUNNING_MSG["planner"]})
+
+        for update in graph.stream(
+            initial_state(case_dict),
+            config={"tags": ["api", "stream"], "run_name": f"api-stream-{case.case_id}"},
+            stream_mode="updates",
+        ):
+            for node, delta in update.items():
+                final.update(delta)
+                if node in _ORDER:
+                    yield _sse("node", {"node": node, "message": _done_message(node, delta, final)})
+                    idx = _ORDER.index(node)
+                    if idx < len(_ORDER) - 1:
+                        nxt = _ORDER[idx + 1]
+                        yield _sse("status", {"stage": nxt, "message": _RUNNING_MSG[nxt]})
+
+        yield _sse("done", {
+            "case_id": case.case_id,
+            "decision": final.get("decision", ""),
+            "confidence": round(final.get("confidence", 0.0), 4),
+            "detected_typology": final.get("detected_typology", ""),
+            "report": final.get("report", ""),
+            "investigation_steps": final.get("investigation_steps", []),
+            "latency_seconds": round(time.perf_counter() - t0, 2),
+        })
+
+    return StreamingResponse(gen(), media_type="text/event-stream")
 
 
 # Static assets (styles.css, app.js). Mounted last so it never shadows API routes.

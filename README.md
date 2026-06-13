@@ -20,30 +20,25 @@ investigation while keeping a human in the loop on the final call.
 
 ## Architecture
 
-```
-                                  ┌─────────────────────────────────────────┐
-   flagged case (JSON)            │            LangGraph agent               │
-        │                         │                                          │
-        ▼                         │   ┌─────────┐    ┌──────────────┐        │
-  ┌───────────┐   POST /investigate │ │ PLANNER │──▶ │ INVESTIGATOR │        │
-  │  Web UI   │ ───────────────────▶│ │  (LLM)  │    │ (4 det. tools)│       │
-  │ (vanilla  │                    │  └─────────┘    └──────┬───────┘        │
-  │  JS SPA)  │ ◀───────────────── │                        ▼                │
-  └───────────┘   decision +       │                 ┌──────────────┐        │
-                  STR + audit      │   ┌──────────┐  │   REASONER   │        │
-        ▲                          │   │ REPORTER │◀─│  (LLM + RAG) │        │
-        │                          │   │  (LLM)   │  └──────┬───────┘        │
-   FastAPI (serves API + UI)       │   └──────────┘         │ conf < 0.6     │
-                                   │         ▲              └──▶ loop once ──┐│
-                                   │         └─────────────────────────────┘│
-                                   └─────────────────────────────────────────┘
-                                          │                    │
-                                  ┌───────▼────────┐   ┌────────▼─────────┐
-                                  │ Chroma RAG     │   │ Deterministic    │
-                                  │ 5 regulatory   │   │ tools: sanctions,│
-                                  │ docs, 928 chunks│  │ patterns, media, │
-                                  │ (PMLA/RBI/FIU) │   │ profile          │
-                                  └────────────────┘   └──────────────────┘
+```mermaid
+flowchart TB
+    UI["Web UI · vanilla JS SPA"] -->|"POST /investigate/stream"| API["FastAPI · serves API + UI"]
+    API --> P
+
+    subgraph AGENT["LangGraph agent"]
+        direction TB
+        P["🧭 Planner<br/>LLM — choose tools"]
+        I["🔍 Investigator<br/>deterministic — run 4 tools"]
+        R["⚖️ Reasoner<br/>LLM + RAG — ESCALATE / DISMISS"]
+        RP["📄 Reporter<br/>LLM — draft STR"]
+        P --> I --> R
+        R -->|"confidence ≥ 0.6"| RP
+        R -.->|"confidence < 0.6 · loop once"| I
+    end
+
+    I <-->|evidence| T["Deterministic tools<br/>sanctions · patterns · media · profile"]
+    R <-->|citations| C[("ChromaDB RAG<br/>5 regulatory docs · 928 chunks<br/>PMLA · RBI · FIU-IND")]
+    RP -->|"SSE: live node updates + decision + STR"| UI
 ```
 
 ---

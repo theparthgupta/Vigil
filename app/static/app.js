@@ -30,7 +30,6 @@ const PIPELINE_STAGES = ["planner", "investigator", "reasoner", "reporter"];
 
 let currentCase = null;
 let factTimer = null;
-let stageTimer = null;
 let agentDecision = null;
 
 // ---- Theme ----
@@ -107,9 +106,13 @@ function renderCase(c) {
 }
 
 // ---- Loading experience ----
+// The pipeline stages are driven by REAL Server-Sent Events from the agent
+// (see investigate()), not a cosmetic timer. Facts rotate independently.
 function startLoadingAnimation() {
   $("#loadingOverlay").classList.remove("hidden");
-  // facts
+  $("#liveStatus").textContent = "";
+  document.querySelectorAll("#pipeline li").forEach((li) => li.classList.remove("active", "done"));
+
   let fi = Math.floor(Math.random() * FACTS.length);
   const factEl = $("#factText");
   factEl.innerHTML = FACTS[fi];
@@ -121,47 +124,67 @@ function startLoadingAnimation() {
       factEl.classList.remove("fading");
     }, 400);
   }, 4200);
-
-  // pipeline stages advance on a timer (cosmetic; holds at reporter until response)
-  const items = [...document.querySelectorAll("#pipeline li")];
-  items.forEach((li) => li.classList.remove("active", "done"));
-  let si = 0;
-  items[0].classList.add("active");
-  stageTimer = setInterval(() => {
-    if (si < items.length - 1) {
-      items[si].classList.remove("active");
-      items[si].classList.add("done");
-      si++;
-      items[si].classList.add("active");
-    }
-  }, 5500);
 }
 
 function stopLoadingAnimation() {
   clearInterval(factTimer);
-  clearInterval(stageTimer);
   document.querySelectorAll("#pipeline li").forEach((li) => { li.classList.remove("active"); li.classList.add("done"); });
   $("#loadingOverlay").classList.add("hidden");
 }
 
-// ---- Investigate ----
+function setStageActive(stage) {
+  const li = document.querySelector(`#pipeline li[data-stage="${stage}"]`);
+  if (li) li.classList.add("active");
+}
+function setStageDone(stage) {
+  const li = document.querySelector(`#pipeline li[data-stage="${stage}"]`);
+  if (li) { li.classList.remove("active"); li.classList.add("done"); }
+}
+
+// ---- Investigate (streams per-node progress via SSE) ----
 async function investigate() {
   if (!currentCase) return;
   startLoadingAnimation();
-  const started = performance.now();
   try {
-    const res = await fetch("/investigate", {
+    const res = await fetch("/investigate/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(currentCase),
     });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
-    // ensure the animation is visible for at least a beat
-    const elapsed = performance.now() - started;
-    if (elapsed < 1800) await new Promise((r) => setTimeout(r, 1800 - elapsed));
+    if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+    let result = null;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const frames = buf.split("\n\n");
+      buf = frames.pop();                       // keep any partial frame
+      for (const frame of frames) {
+        if (!frame.trim()) continue;
+        const ev = (frame.match(/^event: (.*)$/m) || [])[1]?.trim() || "message";
+        const dataLine = (frame.match(/^data: (.*)$/m) || [])[1];
+        if (!dataLine) continue;
+        const data = JSON.parse(dataLine);
+        if (ev === "status") {
+          setStageActive(data.stage);
+          $("#liveStatus").textContent = data.message;
+        } else if (ev === "node") {
+          setStageDone(data.node);
+          $("#liveStatus").textContent = data.message;
+        } else if (ev === "done") {
+          result = data;
+        }
+      }
+    }
+
     stopLoadingAnimation();
-    renderResult(data);
+    if (result) renderResult(result);
+    else showToast("No result received from the agent", true);
   } catch (e) {
     stopLoadingAnimation();
     showToast("Investigation failed: " + e.message, true);
