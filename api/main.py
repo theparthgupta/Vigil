@@ -102,7 +102,7 @@ def investigate(case: Case) -> InvestigateResponse:
 
 _RUNNING_MSG = {
     "planner": "Planning the investigation…",
-    "investigator": "Gathering evidence — sanctions, patterns, profile…",
+    "investigator": "Gathering evidence: sanctions, patterns, profile…",
     "reasoner": "Reasoning against PMLA / RBI regulation…",
     "reporter": "Drafting the Suspicious Transaction Report…",
 }
@@ -121,7 +121,7 @@ def _done_message(node: str, delta: dict, final: dict) -> str:
         san = final.get("evidence", {}).get("sanctions", {})
         hits = len(san.get("hits", []))
         ran = list(final.get("evidence", {}).keys())
-        return (f"Evidence gathered — sanctions: {hits} hit(s) of "
+        return (f"Evidence gathered. Sanctions: {hits} hit(s) of "
                 f"{san.get('checked', 0)} screened; ran {', '.join(ran)}")
     if node == "reasoner":
         # name the regulatory sources actually read

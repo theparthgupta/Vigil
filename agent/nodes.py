@@ -188,7 +188,7 @@ def reasoner(state: VigilState) -> dict:
         "detected_typology": out.typology or "",
         "investigation_steps": state["investigation_steps"]
         + [f"Reasoner: {out.decision} (confidence={out.confidence:.2f}, "
-           f"typology={out.typology}) — {out.reasoning[:160]}"],
+           f"typology={out.typology}). {out.reasoning[:160]}"],
     }
 
 
@@ -214,7 +214,7 @@ def _reasoner_user_message(case: dict, evidence: dict, passages: list[dict]) -> 
     lines = [
         "CASE UNDER REVIEW",
         f"Customer: {cust['name']} ({cust['business_type']}), prior_flags={cust['prior_flags']}",
-        f"Profile risk: {prof.get('risk_level', 'n/a')} — {prof.get('summary', '')}",
+        f"Profile risk: {prof.get('risk_level', 'n/a')}. {prof.get('summary', '')}",
         "",
         "PRE-COMPUTED TRANSACTION FEATURES (do not recompute):",
         f"  total_transactions: {pat.get('total_transactions')}",

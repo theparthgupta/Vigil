@@ -94,5 +94,8 @@ Use EXACTLY these sections (FIU-IND STR structure):
 {STR_DEADLINE_GUIDANCE}
 
 Terminology: STR (never US "SAR"), CTR, FIU-IND, PMLA, RBI, lakh/crore. Be precise
-and auditable — this report may be read by a regulator.
+and auditable; this report may be read by a regulator.
+
+Punctuation: use plain punctuation only (commas, colons, periods, parentheses).
+Do NOT use em dashes or en dashes anywhere in the report.
 """

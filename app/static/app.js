@@ -198,10 +198,10 @@ function renderResult(data) {
 
   const steps = (data.investigation_steps || []).map((s) => {
     const m = s.match(/^([^:]+):\s*(.*)$/);
-    return m ? `<li><b>${esc(m[1])}</b> — ${esc(m[2])}</li>` : `<li>${esc(s)}</li>`;
+    return m ? `<li><b>${esc(m[1])}</b>: ${esc(m[2])}</li>` : `<li>${esc(s)}</li>`;
   }).join("");
 
-  const verdictText = esc8 ? "ESCALATE — file STR" : "DISMISS — no STR warranted";
+  const verdictText = esc8 ? "ESCALATE · File STR" : "DISMISS · No STR warranted";
   const subText = esc8
     ? "Suspicious activity identified. Recommend filing a Suspicious Transaction Report with FIU-IND."
     : "No reportable suspicion found. Activity consistent with the customer profile.";

@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vigil — Autonomous AML Investigation</title>
+  <title>Vigil · Autonomous AML Investigation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css?v=4" />
 </head>
 <body>
   <!-- Ambient background -->
@@ -30,6 +30,7 @@
       </div>
     </div>
     <div class="nav-actions">
+      <span class="status-pill"><span class="status-dot"></span>System operational</span>
       <span class="reg-badge">PMLA 2002 · RBI KYC · FIU-IND STR</span>
       <button id="themeToggle" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">
         <svg class="ic-sun" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2"/><path d="M12 1.5v3M12 19.5v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1.5 12h3M19.5 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -39,6 +40,13 @@
   </header>
 
   <main class="container">
+    <!-- Hero -->
+    <section class="hero reveal">
+      <div class="hero-eyebrow"><span class="hero-dot"></span>AML Intelligence · India</div>
+      <h1 class="hero-title">Investigate a flagged case<br>in two minutes, not forty.</h1>
+      <p class="hero-sub">An autonomous compliance analyst that screens sanctions, applies PMLA &amp; RBI regulation, and drafts a filing-ready STR, with a human on the final call.</p>
+    </section>
+
     <!-- Case panel -->
     <section id="casePanel" class="panel reveal">
       <div class="panel-head">
@@ -86,7 +94,7 @@
 
       <ol class="steps" id="pipeline">
         <li data-stage="planner"><span class="step-ic"></span>Planning the investigation</li>
-        <li data-stage="investigator"><span class="step-ic"></span>Gathering evidence — sanctions, patterns, profile</li>
+        <li data-stage="investigator"><span class="step-ic"></span>Gathering evidence: sanctions, patterns, profile</li>
         <li data-stage="reasoner"><span class="step-ic"></span>Reasoning against PMLA / RBI regulation</li>
         <li data-stage="reporter"><span class="step-ic"></span>Drafting the report</li>
       </ol>
@@ -100,6 +108,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=4"></script>
 </body>
 </html>
