@@ -305,15 +305,8 @@ function wireResult(esc8) {
 // ============================================================
 let mode = "sample";
 
-// The schema enums are fixed (data/schema.py). The form offers friendlier
-// labels; map them to valid enum values so the POSTed Case always validates.
-const BTYPE_MAP = {
-  retail_trader: "retail", sme: "sme", jewelry: "jewelry",
-  real_estate: "real_estate", logistics: "logistics",
-  restaurant: "hospitality", other: "individual",
-};
-// Channel enum has no IMPS; map it to NEFT (closest instant interbank transfer).
-const CHANNEL_MAP = { UPI: "UPI", NEFT: "NEFT", RTGS: "RTGS", cash: "cash", IMPS: "NEFT" };
+// Every form value is a valid enum value in data/schema.py (BusinessType,
+// Channel, Direction), so values pass through directly with no mapping.
 const CHANNELS = ["UPI", "NEFT", "RTGS", "cash", "IMPS"];
 
 const randHex = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join("");
@@ -383,7 +376,7 @@ function buildCustomCase() {
       counterparty_name: cp,
       counterparty_account: randDigits(14),
       direction: row.querySelector(".ct-direction").value,
-      channel: CHANNEL_MAP[row.querySelector(".ct-channel").value] || "NEFT",
+      channel: row.querySelector(".ct-channel").value,
     });
   }
 
@@ -393,15 +386,15 @@ function buildCustomCase() {
     customer: {
       id: cid,
       name,
-      business_type: BTYPE_MAP[$("#cf-btype").value] || "individual",
+      business_type: $("#cf-btype").value,
       account_open_date: opened + "T00:00:00",
       stated_monthly_turnover_inr: (parseFloat($("#cf-turnover").value) || 0) * 1e5,
       prior_flags: parseInt($("#cf-flags").value, 10) || 0,
     },
     transactions,
-    // ground_truth_label is required by the schema but unused by the agent
-    // (the agent decides). Placeholder for a user-submitted case.
-    ground_truth_label: "clean",
+    // No ground truth for a user-submitted case; the agent decides.
+    // "custom" is an explicit Label sentinel (data/schema.py).
+    ground_truth_label: "custom",
     typology: null,
     notes: "User-submitted custom case.",
   };

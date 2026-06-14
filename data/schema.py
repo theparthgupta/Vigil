@@ -16,6 +16,8 @@ class BusinessType(str, Enum):
     logistics = "logistics"
     textile = "textile"
     jewelry = "jewelry"
+    restaurant = "restaurant"   # user-facing custom-case option
+    other = "other"             # user-facing custom-case option
 
 
 class Direction(str, Enum):
@@ -28,11 +30,13 @@ class Channel(str, Enum):
     neft = "NEFT"
     rtgs = "RTGS"
     cash = "cash"
+    imps = "IMPS"
 
 
 class Label(str, Enum):
     suspicious = "suspicious"
     clean = "clean"
+    custom = "custom"   # user-submitted case: no ground-truth label
 
 
 class Typology(str, Enum):
