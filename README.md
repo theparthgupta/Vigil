@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/python-3.11+-blue)
+![Tests](https://img.shields.io/badge/tests-63%20passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
+![LangGraph](https://img.shields.io/badge/built%20with-LangGraph-orange)
+
 # Vigil
 
 > An AI compliance analyst that takes a flagged transaction case, autonomously investigates it against live sanctions data and Indian PMLA/RBI regulations, and produces a legally-grounded **STR-format report** with a clear ESCALATE/DISMISS recommendation — turning a 40-minute manual review into a 2-minute one.
@@ -21,24 +26,21 @@ investigation while keeping a human in the loop on the final call.
 ## Architecture
 
 ```mermaid
-flowchart TB
-    UI["Web UI · vanilla JS SPA"] -->|"POST /investigate/stream"| API["FastAPI · serves API + UI"]
-    API --> P
+flowchart TD
+    A[Flagged Case Input] --> B[🧠 Planner Node\nLLM decides tool order]
+    B --> C[🔍 Investigator Node\nRuns 4 deterministic tools]
+    C --> D[⚖️ Reasoner Node\nRAG + regulatory synthesis]
+    D -->|confidence ≥ 0.6| E[📄 Reporter Node\nGenerates STR report]
+    D -->|confidence < 0.6| C
+    E --> F[ESCALATE / DISMISS\n+ Citation-grounded STR]
 
-    subgraph AGENT["LangGraph agent"]
-        direction TB
-        P["🧭 Planner<br/>LLM — choose tools"]
-        I["🔍 Investigator<br/>deterministic — run 4 tools"]
-        R["⚖️ Reasoner<br/>LLM + RAG — ESCALATE / DISMISS"]
-        RP["📄 Reporter<br/>LLM — draft STR"]
-        P --> I --> R
-        R -->|"confidence ≥ 0.6"| RP
-        R -.->|"confidence < 0.6 · loop once"| I
+    subgraph Tools
+        G[Sanctions Lookup\nOpenSanctions API]
+        H[Pattern Detector\nStructuring + Passthrough]
+        I[Adverse Media\nDuckDuckGo]
+        J[Profile Scorer\nRisk tier]
     end
-
-    I <-->|evidence| T["Deterministic tools<br/>sanctions · patterns · media · profile"]
-    R <-->|citations| C[("ChromaDB RAG<br/>5 regulatory docs · 928 chunks<br/>PMLA · RBI · FIU-IND")]
-    RP -->|"SSE: live node updates + decision + STR"| UI
+    C --> Tools
 ```
 
 ---
@@ -114,18 +116,37 @@ can't hallucinate a transaction amount or count.
 
 ---
 
-## Regulatory corpus (RAG)
+## Regulatory corpus
 
 928 section-aware chunks across 5 documents, embedded with `text-embedding-3-small` in ChromaDB.
 Chunking respects legal section boundaries so citations stay intact.
 
-| Document | Citation | Role |
-|---|---|---|
-| Prevention of Money-Laundering Act, 2002 | Act No. 15 of 2003 | Core AML statute |
-| PMLA (Maintenance of Records) Rules, 2005 | G.S.R. 444(E) | STR/CTR filing deadlines |
-| RBI KYC Master Directions, 2025 | DOR.AML.REC.No.88/14.01.002/2025-26 | KYC/EDD, PEP rules |
-| FIU-IND Reporting Format v1.14 | FINnet 2.0 | STR structure *(distribution-restricted — not in repo)* |
-| APG Yearly Typologies Report, 2024 | Asia/Pacific Group | ML/TF typologies |
+```mermaid
+graph LR
+    A[928 chunks\n5 documents] --> B[PMLA 2002\n158 chunks]
+    A --> C[PMLA Rules 2005\n35 chunks]
+    A --> D[RBI KYC MD 2025\n226 chunks]
+    A --> E[FIU-IND FINnet 2.0\n22 chunks]
+    A --> F[APG Typologies 2024\n487 chunks]
+```
+
+### Documents and where to download them
+
+The vector store is **not** committed — build it locally with `python rag/ingest.py` after
+placing the source PDFs in `regs/`. Four of the five are public; the FIU-IND reporting
+format is distribution-restricted and **must be downloaded manually** from the official
+portal (it is not included in this repository).
+
+| # | Document | Citation | Chunks | Download |
+|---|---|---|---|---|
+| 1 | Prevention of Money-Laundering Act, 2002 | Act No. 15 of 2003 | 158 | [India Code](https://www.indiacode.nic.in) — search "Prevention of Money-laundering Act 2002" |
+| 2 | PMLA (Maintenance of Records) Rules, 2005 | G.S.R. 444(E) | 35 | [FIU-IND](https://fiuindia.gov.in) → Acts & Rules |
+| 3 | RBI KYC Master Direction, 2025 | DOR.AML.REC.No.88/14.01.002/2025-26 | 226 | [RBI](https://www.rbi.org.in) → Notifications → Master Directions → "Know Your Customer" |
+| 4 | FIU-IND Reporting Format v1.14 (FINnet 2.0) | FINnet 2.0 | 22 | [FIU-IND](https://fiuindia.gov.in) → FINGate / Reporting Format — **restricted, download manually** |
+| 5 | APG Yearly Typologies Report, 2024 | Asia/Pacific Group on Money Laundering | 487 | [APG](https://www.apgml.org) → Documents → Typologies Reports |
+
+Expected filenames in `regs/`: `A2003-15.pdf` (PMLA), `PMLA_Rules.pdf`, `169MD.pdf` (RBI),
+`Reporting_Format.pdf` (FIU-IND), `2024_APG_Typologies_Report.pdf`.
 
 ---
 
@@ -208,7 +229,7 @@ agent/  LangGraph graph, nodes, state, prompts
 eval/   evaluation harness + metrics + results
 api/    FastAPI app (serves the agent API + the UI)
 app/    static single-page UI (HTML/CSS/JS)
-regs/   source regulatory PDFs (gitignored)
+regs/   source regulatory PDFs (FIU-IND doc gitignored; see Regulatory corpus)
 ```
 
 See **[DECISIONS.md](DECISIONS.md)** for the full engineering narrative — every significant

@@ -1,11 +1,11 @@
-# Environment
+# Environment / secrets
 .env
 *.env
 
 # Python
 venv/
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 .pytest_cache/
 .mypy_cache/
@@ -14,15 +14,16 @@ __pycache__/
 dist/
 build/
 
-# Data (generated, not source)
-data/cases/*.json
-data/cases/*.jsonl
-
-# Chroma DB (generated vector store)
+# Generated vector store (rebuilt by `python rag/ingest.py`)
+chroma_db/
 rag/chroma_db/
 
-# Regs (PDFs — large binary files, commit only if small)
-regs/*.pdf
+# Regulatory source — distribution-restricted, download manually (see README)
+regs/Reporting_Format.pdf
+
+# Background-task / run artifacts
+*.output
+*.tmp
 
 # IDE
 .vscode/

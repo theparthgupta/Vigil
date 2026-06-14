@@ -1,7 +1,5 @@
 # Launch post (X / Twitter)
 
-> Note: project was renamed **Prahari → Vigil**. This is written for the current brand, Vigil.
-
 ## Main tweet (≤280 chars)
 
 ```
