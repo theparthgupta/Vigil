@@ -105,14 +105,14 @@ function setStageDone(stage) {
 }
 
 // ---- Investigate (streams per-node progress via SSE) ----
-async function investigate() {
-  if (!currentCase) return;
+async function runInvestigation(caseObj) {
+  if (!caseObj) return;
   startLoadingAnimation();
   try {
     const res = await fetch("/investigate/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(currentCase),
+      body: JSON.stringify(caseObj),
     });
     if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
 
@@ -300,6 +300,122 @@ function wireResult(esc8) {
   });
 }
 
+// ============================================================
+//  Custom case mode
+// ============================================================
+let mode = "sample";
+
+// The schema enums are fixed (data/schema.py). The form offers friendlier
+// labels; map them to valid enum values so the POSTed Case always validates.
+const BTYPE_MAP = {
+  retail_trader: "retail", sme: "sme", jewelry: "jewelry",
+  real_estate: "real_estate", logistics: "logistics",
+  restaurant: "hospitality", other: "individual",
+};
+// Channel enum has no IMPS; map it to NEFT (closest instant interbank transfer).
+const CHANNEL_MAP = { UPI: "UPI", NEFT: "NEFT", RTGS: "RTGS", cash: "cash", IMPS: "NEFT" };
+const CHANNELS = ["UPI", "NEFT", "RTGS", "cash", "IMPS"];
+
+const randHex = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+const randDigits = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join("");
+
+function txnRow(p = {}) {
+  const row = document.createElement("div");
+  row.className = "ctxn-row";
+  row.innerHTML = `
+    <input class="ct-date" type="date" value="${p.date || ""}" />
+    <input class="ct-amount" type="number" min="0" step="1000" placeholder="0" value="${p.amount || ""}" />
+    <select class="ct-direction">
+      <option value="credit"${p.direction === "credit" ? " selected" : ""}>Credit</option>
+      <option value="debit"${p.direction === "debit" ? " selected" : ""}>Debit</option>
+    </select>
+    <select class="ct-channel">${CHANNELS.map((c) => `<option${p.channel === c ? " selected" : ""}>${c}</option>`).join("")}</select>
+    <input class="ct-cp" type="text" placeholder="Counterparty name" value="${p.cp ? esc(p.cp) : ""}" />
+    <button type="button" class="ctxn-remove" title="Remove transaction">&times;</button>`;
+  row.querySelector(".ctxn-remove").addEventListener("click", () => {
+    if (document.querySelectorAll("#ctxn-rows .ctxn-row").length <= 1) {
+      showToast("At least one transaction is required", true);
+      return;
+    }
+    row.remove();
+  });
+  return row;
+}
+
+function addTxnRow(p) { $("#ctxn-rows").appendChild(txnRow(p)); }
+
+// Pre-fill with a realistic structuring example so the format is obvious.
+function seedCustomForm() {
+  $("#cf-name").value = "Sharma Textiles";
+  $("#cf-btype").value = "sme";
+  $("#cf-turnover").value = "45";
+  $("#cf-flags").value = "1";
+  $("#cf-opened").value = "2021-06-15";
+  $("#ctxn-rows").innerHTML = "";
+  addTxnRow({ date: "2024-03-05", amount: 920000, direction: "credit", channel: "cash", cp: "Cash Deposit - Mumbai Andheri Branch" });
+  addTxnRow({ date: "2024-03-14", amount: 880000, direction: "credit", channel: "cash", cp: "Cash Deposit - Pune Kothrud Branch" });
+  addTxnRow({ date: "2024-03-22", amount: 950000, direction: "credit", channel: "cash", cp: "Cash Deposit - Delhi CP Branch" });
+}
+
+// Validate the form and build a schema-valid Case JSON, or null on error.
+function buildCustomCase() {
+  const name = $("#cf-name").value.trim();
+  if (!name) { showToast("Customer name is required", true); return null; }
+
+  const rows = [...document.querySelectorAll("#ctxn-rows .ctxn-row")];
+  if (rows.length < 1) { showToast("Add at least one transaction", true); return null; }
+
+  const cid = "cust_custom_" + randHex(6);
+  const transactions = [];
+  for (const row of rows) {
+    const date = row.querySelector(".ct-date").value;
+    const amount = parseFloat(row.querySelector(".ct-amount").value);
+    const cp = row.querySelector(".ct-cp").value.trim();
+    if (!date || !(amount > 0) || !cp) {
+      showToast("Each transaction needs a date, an amount and a counterparty", true);
+      return null;
+    }
+    transactions.push({
+      id: "txn_" + randHex(8),
+      customer_id: cid,
+      amount_inr: amount,
+      timestamp: date + "T00:00:00",
+      counterparty_name: cp,
+      counterparty_account: randDigits(14),
+      direction: row.querySelector(".ct-direction").value,
+      channel: CHANNEL_MAP[row.querySelector(".ct-channel").value] || "NEFT",
+    });
+  }
+
+  const opened = $("#cf-opened").value || "2020-01-01";
+  return {
+    case_id: "case_custom_" + Date.now().toString(36),
+    customer: {
+      id: cid,
+      name,
+      business_type: BTYPE_MAP[$("#cf-btype").value] || "individual",
+      account_open_date: opened + "T00:00:00",
+      stated_monthly_turnover_inr: (parseFloat($("#cf-turnover").value) || 0) * 1e5,
+      prior_flags: parseInt($("#cf-flags").value, 10) || 0,
+    },
+    transactions,
+    // ground_truth_label is required by the schema but unused by the agent
+    // (the agent decides). Placeholder for a user-submitted case.
+    ground_truth_label: "clean",
+    typology: null,
+    notes: "User-submitted custom case.",
+  };
+}
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll("#caseTabs .tab").forEach((t) => t.classList.toggle("active", t.dataset.mode === m));
+  $("#sampleMode").classList.toggle("hidden", m !== "sample");
+  $("#customMode").classList.toggle("hidden", m !== "custom");
+  $("#resultPanel").classList.add("hidden");
+  $("#investigateBtn").disabled = m === "sample" ? !currentCase : false;
+}
+
 // ---- Toast ----
 function showToast(msg, warn = false) {
   const t = $("#toast");
@@ -316,5 +432,20 @@ function showToast(msg, warn = false) {
 // ---- Init ----
 initTheme();
 $("#loadSample").addEventListener("click", loadSample);
-$("#investigateBtn").addEventListener("click", investigate);
+
+document.querySelectorAll("#caseTabs .tab").forEach((t) =>
+  t.addEventListener("click", () => setMode(t.dataset.mode))
+);
+$("#addTxn").addEventListener("click", () => addTxnRow());
+
+$("#investigateBtn").addEventListener("click", () => {
+  if (mode === "custom") {
+    const c = buildCustomCase();
+    if (c) runInvestigation(c);
+  } else if (currentCase) {
+    runInvestigation(currentCase);
+  }
+});
+
+seedCustomForm();
 loadSample();

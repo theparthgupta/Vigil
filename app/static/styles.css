@@ -324,6 +324,42 @@ textarea.note::placeholder { color: var(--text-faint); }
 .toast .tdot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
 .toast.warn .tdot { background: var(--gold); }
 
+/* ============================================================
+   Tabs + custom-case form
+   ============================================================ */
+.tabs { display: flex; gap: 2px; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+.tab { font-family: var(--font); font-weight: 600; font-size: 13.5px; padding: 10px 16px; background: none; border: none; border-bottom: 2px solid transparent; color: var(--text-dim); cursor: pointer; margin-bottom: -1px; transition: all 0.2s var(--ease); letter-spacing: -0.01em; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--text); border-bottom-color: var(--gold); }
+
+.form-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin-bottom: 13px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 26px; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field.span2 { grid-column: span 2; }
+.field label { font-size: 10.5px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.field input, .field select, .ctxn-row input, .ctxn-row select {
+  font-family: var(--font); font-size: 13.5px; color: var(--text); width: 100%;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 11px; transition: border-color 0.18s var(--ease);
+}
+.field input::placeholder, .ctxn-row input::placeholder { color: var(--text-faint); }
+.field input:focus, .field select:focus, .ctxn-row input:focus, .ctxn-row select:focus { outline: none; border-color: var(--gold); }
+.field select, .ctxn-row select { cursor: pointer; }
+.field input[type="date"], .ctxn-row input[type="date"] { color-scheme: dark; }
+[data-theme="light"] .field input[type="date"], [data-theme="light"] .ctxn-row input[type="date"] { color-scheme: light; }
+
+.ctxn { border: 1px solid var(--border); border-radius: var(--r-sm); overflow-x: auto; }
+.ctxn-head, .ctxn-row { display: grid; grid-template-columns: 128px 110px 96px 92px minmax(140px, 1fr) 34px; gap: 8px; align-items: center; min-width: 620px; }
+.ctxn-head { padding: 11px 14px; background: var(--surface-2); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-faint); font-weight: 600; border-bottom: 1px solid var(--border); }
+.ctxn-row { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+#ctxn-rows .ctxn-row:last-child { border-bottom: none; }
+.ctxn-row input, .ctxn-row select { padding: 7px 9px; font-size: 12.5px; }
+.ctxn-row input.ct-amount { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.ctxn-remove { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface); color: var(--text-dim); cursor: pointer; font-size: 18px; line-height: 1; display: grid; place-items: center; transition: all 0.18s var(--ease); }
+.ctxn-remove:hover { color: var(--danger); border-color: var(--danger); }
+.btn-add { margin: 13px 14px; }
+
 @media (max-width: 720px) {
   .metrics, .skeleton-grid { grid-template-columns: repeat(2, 1fr); }
   .metric.wide { grid-column: span 2; }
@@ -332,5 +368,7 @@ textarea.note::placeholder { color: var(--text-faint); }
   .nav { padding: 14px 18px; }
   .hero-title { font-size: 31px; }
   .banner-row { flex-wrap: wrap; }
+  .form-grid { grid-template-columns: 1fr; }
+  .field.span2 { grid-column: span 1; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
