@@ -126,11 +126,13 @@ def investigator(state: VigilState) -> dict:
         evidence["patterns"] = analyze_patterns(txns)
 
     if "sanctions" in plan:
-        # 1st pass: screen all counterparties (cheap, local). Widen pass: same set
-        # (already exhaustive) — kept for symmetry / future remote API throttling.
+        # Synthetic cases (suspicious/clean) screen against the local list so results
+        # match the dataset's ground truth and stay deterministic. User-submitted
+        # custom cases carry real names, so screen those against the live API.
+        use_api = case.get("ground_truth_label") == "custom"
         hits = []
         for name in counterparties:
-            res = check_sanctions(name)
+            res = check_sanctions(name, use_api=use_api)
             if res["is_match"]:
                 hits.append(res)
         evidence["sanctions"] = {"hits": hits, "checked": len(counterparties)}

@@ -1,15 +1,13 @@
 """
 Tool 1 tests: sanctions / PEP screening.
 
-All tests run against the local fuzzy-match fallback (no OPENSANCTIONS_API_KEY).
+All tests run against the local fuzzy-match list — `check_sanctions` defaults to
+the local source (use_api=False), so these are deterministic and never touch the
+network, regardless of whether OPENSANCTIONS_API_KEY is set.
 Two real train cases are used: one sanctions_hit, one clean.
 """
 
-import os
-
 import pytest
-
-os.environ.pop("OPENSANCTIONS_API_KEY", None)   # force local list mode
 
 from tools.sanctions import check_sanctions
 
