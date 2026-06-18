@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 
+from monitor.behavioral import detect_behavioral_anomaly
 from monitor.graph import run_graph_analysis
 from monitor.typologies import (
     detect_dormant_reactivation,
@@ -86,19 +87,49 @@ def compute_risk_score(typology_results: list[dict], graph_result: dict | None =
     return round(min(1.0, max(typology_score, graph_score * 0.9)), 4)
 
 
+def combine_scores(
+    typology_score: float,
+    graph_score: float,
+    behavioral_score: float,
+    has_sanctions: bool = False,
+) -> float:
+    """
+    Blend the three detection layers into a single 0.0-1.0 risk score.
+
+    Weighted sum (typology 0.60 / graph 0.25 / behavioral 0.15), then:
+      OVERRIDE: a sanctions hit forces 1.0.
+      FLOOR:    a strong typology score (>=0.85) keeps the result at >=0.75.
+    """
+    combined = min(1.0, typology_score * 0.60 + graph_score * 0.25 + behavioral_score * 0.15)
+    if has_sanctions:
+        combined = 1.0
+    if typology_score >= 0.85:
+        combined = max(combined, 0.75)
+    return round(combined, 4)
+
+
 def run_detection(case: dict) -> dict:
     """
-    Full Layer-1 + Layer-2A detection over a case.
+    Full Layer-1 (typologies) + Layer-2A (graph) + Layer-2B (behavioral) detection.
 
-    Returns the flagged typologies, the full graph analysis, the combined risk
-    score, and whether it clears the triage threshold for LLM escalation.
+    Returns the flagged typologies, the graph analysis, the behavioral analysis,
+    the combined risk score, and whether it clears the triage threshold.
     """
     flags = _typology_flags(case)
     graph_analysis = run_graph_analysis(case)
-    risk_score = compute_risk_score(flags, graph_analysis)
+    behavioral = detect_behavioral_anomaly(case)
+
+    typology_score = compute_risk_score(flags, graph_analysis)
+    graph_score = graph_analysis["graph_risk_score"]
+    behavioral_score = behavioral["behavioral_score"] if behavioral["flagged"] else 0.0
+    has_sanctions = any(f["typology"] == "sanctions_hit" for f in flags)
+
+    risk_score = combine_scores(typology_score, graph_score, behavioral_score, has_sanctions)
+
     return {
         "typology_flags": flags,
         "graph_analysis": graph_analysis,
+        "behavioral_analysis": behavioral,
         "risk_score": risk_score,
         "above_threshold": risk_score >= TRIAGE_THRESHOLD,
     }

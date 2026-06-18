@@ -102,7 +102,7 @@ def test_run_detection_shape():
         ],
     }
     out = run_detection(case)
-    assert set(out.keys()) == {"typology_flags", "graph_analysis", "risk_score", "above_threshold"}
+    assert {"typology_flags", "graph_analysis", "risk_score", "above_threshold"} <= set(out.keys())
     assert isinstance(out["typology_flags"], list)
     assert isinstance(out["graph_analysis"], dict)
     assert isinstance(out["risk_score"], float)
