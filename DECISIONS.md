@@ -191,3 +191,14 @@ at the bottom.
 **Alternatives considered:** Build at `buildCommand` time (rejected — Render build env may not have the runtime secrets, and it duplicates work); persistent disk (kept as a paid-tier option in DEPLOY.md); commit the prebuilt store (rejected — it embeds the distribution-restricted FIU text).
 **How to verify:** Locally with a populated store, startup logs `RAG corpus ready (928 chunks).` (fast no-op). Delete `rag/chroma_db/` and start `uvicorn api.main:app` → logs `Building RAG corpus from regs/... done (N chunks)` then serves. `pytest -q` → 63 passed.
 ---
+
+---
+### 2026-06-14 — Phase 8A Layer 1: deterministic 10-typology rule engine (monitor/)
+**What changed:** New top-level package `monitor/`: `typologies.py` (10 pure-Python detectors — structuring, rapid_passthrough, sanctions_hit, round_trip, velocity_spike, dormant_reactivation, smurfing_network, high_risk_sector_spike, upi_micro_structuring, geographic_anomaly), `scorer.py` (`run_all_typologies`, `compute_risk_score`, `TRIAGE_THRESHOLD`), `__init__.py` exports. `tests/test_monitor.py` (26 tests).
+**Why:** Running the LLM agent on every transaction stream is slow and costly. A deterministic first-pass triage layer can score a case in microseconds and decide whether it is worth escalating to the LLM investigation graph — the agent should only see cases that already look risky.
+**What this is:** Each detector takes `(transactions, customer)` and returns `{flagged, typology, confidence, evidence, regulatory_ref}` with the exact numbers that triggered it and an India-specific citation. `compute_risk_score` takes the flagged set: base = highest severity weight, plus 0.08 per additional flag, capped at 1.0. `TRIAGE_THRESHOLD` (env `VIGIL_THRESHOLD`, default 0.60) is the escalate cutoff.
+**Why it matters here:** Cheap, explainable, auditable screening with citations — and a clean seam to gate the expensive agent. Reuses the existing `check_sanctions` (local-list default, so the engine stays offline/deterministic).
+**Drawbacks / risks:** Thresholds are hand-set heuristics, not calibrated against labelled data. Structuring branch 2 (>Rs.10L across ≥2 channels in 30d) is broad and may over-fire on legitimately busy accounts. `geographic_anomaly` infers state from name substrings (word-boundary matched) — a coarse proxy that misses names without geographic markers (returns a `state_inference_unavailable` reason rather than guessing). Not yet wired into the agent/API — this is Layer 1 only.
+**Alternatives considered:** Put these in the existing `tools/patterns.py` (rejected — that tool feeds the agent; the monitor is a separate triage stage with its own scoring contract); compute confidence from magnitude per detector (deferred — fixed per-typology confidence is enough for Layer 1; the scorer's weights drive routing).
+**How to verify:** `pytest tests/test_monitor.py -v` → 26 passed in ~0.4s, no network/LLM. Full suite → 89 passed.
+---
