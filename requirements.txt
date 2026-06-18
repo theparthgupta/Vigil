@@ -11,6 +11,7 @@ langsmith
 httpx
 requests
 pypdf
+networkx
 # opensanctions pip package requires pyicu (ICU C lib, not installable on Windows without
 # extra tooling). The OpenSanctions /match endpoint is plain REST — use httpx directly.
 # See tools/sanctions.py in Phase 2.

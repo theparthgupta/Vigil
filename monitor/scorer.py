@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 
+from monitor.graph import run_graph_analysis
 from monitor.typologies import (
     detect_dormant_reactivation,
     detect_geographic_anomaly,
@@ -53,22 +54,56 @@ _WEIGHTS = {
 TRIAGE_THRESHOLD = float(os.getenv("VIGIL_THRESHOLD", "0.60"))
 
 
-def run_all_typologies(case: dict) -> list[dict]:
-    """Run all 10 detectors over a case; return only the flagged results."""
+def _typology_flags(case: dict) -> list[dict]:
+    """Run all 10 typology detectors over a case; return only the flagged results."""
     transactions = case.get("transactions", [])
     customer = case.get("customer", {})
     results = [detect(transactions, customer) for detect in _DETECTORS]
     return [r for r in results if r["flagged"]]
 
 
-def compute_risk_score(typology_results: list[dict]) -> float:
+def compute_risk_score(typology_results: list[dict], graph_result: dict | None = None) -> float:
     """
-    Combine flagged typologies into a 0.0-1.0 risk score:
+    Combine flagged typologies (and optionally graph analysis) into a 0.0-1.0 score.
+
+    Typology component:
       base        = highest severity weight among the flagged typologies
       compounding = 0.08 for each additional flag beyond the first
+    If `graph_result` is given, fold in its score at 0.9 weight (heuristic on
+    limited synthetic data); otherwise return the typology score (backwards-compatible).
     """
-    if not typology_results:
-        return 0.0
-    base = max(_WEIGHTS.get(r["typology"], 0.0) for r in typology_results)
-    compounding = 0.08 * (len(typology_results) - 1)
-    return round(min(1.0, base + compounding), 4)
+    if typology_results:
+        base = max(_WEIGHTS.get(r["typology"], 0.0) for r in typology_results)
+        compounding = 0.08 * (len(typology_results) - 1)
+        typology_score = round(min(1.0, base + compounding), 4)
+    else:
+        typology_score = 0.0
+
+    if graph_result is None:
+        return typology_score
+
+    graph_score = graph_result.get("graph_risk_score", 0.0)
+    return round(min(1.0, max(typology_score, graph_score * 0.9)), 4)
+
+
+def run_detection(case: dict) -> dict:
+    """
+    Full Layer-1 + Layer-2A detection over a case.
+
+    Returns the flagged typologies, the full graph analysis, the combined risk
+    score, and whether it clears the triage threshold for LLM escalation.
+    """
+    flags = _typology_flags(case)
+    graph_analysis = run_graph_analysis(case)
+    risk_score = compute_risk_score(flags, graph_analysis)
+    return {
+        "typology_flags": flags,
+        "graph_analysis": graph_analysis,
+        "risk_score": risk_score,
+        "above_threshold": risk_score >= TRIAGE_THRESHOLD,
+    }
+
+
+def run_all_typologies(case: dict) -> list[dict]:
+    """Backwards-compatible wrapper: just the flagged typologies (Layer 1)."""
+    return run_detection(case)["typology_flags"]
