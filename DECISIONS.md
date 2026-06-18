@@ -180,3 +180,14 @@ at the bottom.
 **Alternatives considered:** Auto-toggle on key presence (rejected — the cause of the breakage); all-local always (rejected — wastes a working real-screening capability for custom cases); all-API including synthetic (rejected — invalidates the synthetic benchmark and would force restating the eval numbers).
 **How to verify:** `pytest tests/test_sanctions.py -q` → 8 passed in ~0.3s with no network, even with `OPENSANCTIONS_API_KEY` set. `pytest -q` → 63 passed. A custom case with a real flagged name routes to the API (`source: opensanctions_api`); synthetic cases stay `source: local_list`.
 ---
+
+---
+### 2026-06-14 — Auto-build the RAG corpus on startup (cold-deploy support)
+**What changed:** `api/main.py` gained a FastAPI `lifespan` that runs `_ensure_corpus()` before the app serves traffic: it checks the Chroma collection's chunk count and, if empty, calls `rag.ingest.ingest_all()` and logs `Building RAG corpus from regs/... done (N chunks)`. `DEPLOY.md` updated to describe the automatic behaviour.
+**Why:** Render's free tier does not persist `rag/chroma_db/` across deploys, and the store is gitignored, so a fresh container would boot with no corpus and the Reasoner's retrieval would return nothing. The app needs to be able to rebuild itself from the committed PDFs.
+**What this is:** A startup hook (ASGI lifespan) that makes the vector store self-healing: present → fast no-op; absent → build from `regs/` once, before the first request.
+**Why it matters here:** Makes a one-click Render deploy work with no persistent disk and no build step — only `OPENAI_API_KEY` (for embeddings) and the PDFs are required. Idempotent, so local runs and warm instances are unaffected.
+**Drawbacks / risks:** First boot blocks ~30–90 s while ~900 chunks embed (Render tolerates the startup window; later boots are instant). Ingest runs synchronously in the lifespan, so a hard failure (no key / no PDFs) fails startup by design rather than serving a broken agent. With the FIU document gitignored, the deployed corpus is the four public docs (slightly fewer chunks), which is fully functional.
+**Alternatives considered:** Build at `buildCommand` time (rejected — Render build env may not have the runtime secrets, and it duplicates work); persistent disk (kept as a paid-tier option in DEPLOY.md); commit the prebuilt store (rejected — it embeds the distribution-restricted FIU text).
+**How to verify:** Locally with a populated store, startup logs `RAG corpus ready (928 chunks).` (fast no-op). Delete `rag/chroma_db/` and start `uvicorn api.main:app` → logs `Building RAG corpus from regs/... done (N chunks)` then serves. `pytest -q` → 63 passed.
+---

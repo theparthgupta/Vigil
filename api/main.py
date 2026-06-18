@@ -18,6 +18,7 @@ import json
 import random
 import sys
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -38,10 +39,51 @@ _ROOT = Path(__file__).parent.parent
 _TRAIN = _ROOT / "data" / "cases_train.json"
 _STATIC = _ROOT / "app" / "static"
 
+
+def _corpus_count() -> int:
+    """How many chunks are in the Chroma collection (0 if it doesn't exist yet)."""
+    import chromadb
+
+    from rag.ingest import _CHROMA_DIR, _COLLECTION
+    try:
+        client = chromadb.PersistentClient(path=str(_CHROMA_DIR))
+        return client.get_collection(_COLLECTION).count()
+    except Exception:
+        return 0
+
+
+def _ensure_corpus() -> None:
+    """
+    Make sure the RAG vector store exists before serving requests.
+
+    On a fresh deploy (e.g. Render, where `chroma_db/` is not persisted) the
+    collection is empty, so build it from the PDFs in `regs/`. Idempotent: if
+    the corpus is already present, this is a fast no-op.
+    """
+    existing = _corpus_count()
+    if existing > 0:
+        print(f"RAG corpus ready ({existing} chunks).")
+        return
+
+    print("Building RAG corpus from regs/...", flush=True)
+    from rag.ingest import ingest_all
+
+    ingest_all()
+    print(f"Building RAG corpus from regs/... done ({_corpus_count()} chunks)", flush=True)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Build the RAG corpus before the app accepts any requests.
+    _ensure_corpus()
+    yield
+
+
 app = FastAPI(
     title="Vigil AML Investigation API",
     description="Autonomous AML triage agent for Indian financial institutions (PMLA/FIU-IND).",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 

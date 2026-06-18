@@ -35,30 +35,31 @@ Required env vars:
 
 ## 2. The vector store — the one real gotcha
 
-The app needs the Chroma vector store (`rag/chroma_db/`, ~29 MB) at runtime. It
-is **gitignored**, so it is NOT in the repo. Pick one:
+The app needs the Chroma vector store (`rag/chroma_db/`) at runtime. It is
+**gitignored**, so it is NOT in the repo.
 
-**Option A — Render persistent disk (recommended).**
-Add a disk to the service (mount at `/opt/render/project/src/rag/chroma_db`),
-then upload your locally-built `rag/chroma_db/` once. The free plan does not
-include disks, so this needs a paid instance.
+**This is now automatic.** On startup, `api/main.py` checks whether the Chroma
+collection has any chunks; if it is empty (a fresh Render deploy), it runs the
+ingest pipeline from the PDFs in `regs/` before the app accepts requests, and
+logs `Building RAG corpus from regs/... done (N chunks)`. So you do not need a
+persistent disk or a build step — just make sure `OPENAI_API_KEY` is set (used
+to embed the chunks) and the regulatory PDFs are present.
 
-**Option B — Re-ingest at build time.**
-Place the regulatory PDFs in `regs/` on the build (they are also gitignored),
-add `python rag/ingest.py` to the `buildCommand`, and ensure `OPENAI_API_KEY`
-is available at build (embeds 928 chunks, a few cents). Cleanest for a public
-repo because no regulatory text is committed.
+Consequences:
+- **First boot is slow** (~30–90 s) while the corpus embeds; Render's health
+  check tolerates the startup window, but the first deploy takes longer than later
+  ones. Subsequent boots on the same instance are instant (collection already populated).
+- The four **public** PDFs are committed, so a stock deploy builds a ~900-chunk
+  corpus automatically. The FIU-IND document is gitignored (see below); with it
+  absent the corpus is slightly smaller but fully functional.
+- For a paid instance you can still add a persistent disk mounted at
+  `rag/chroma_db/` to skip the rebuild entirely.
 
-**Option C — Commit the store.** Remove `rag/chroma_db/` from `.gitignore` and
-commit it. Simplest, but see the confidentiality note below.
-
-### ⚠️ Confidentiality note (read before Option C)
+### ⚠️ Confidentiality note
 `regs/Reporting_Format.pdf` (FIU-IND) carries a **"not for general distribution"**
-clause. Its text is also embedded inside the Chroma store. **Do not commit that
-document — or a vector store containing it — to a public repo** without
-clearance. The PMLA Act, PMLA Rules, RBI Master Directions and APG report are
-public; the FIU reporting-format spec is the sensitive one. If you go public,
-prefer Option A/B, or rebuild the store excluding the FIU document.
+clause, so it is gitignored and not deployed. The PMLA Act, PMLA Rules, RBI Master
+Directions and APG report are public and committed. If you want the FIU document in
+the live corpus, upload it to the instance out-of-band; do not commit it to a public repo.
 
 ---
 
