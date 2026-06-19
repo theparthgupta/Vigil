@@ -18,6 +18,9 @@ build/
 chroma_db/
 rag/chroma_db/
 
+# Trained Isolation Forest model (regenerates on first run/deploy)
+monitor/isolation_forest.pkl
+
 # Regulatory source — distribution-restricted, download manually (see README)
 regs/Reporting_Format.pdf
 

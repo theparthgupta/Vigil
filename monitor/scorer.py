@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import os
 
+from monitor.anomaly import detect_anomaly, load_or_train_model
 from monitor.behavioral import detect_behavioral_anomaly
 from monitor.graph import run_graph_analysis
 from monitor.typologies import (
@@ -54,6 +55,9 @@ _WEIGHTS = {
 # Cases scoring at/above this are routed to the LLM investigation agent.
 TRIAGE_THRESHOLD = float(os.getenv("VIGIL_THRESHOLD", "0.60"))
 
+# Load the Isolation Forest once (trains + persists on first import if absent).
+_ANOMALY_MODEL = load_or_train_model()
+
 
 def _typology_flags(case: dict) -> list[dict]:
     """Run all 10 typology detectors over a case; return only the flagged results."""
@@ -91,16 +95,22 @@ def combine_scores(
     typology_score: float,
     graph_score: float,
     behavioral_score: float,
+    anomaly_score: float = 0.0,
     has_sanctions: bool = False,
 ) -> float:
     """
-    Blend the three detection layers into a single 0.0-1.0 risk score.
+    Blend the four detection layers into a single 0.0-1.0 risk score.
 
-    Weighted sum (typology 0.60 / graph 0.25 / behavioral 0.15), then:
+    Weighted sum (typology 0.45 / graph 0.20 / behavioral 0.15 / anomaly 0.20), then:
       OVERRIDE: a sanctions hit forces 1.0.
       FLOOR:    a strong typology score (>=0.85) keeps the result at >=0.75.
     """
-    combined = min(1.0, typology_score * 0.60 + graph_score * 0.25 + behavioral_score * 0.15)
+    combined = min(1.0, (
+        typology_score * 0.45
+        + graph_score * 0.20
+        + behavioral_score * 0.15
+        + anomaly_score * 0.20
+    ))
     if has_sanctions:
         combined = 1.0
     if typology_score >= 0.85:
@@ -113,25 +123,31 @@ def run_detection(case: dict) -> dict:
     Full Layer-1 (typologies) + Layer-2A (graph) + Layer-2B (behavioral) detection.
 
     Returns the flagged typologies, the graph analysis, the behavioral analysis,
-    the combined risk score, and whether it clears the triage threshold.
+    the ML anomaly analysis, the combined risk score, and whether it clears the
+    triage threshold.
     """
     flags = _typology_flags(case)
     graph_analysis = run_graph_analysis(case)
     behavioral = detect_behavioral_anomaly(case)
+    anomaly = detect_anomaly(case, model=_ANOMALY_MODEL)
 
     typology_score = compute_risk_score(flags, graph_analysis)
     graph_score = graph_analysis["graph_risk_score"]
     behavioral_score = behavioral["behavioral_score"] if behavioral["flagged"] else 0.0
+    anomaly_score = anomaly["anomaly_score"] if anomaly["flagged"] else 0.0
     has_sanctions = any(f["typology"] == "sanctions_hit" for f in flags)
 
-    risk_score = combine_scores(typology_score, graph_score, behavioral_score, has_sanctions)
+    risk_score = combine_scores(
+        typology_score, graph_score, behavioral_score, anomaly_score, has_sanctions
+    )
 
     return {
         "typology_flags": flags,
         "graph_analysis": graph_analysis,
         "behavioral_analysis": behavioral,
+        "anomaly_analysis": anomaly,
         "risk_score": risk_score,
-        "above_threshold": risk_score >= TRIAGE_THRESHOLD,
+        "above_threshold": bool(risk_score >= TRIAGE_THRESHOLD),
     }
 
 

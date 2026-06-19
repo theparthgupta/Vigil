@@ -6,6 +6,7 @@ fastapi
 uvicorn
 pydantic
 scikit-learn
+joblib
 python-dotenv
 langsmith
 httpx

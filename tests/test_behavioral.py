@@ -100,7 +100,8 @@ def test_sanctions_override():
     assert run_detection(case_of(txns))["risk_score"] == 1.0
 
 
-# ── 8. Three-layer score formula ──────────────────────────────────────────────
+# ── 8. Score formula (anomaly layer defaults to 0 here) ───────────────────────
 
 def test_combine_scores_formula():
-    assert combine_scores(0.5, 0.4, 0.3) == 0.445
+    # 0.5*0.45 + 0.4*0.20 + 0.3*0.15 + 0.0*0.20 = 0.35
+    assert combine_scores(0.5, 0.4, 0.3, 0.0) == 0.35
