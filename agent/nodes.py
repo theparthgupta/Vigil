@@ -119,23 +119,36 @@ def investigator(state: VigilState) -> dict:
     evidence = dict(state["evidence"])   # copy; merge so a re-pass augments, not replaces
     counterparties = sorted({t["counterparty_name"] for t in txns})
 
+    # If the case came pre-screened through the monitor triage gate, reuse that
+    # work instead of redoing it (saves redundant tool calls in the agent flow).
+    pre = evidence.get("pre_screening")
+    pre_skips: list[str] = []
+
     if "profile" in plan:
         evidence["profile"] = summarize_profile(case["customer"])
 
     if "patterns" in plan:
         evidence["patterns"] = analyze_patterns(txns)
 
-    if "sanctions" in plan:
-        # Synthetic cases (suspicious/clean) screen against the local list so results
-        # match the dataset's ground truth and stay deterministic. User-submitted
-        # custom cases carry real names, so screen those against the live API.
-        use_api = case.get("ground_truth_label") == "custom"
-        hits = []
-        for name in counterparties:
-            res = check_sanctions(name, use_api=use_api)
-            if res["is_match"]:
-                hits.append(res)
-        evidence["sanctions"] = {"hits": hits, "checked": len(counterparties)}
+    if "sanctions" in plan and "sanctions" not in evidence:
+        # Pre-screening already screened sanctions: if it found no hit we trust
+        # that clean result and skip re-running check_sanctions. A pre-screened
+        # hit still re-runs here to capture the full match shape downstream.
+        if pre is not None and not _pre_has_sanctions(pre):
+            evidence["sanctions"] = {"hits": [], "checked": len(counterparties),
+                                     "source": "pre_screening"}
+            pre_skips.append("sanctions (clean from pre-screening)")
+        else:
+            # Synthetic cases (suspicious/clean) screen against the local list so results
+            # match the dataset's ground truth and stay deterministic. User-submitted
+            # custom cases carry real names, so screen those against the live API.
+            use_api = case.get("ground_truth_label") == "custom"
+            hits = []
+            for name in counterparties:
+                res = check_sanctions(name, use_api=use_api)
+                if res["is_match"]:
+                    hits.append(res)
+            evidence["sanctions"] = {"hits": hits, "checked": len(counterparties)}
 
     if "adverse_media" in plan:
         if is_widen_pass:
@@ -153,13 +166,21 @@ def investigator(state: VigilState) -> dict:
         }
 
     pass_label = "widened re-pass" if is_widen_pass else "initial pass"
+    skip_note = f"; reused pre-screening: {', '.join(pre_skips)}" if pre_skips else ""
     return {
         "evidence": evidence,
         "investigation_passes": state["investigation_passes"] + 1,
         "investigation_steps": state["investigation_steps"]
         + [f"Investigator ({pass_label}): ran {plan}; "
-           f"{len(evidence.get('sanctions', {}).get('hits', []))} sanctions hit(s)"],
+           f"{len(evidence.get('sanctions', {}).get('hits', []))} sanctions hit(s)"
+           f"{skip_note}"],
     }
+
+
+def _pre_has_sanctions(pre: dict) -> bool:
+    """True if the monitor pre-screening flagged a sanctions hit."""
+    return any(f.get("typology") == "sanctions_hit"
+               for f in pre.get("typology_flags", []))
 
 
 # ── 3. Reasoner ───────────────────────────────────────────────────────────────

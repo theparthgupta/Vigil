@@ -36,11 +36,20 @@ class VigilState(TypedDict):
     investigation_passes: int        # bounds the conditional loop to ONE extra pass
 
 
-def initial_state(case: dict) -> VigilState:
-    """Build a fresh state for a single case."""
+def initial_state(case: dict, detection_result: dict | None = None) -> VigilState:
+    """
+    Build a fresh state for a single case.
+
+    If `detection_result` is given (the case already cleared the monitor triage
+    gate via /detect or the triage queue), it is stashed at
+    evidence["pre_screening"] so the Investigator can skip redundant tool calls.
+    """
+    evidence: dict = {}
+    if detection_result is not None:
+        evidence["pre_screening"] = detection_result
     return VigilState(
         case=case,
-        evidence={},
+        evidence=evidence,
         retrieved_passages=[],
         decision="",
         confidence=0.0,

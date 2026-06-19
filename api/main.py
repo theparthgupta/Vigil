@@ -24,14 +24,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import Optional
 
 from agent.graph import graph
 from agent.state import initial_state
 from data.schema import Case
+from monitor.pipeline import process_batch, process_case
 
 load_dotenv()
 
@@ -93,6 +95,13 @@ def index() -> FileResponse:
     return FileResponse(_STATIC / "index.html")
 
 
+class InvestigateRequest(Case):
+    """A Case plus optional pre-computed monitor detection (from /detect or the
+    triage queue). Backwards-compatible: callers that POST a bare Case still work
+    — detection_result defaults to None and the agent runs exactly as before."""
+    detection_result: Optional[dict] = None
+
+
 class InvestigateResponse(BaseModel):
     case_id: str
     decision: str
@@ -101,6 +110,15 @@ class InvestigateResponse(BaseModel):
     report: str
     investigation_steps: list[str]
     latency_seconds: float
+
+
+class TriageBatchRequest(BaseModel):
+    cases: list[Case]
+
+
+_MAX_BATCH = 500
+# Most recent batch triage result, served by GET /triage-queue.
+_last_batch_result: Optional[dict] = None
 
 
 @app.get("/health")
@@ -115,20 +133,54 @@ def sample() -> dict:
     return random.choice(cases)
 
 
-@app.post("/investigate", response_model=InvestigateResponse)
-def investigate(case: Case) -> InvestigateResponse:
-    """Run a single case through the agent and return the decision + report."""
+@app.post("/detect")
+def detect(case: Case) -> dict:
+    """Cheap monitor triage for one case (no LLM). Sub-second."""
     case_dict = json.loads(case.model_dump_json())
+    return process_case(case_dict)
+
+
+@app.post("/triage-batch")
+def triage_batch(req: TriageBatchRequest) -> dict:
+    """Triage a batch of cases; cache the result for GET /triage-queue."""
+    global _last_batch_result
+    if len(req.cases) > _MAX_BATCH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Batch too large: {len(req.cases)} cases (max {_MAX_BATCH}).",
+        )
+    cases = [json.loads(c.model_dump_json()) for c in req.cases]
+    _last_batch_result = process_batch(cases)
+    return _last_batch_result
+
+
+@app.get("/triage-queue")
+def triage_queue() -> dict:
+    """Return the most recent batch triage result (empty if none run yet)."""
+    if _last_batch_result is None:
+        return {"message": "No batch processed yet", "triage_queue": []}
+    return _last_batch_result
+
+
+@app.post("/investigate", response_model=InvestigateResponse)
+def investigate(req: InvestigateRequest) -> InvestigateResponse:
+    """Run a single case through the agent and return the decision + report.
+
+    If `detection_result` is supplied (case already cleared the monitor gate),
+    it is passed into the graph as pre-screening so the Investigator can skip
+    redundant tool calls.
+    """
+    case_dict = json.loads(req.model_dump_json(exclude={"detection_result"}))
 
     t0 = time.perf_counter()
     result = graph.invoke(
-        initial_state(case_dict),
-        config={"tags": ["api"], "run_name": f"api-{case.case_id}"},
+        initial_state(case_dict, detection_result=req.detection_result),
+        config={"tags": ["api"], "run_name": f"api-{req.case_id}"},
     )
     latency = time.perf_counter() - t0
 
     return InvestigateResponse(
-        case_id=case.case_id,
+        case_id=req.case_id,
         decision=result["decision"],
         confidence=round(result["confidence"], 4),
         detected_typology=result.get("detected_typology", ""),
