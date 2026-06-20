@@ -372,3 +372,68 @@ textarea.note::placeholder { color: var(--text-faint); }
   .field.span2 { grid-column: span 1; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+
+/* ============================================================
+   Phase 10A — Batch triage (CSV upload, queue, risk bars)
+   ============================================================ */
+.csv-help { font-size: 12.5px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px; }
+.csv-help code { display: block; margin-top: 8px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); font-family: var(--mono, monospace); font-size: 11.5px; color: var(--text); word-break: break-word; }
+
+.dropzone { border: 1.5px dashed var(--border-2); border-radius: var(--r); padding: 34px 20px; text-align: center; cursor: pointer; transition: all 0.2s var(--ease); background: var(--surface-2); }
+.dropzone:hover, .dropzone.drag { border-color: var(--gold); background: var(--gold-tint); }
+.dz-ic { width: 30px; height: 30px; color: var(--gold); margin-bottom: 8px; }
+.dz-main { font-family: var(--display); font-weight: 600; font-size: 15px; }
+.dz-sub { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+.link-btn { background: none; border: none; color: var(--gold); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; text-decoration: none; }
+.link-btn:hover { text-decoration: underline; }
+.dz-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+
+.batch-warn { margin-top: 16px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--gold-tint); border: 1px solid var(--gold); color: var(--text); font-size: 12.5px; }
+.batch-warn ul { margin: 6px 0 0; padding-left: 18px; }
+.batch-warn li { margin: 2px 0; color: var(--text-dim); }
+
+.batch-preview { margin-top: 16px; }
+.bp-summary { font-size: 14px; }
+.bp-summary b { color: var(--gold); }
+.bp-details { margin-top: 8px; }
+.bp-details summary { cursor: pointer; font-size: 12.5px; color: var(--text-dim); }
+.bp-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+.bp-table th, .bp-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+.bp-table th { color: var(--text-dim); font-weight: 600; }
+.num { text-align: right !important; font-variant-numeric: tabular-nums; }
+
+.batch-spin { display: flex; align-items: center; gap: 12px; padding: 24px; color: var(--text-dim); font-size: 14px; }
+.spinner { width: 18px; height: 18px; border: 2px solid var(--border-2); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.batch-results { margin-top: 20px; }
+.batch-banner { padding: 14px 16px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--border); font-size: 13.5px; line-height: 1.6; }
+.batch-banner .hi { color: var(--gold); }
+
+.queue { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+.queue th { text-align: left; padding: 8px 12px; color: var(--text-dim); font-weight: 600; border-bottom: 1px solid var(--border); font-size: 12px; }
+.queue td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+
+.risk { display: flex; align-items: center; gap: 10px; }
+.risk-bar { width: 70px; height: 7px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.risk-fill { display: block; height: 100%; border-radius: 4px; }
+.risk-fill.red { background: var(--danger); }
+.risk-fill.orange { background: #e8924e; }
+.risk-fill.yellow { background: var(--gold); }
+.risk-num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.risk-num.red { color: var(--danger); }
+.risk-num.orange { color: #e8924e; }
+.risk-num.yellow { color: var(--gold); }
+
+.typ-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; text-transform: capitalize; }
+.typ-pill.red { background: var(--danger-tint); color: var(--danger); }
+.typ-pill.orange { background: rgba(232,146,78,0.14); color: #e8924e; }
+.typ-pill.yellow { background: var(--gold-tint); color: var(--gold); }
+.btn-row-inv { padding: 6px 12px; font-size: 12.5px; }
+
+.muted { color: var(--text-dim); font-size: 13px; margin-top: 14px; }
+.dismissed { margin-top: 16px; }
+.dismissed summary { cursor: pointer; font-size: 13px; color: var(--text-dim); font-weight: 600; }
+.dism-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.dism-list li { display: flex; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.dism-list .num { color: var(--text-dim); }

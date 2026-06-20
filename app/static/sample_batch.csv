@@ -1,0 +1,15 @@
+customer_name,business_type,monthly_turnover_lakhs,prior_flags,account_opened,txn_date,amount_inr,direction,channel,counterparty
+Patel Grocers,retail,30,0,2020-03-10,2024-04-02,45000,credit,UPI,Local Customer Payments
+Patel Grocers,retail,30,0,2020-03-10,2024-04-08,120000,debit,NEFT,Wholesale Supplier Mumbai
+Patel Grocers,retail,30,0,2020-03-10,2024-04-15,38000,credit,UPI,Local Customer Payments
+Patel Grocers,retail,30,0,2020-03-10,2024-04-21,95000,debit,NEFT,Packaging Vendor Pune
+Patel Grocers,retail,30,0,2020-03-10,2024-04-28,52000,credit,UPI,Local Customer Payments
+Sharma Textiles,sme,45,1,2021-06-15,2024-03-05,920000,credit,cash,Cash Deposit - Mumbai Andheri Branch
+Sharma Textiles,sme,45,1,2021-06-15,2024-03-14,880000,credit,cash,Cash Deposit - Pune Kothrud Branch
+Sharma Textiles,sme,45,1,2021-06-15,2024-03-22,950000,credit,cash,Cash Deposit - Delhi CP Branch
+Sharma Textiles,sme,45,1,2021-06-15,2024-03-28,905000,credit,cash,Cash Deposit - Surat Ring Road Branch
+Verma Imports,logistics,60,0,2019-11-02,2024-05-03,1500000,debit,RTGS,Viktor Petrov
+Verma Imports,logistics,60,0,2019-11-02,2024-05-03,250000,credit,NEFT,Client Invoice 4021
+Verma Imports,logistics,60,0,2019-11-02,2024-05-10,180000,debit,NEFT,Logistics Partner Chennai
+Verma Imports,logistics,60,0,2019-11-02,2024-05-18,300000,credit,NEFT,Client Invoice 4055
+Verma Imports,logistics,60,0,2019-11-02,2024-05-24,210000,debit,NEFT,Customs Clearance Agent

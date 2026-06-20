@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/styles.css?v=6" />
+  <link rel="stylesheet" href="/static/styles.css?v=7" />
 </head>
 <body>
   <!-- Ambient background -->
@@ -52,6 +52,7 @@
       <div class="tabs" id="caseTabs">
         <button class="tab active" data-mode="sample" type="button">Sample case</button>
         <button class="tab" data-mode="custom" type="button">Custom case</button>
+        <button class="tab" data-mode="batch" type="button">Batch triage</button>
       </div>
 
       <!-- Sample mode -->
@@ -129,6 +130,42 @@
         </form>
       </div>
 
+      <!-- Batch triage mode -->
+      <div id="batchMode" class="mode hidden">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Batch triage queue</h2>
+            <p class="panel-desc">Screen many customers at once through the deterministic, statistical &amp; ML detection layers (no LLM). Flagged cases surface below for one-click investigation.</p>
+          </div>
+        </div>
+
+        <p class="csv-help">
+          One row per transaction. Rows sharing a <b>customer_name</b> group into a single case. Required columns:
+          <code>customer_name, business_type, monthly_turnover_lakhs, prior_flags, account_opened, txn_date, amount_inr, direction, channel, counterparty</code>
+        </p>
+
+        <div id="dropZone" class="dropzone">
+          <input id="csvInput" type="file" accept=".csv" hidden />
+          <svg class="dz-ic" viewBox="0 0 24 24" fill="none"><path d="M12 16V4m0 0L7 9m5-5 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <div class="dz-main">Upload transaction batch (.csv)</div>
+          <div class="dz-sub">Drag &amp; drop, or <button type="button" id="browseCsv" class="link-btn">browse files</button></div>
+        </div>
+        <div class="dz-actions">
+          <a class="link-btn" href="/static/sample_batch.csv" download="vigil_sample_batch.csv">↓ Download sample CSV</a>
+        </div>
+
+        <div id="batchWarn" class="batch-warn hidden"></div>
+        <div id="batchPreview" class="batch-preview hidden"></div>
+
+        <button id="runBatchBtn" class="btn btn-primary btn-investigate" disabled type="button">
+          <span class="btn-glow"></span>
+          <svg viewBox="0 0 24 24" fill="none" class="btn-ic"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Run batch triage
+        </button>
+
+        <div id="batchResults" class="batch-results hidden"></div>
+      </div>
+
       <button id="investigateBtn" class="btn btn-primary btn-investigate" disabled type="button">
         <span class="btn-glow"></span>
         <svg viewBox="0 0 24 24" fill="none" class="btn-ic"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -170,6 +207,6 @@
   <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
-  <script src="/static/app.js?v=6"></script>
+  <script src="/static/app.js?v=7"></script>
 </body>
 </html>

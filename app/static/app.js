@@ -105,14 +105,17 @@ function setStageDone(stage) {
 }
 
 // ---- Investigate (streams per-node progress via SSE) ----
-async function runInvestigation(caseObj) {
+async function runInvestigation(caseObj, detectionResult = null) {
   if (!caseObj) return;
   startLoadingAnimation();
   try {
+    // If the case came from the batch queue it already went through /detect;
+    // pass that detection_result so the agent skips redundant tool calls (Phase 8E gate).
+    const body = detectionResult ? { ...caseObj, detection_result: detectionResult } : caseObj;
     const res = await fetch("/investigate/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(caseObj),
+      body: JSON.stringify(body),
     });
     if (!res.ok || !res.body) throw new Error("HTTP " + res.status);
 
@@ -405,7 +408,10 @@ function setMode(m) {
   document.querySelectorAll("#caseTabs .tab").forEach((t) => t.classList.toggle("active", t.dataset.mode === m));
   $("#sampleMode").classList.toggle("hidden", m !== "sample");
   $("#customMode").classList.toggle("hidden", m !== "custom");
+  $("#batchMode").classList.toggle("hidden", m !== "batch");
   $("#resultPanel").classList.add("hidden");
+  // Batch mode has its own action buttons; hide the shared investigate button.
+  $("#investigateBtn").classList.toggle("hidden", m === "batch");
   $("#investigateBtn").disabled = m === "sample" ? !currentCase : false;
 }
 
@@ -422,8 +428,157 @@ function showToast(msg, warn = false) {
   }, 3200);
 }
 
+// ============================================================
+//  Batch triage mode
+// ============================================================
+let parsedCases = null;
+let batchQueue = [];
+
+const typoLabel = (t) => (t || "—").replace(/_/g, " ");
+const riskTier = (s) => (s >= 0.85 ? "red" : s >= 0.70 ? "orange" : "yellow");
+
+async function handleCsvFile(file) {
+  if (!file) return;
+  if (!file.name.toLowerCase().endsWith(".csv")) {
+    showToast("Please upload a .csv file", true);
+    return;
+  }
+  $("#batchWarn").classList.add("hidden");
+  $("#batchPreview").classList.add("hidden");
+  $("#batchResults").classList.add("hidden");
+  $("#runBatchBtn").disabled = true;
+  parsedCases = null;
+
+  const fd = new FormData();
+  fd.append("file", file);
+  try {
+    const res = await fetch("/parse-csv", { method: "POST", body: fd });
+    const data = await res.json();
+    if (!res.ok) {
+      showToast(data.detail || "Parse failed (HTTP " + res.status + ")", true);
+      return;
+    }
+    if ((data.warnings || []).length) {
+      $("#batchWarn").innerHTML =
+        `<b>${data.warnings.length} row(s) skipped:</b><ul>` +
+        data.warnings.map((w) => `<li>${esc(w)}</li>`).join("") + "</ul>";
+      $("#batchWarn").classList.remove("hidden");
+    }
+    if (!data.customer_count) {
+      showToast("No valid cases found in the CSV", true);
+      return;
+    }
+    parsedCases = data.cases;
+    renderBatchPreview(data);
+    $("#runBatchBtn").disabled = false;
+  } catch (e) {
+    showToast("Upload failed: " + e.message, true);
+  }
+}
+
+function renderBatchPreview(data) {
+  const rows = data.cases.map((c) =>
+    `<tr><td>${esc(c.customer.name)}</td><td class="num">${c.transactions.length}</td><td>${esc(c.customer.business_type)}</td></tr>`
+  ).join("");
+  $("#batchPreview").innerHTML = `
+    <div class="bp-summary">Parsed <b>${data.customer_count}</b> customers · <b>${data.total_transaction_count}</b> transactions</div>
+    <details class="bp-details">
+      <summary>Preview customers</summary>
+      <table class="bp-table"><thead><tr><th>Customer</th><th class="num">Txns</th><th>Business type</th></tr></thead><tbody>${rows}</tbody></table>
+    </details>`;
+  $("#batchPreview").classList.remove("hidden");
+}
+
+async function runBatch() {
+  if (!parsedCases) return;
+  $("#runBatchBtn").disabled = true;
+  $("#batchResults").classList.remove("hidden");
+  $("#batchResults").innerHTML = `<div class="batch-spin"><span class="spinner"></span>Screening ${parsedCases.length} cases…</div>`;
+  try {
+    const res = await fetch("/triage-batch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cases: parsedCases }),
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    renderBatchResults(await res.json());
+  } catch (e) {
+    $("#batchResults").innerHTML = `<p style="color:var(--danger)">Triage failed: ${esc(e.message)}</p>`;
+  } finally {
+    $("#runBatchBtn").disabled = false;
+  }
+}
+
+function renderBatchResults(data) {
+  batchQueue = data.triage_queue || [];
+  const dismissed = data.dismissed_cases || [];
+
+  const queueRows = batchQueue.map((r, i) => {
+    const tier = riskTier(r.risk_score);
+    const pct = Math.round(r.risk_score * 100);
+    const top = (r.typology_flags && r.typology_flags[0]) ? r.typology_flags[0].typology : "—";
+    return `<tr>
+      <td><div class="risk"><div class="risk-bar"><span class="risk-fill ${tier}" style="width:${pct}%"></span></div><span class="risk-num ${tier}">${r.risk_score.toFixed(2)}</span></div></td>
+      <td>${esc(r.customer_name)}</td>
+      <td><span class="typ-pill ${tier}">${esc(typoLabel(top))}</span></td>
+      <td><button class="btn btn-ghost btn-row-inv" data-i="${i}">Investigate →</button></td>
+    </tr>`;
+  }).join("");
+
+  const dismRows = dismissed.map((d) =>
+    `<li><span>${esc(d.customer_name)}</span><span class="num">${d.risk_score.toFixed(2)}</span></li>`
+  ).join("");
+
+  $("#batchResults").innerHTML = `
+    <div class="batch-banner">
+      Processed <b>${data.total_cases}</b> cases · <b class="hi">${data.flagged_for_investigation}</b> flagged for investigation ·
+      <b>${data.auto_dismissed}</b> auto-dismissed · <b class="hi">${data.false_positive_reduction_pct}%</b> noise reduction
+    </div>
+    ${batchQueue.length
+      ? `<table class="queue"><thead><tr><th>Risk score</th><th>Customer</th><th>Top typology</th><th></th></tr></thead><tbody>${queueRows}</tbody></table>`
+      : `<p class="muted">No cases cleared the triage threshold.</p>`}
+    ${dismissed.length
+      ? `<details class="dismissed"><summary>Auto-dismissed (${dismissed.length} cases)</summary><ul class="dism-list">${dismRows}</ul></details>`
+      : ""}`;
+
+  $("#batchResults").querySelectorAll(".btn-row-inv").forEach((b) =>
+    b.addEventListener("click", () => investigateFromQueue(parseInt(b.dataset.i, 10)))
+  );
+}
+
+function investigateFromQueue(i) {
+  const row = batchQueue[i];
+  if (!row) return;
+  const caseObj = (parsedCases || []).find((c) => c.case_id === row.case_id);
+  if (!caseObj) { showToast("Case not found in parsed batch", true); return; }
+  // Reuse the detection already computed during the batch (Phase 8E gate).
+  const detectionResult = {
+    typology_flags: row.typology_flags,
+    graph_analysis: row.graph_analysis,
+    behavioral_analysis: row.behavioral_analysis,
+    anomaly_analysis: row.anomaly_analysis,
+    risk_score: row.risk_score,
+    above_threshold: row.above_threshold,
+  };
+  runInvestigation(caseObj, detectionResult);
+}
+
+function wireBatch() {
+  const dz = $("#dropZone");
+  $("#browseCsv").addEventListener("click", () => $("#csvInput").click());
+  $("#csvInput").addEventListener("change", (e) => handleCsvFile(e.target.files[0]));
+  dz.addEventListener("click", (e) => { if (e.target.id !== "browseCsv") $("#csvInput").click(); });
+  ["dragenter", "dragover"].forEach((ev) =>
+    dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add("drag"); }));
+  ["dragleave", "drop"].forEach((ev) =>
+    dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove("drag"); }));
+  dz.addEventListener("drop", (e) => handleCsvFile(e.dataTransfer.files[0]));
+  $("#runBatchBtn").addEventListener("click", runBatch);
+}
+
 // ---- Init ----
 initTheme();
+wireBatch();
 $("#loadSample").addEventListener("click", loadSample);
 
 document.querySelectorAll("#caseTabs .tab").forEach((t) =>

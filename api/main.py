@@ -14,8 +14,11 @@ Run: uvicorn api.main:app --reload
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 import random
+import re
 import sys
 import time
 from contextlib import asynccontextmanager
@@ -24,7 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -32,7 +35,7 @@ from typing import Optional
 
 from agent.graph import graph
 from agent.state import initial_state
-from data.schema import Case
+from data.schema import BusinessType, Case, Channel, Direction
 from monitor.pipeline import process_batch, process_case
 
 load_dotenv()
@@ -132,6 +135,138 @@ def sample() -> dict:
     """Return one random TRAIN case so the UI has something to load instantly."""
     cases = json.loads(_TRAIN.read_text(encoding="utf-8"))
     return random.choice(cases)
+
+
+# ── CSV batch upload ──────────────────────────────────────────────────────────
+
+_REQUIRED_CSV_COLS = [
+    "customer_name", "business_type", "monthly_turnover_lakhs", "prior_flags",
+    "account_opened", "txn_date", "amount_inr", "direction", "channel", "counterparty",
+]
+_VALID_CHANNELS = {c.value for c in Channel}
+_VALID_DIRECTIONS = {d.value for d in Direction}
+_VALID_BTYPES = {b.value for b in BusinessType}
+
+
+def _slug(name: str) -> str:
+    s = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+    return s or "customer"
+
+
+@app.post("/parse-csv")
+async def parse_csv(file: UploadFile = File(...)) -> dict:
+    """
+    Parse an uploaded transaction CSV into schema-valid Case objects.
+
+    Rows sharing a customer_name are grouped into one Case. Row-level problems
+    (bad amount/direction/channel) are collected as warnings and the row is
+    skipped — one bad row never fails the whole upload. Missing columns or a
+    file with no data rows are hard 400 errors.
+    """
+    raw = (await file.read()).decode("utf-8-sig", errors="replace")
+    reader = csv.DictReader(io.StringIO(raw))
+    headers = reader.fieldnames or []
+
+    missing = [c for c in _REQUIRED_CSV_COLS if c not in headers]
+    if missing:
+        raise HTTPException(400, f"CSV missing required column(s): {', '.join(missing)}")
+
+    rows = list(reader)
+    if not rows:
+        raise HTTPException(400, "CSV has no transaction rows")
+
+    warnings: list[str] = []
+    grouped: dict[str, dict] = {}
+    order: list[str] = []
+
+    for i, row in enumerate(rows, start=2):  # header is line 1; data starts at line 2
+        name = (row.get("customer_name") or "").strip()
+        if not name:
+            warnings.append(f"Row {i}: missing customer_name, skipped")
+            continue
+
+        amt_raw = (row.get("amount_inr") or "").strip().replace(",", "")
+        try:
+            amount = float(amt_raw)
+        except ValueError:
+            warnings.append(f"Row {i} ({name}): non-numeric amount_inr '{row.get('amount_inr')}', skipped")
+            continue
+
+        direction = (row.get("direction") or "").strip().lower()
+        if direction not in _VALID_DIRECTIONS:
+            warnings.append(f"Row {i} ({name}): invalid direction '{row.get('direction')}', skipped")
+            continue
+
+        channel = (row.get("channel") or "").strip()
+        if channel not in _VALID_CHANNELS:
+            warnings.append(f"Row {i} ({name}): invalid channel '{row.get('channel')}', skipped")
+            continue
+
+        if name not in grouped:
+            order.append(name)
+            btype = (row.get("business_type") or "").strip().lower()
+            if btype not in _VALID_BTYPES:
+                warnings.append(f"Row {i} ({name}): unknown business_type '{row.get('business_type')}', defaulted to 'other'")
+                btype = "other"
+            try:
+                turnover = float((row.get("monthly_turnover_lakhs") or "0").strip())
+            except ValueError:
+                turnover = 0.0
+            try:
+                flags = int(float((row.get("prior_flags") or "0").strip()))
+            except ValueError:
+                flags = 0
+            opened = (row.get("account_opened") or "").strip() or "2020-01-01"
+            slug = _slug(name)
+            grouped[name] = {
+                "slug": slug,
+                "customer": {
+                    "id": f"cust_csv_{slug}",
+                    "name": name,
+                    "business_type": btype,
+                    "account_open_date": opened + "T00:00:00",
+                    "stated_monthly_turnover_inr": turnover * 1e5,
+                    "prior_flags": flags,
+                },
+                "txns": [],
+            }
+
+        g = grouped[name]
+        date = (row.get("txn_date") or "").strip() or "2024-01-01"
+        g["txns"].append({
+            "id": f"txn_csv_{g['slug']}_{len(g['txns'])}",
+            "customer_id": g["customer"]["id"],
+            "amount_inr": amount,
+            "timestamp": date + "T00:00:00",
+            "counterparty_name": (row.get("counterparty") or "").strip() or "Unknown",
+            "counterparty_account": "".join(random.choices("0123456789", k=14)),
+            "direction": direction,
+            "channel": channel,
+        })
+
+    cases = []
+    for idx, name in enumerate(order):
+        g = grouped[name]
+        if not g["txns"]:
+            continue
+        cases.append({
+            "case_id": f"csv_{g['slug']}_{idx}",
+            "customer": g["customer"],
+            "transactions": g["txns"],
+            "ground_truth_label": "custom",
+            "typology": None,
+            "notes": "Imported from CSV batch upload.",
+        })
+
+    # Round-trip through the Pydantic schema so downstream endpoints accept them as-is.
+    validated = [json.loads(Case(**c).model_dump_json()) for c in cases]
+
+    return {
+        "cases": validated,
+        "customer_count": len(validated),
+        "total_transaction_count": sum(len(c["transactions"]) for c in validated),
+        "warnings": warnings,
+    }
 
 
 @app.post("/detect")
@@ -235,9 +370,14 @@ def _done_message(node: str, delta: dict, final: dict) -> str:
 
 
 @app.post("/investigate/stream")
-def investigate_stream(case: Case) -> StreamingResponse:
-    """Run the agent and stream per-node progress as SSE, ending with the result."""
-    case_dict = json.loads(case.model_dump_json())
+def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
+    """Run the agent and stream per-node progress as SSE, ending with the result.
+
+    Accepts an optional `detection_result` (batch-triage rows already cleared the
+    monitor gate) so the same streaming modal serves both sample/custom cases and
+    one-click investigations from the triage queue. Backwards-compatible.
+    """
+    case_dict = json.loads(req.model_dump_json(exclude={"detection_result"}))
 
     def gen():
         t0 = time.perf_counter()
@@ -246,8 +386,8 @@ def investigate_stream(case: Case) -> StreamingResponse:
         yield _sse("status", {"stage": "planner", "message": _RUNNING_MSG["planner"]})
 
         for update in graph.stream(
-            initial_state(case_dict),
-            config={"tags": ["api", "stream"], "run_name": f"api-stream-{case.case_id}"},
+            initial_state(case_dict, detection_result=req.detection_result),
+            config={"tags": ["api", "stream"], "run_name": f"api-stream-{req.case_id}"},
             stream_mode="updates",
         ):
             for node, delta in update.items():
@@ -260,7 +400,7 @@ def investigate_stream(case: Case) -> StreamingResponse:
                         yield _sse("status", {"stage": nxt, "message": _RUNNING_MSG[nxt]})
 
         yield _sse("done", {
-            "case_id": case.case_id,
+            "case_id": req.case_id,
             "decision": final.get("decision", ""),
             "confidence": round(final.get("confidence", 0.0), 4),
             "detected_typology": final.get("detected_typology", ""),
