@@ -1,10 +1,13 @@
 """
-RAG retrieve for Vigil.
+RAG retrieve for Vigil — Chroma backend (LEGACY / FALLBACK).
+
+Superseded by rag/retrieve_pg.py (CocoIndex + pgvector) in Phase 9A. Kept as a
+tested fallback; not imported by the agent anymore.
 
 Query the Chroma vector store; return passages with full citation metadata.
 
 Usage:
-    from rag.retrieve import retrieve
+    from rag.retrieve_chroma import retrieve
     results = retrieve("structuring threshold cash transaction India", k=5)
 """
 

@@ -13,6 +13,11 @@ httpx
 requests
 pypdf
 networkx
+# Phase 9A — CocoIndex declarative RAG (incremental pgvector index).
+# Pinned to 0.3.x: the 1.0 line dropped the sources/functions/targets/flow_def DSL.
+cocoindex==0.3.39
+psycopg2-binary
+pgvector
 # opensanctions pip package requires pyicu (ICU C lib, not installable on Windows without
 # extra tooling). The OpenSanctions /match endpoint is plain REST — use httpx directly.
 # See tools/sanctions.py in Phase 2.

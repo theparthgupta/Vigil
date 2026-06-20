@@ -9,7 +9,7 @@ Verifies:
 """
 
 import pytest
-from rag.retrieve import retrieve
+from rag.retrieve_pg import retrieve
 
 
 _REQUIRED_KEYS = {"text", "citation", "source", "section", "page", "score"}

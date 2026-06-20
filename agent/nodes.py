@@ -24,7 +24,7 @@ from agent.prompts import (
     REPORTER_SYSTEM_PROMPT,
 )
 from agent.state import VigilState
-from rag.retrieve import retrieve
+from rag.retrieve_pg import retrieve
 from tools.media import search_adverse_media
 from tools.patterns import analyze_patterns
 from tools.profile import summarize_profile

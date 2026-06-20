@@ -43,35 +43,36 @@ _STATIC = _ROOT / "app" / "static"
 
 
 def _corpus_count() -> int:
-    """How many chunks are in the Chroma collection (0 if it doesn't exist yet)."""
-    import chromadb
-
-    from rag.ingest import _CHROMA_DIR, _COLLECTION
+    """How many chunks are in the pgvector table (0 if it doesn't exist yet)."""
+    from rag.retrieve_pg import _TABLE, _connect
     try:
-        client = chromadb.PersistentClient(path=str(_CHROMA_DIR))
-        return client.get_collection(_COLLECTION).count()
+        with _connect() as conn, conn.cursor() as cur:
+            cur.execute(f"SELECT COUNT(*) FROM {_TABLE}")
+            return cur.fetchone()[0]
     except Exception:
         return 0
 
 
 def _ensure_corpus() -> None:
     """
-    Make sure the RAG vector store exists before serving requests.
+    Make sure the pgvector RAG index exists before serving requests.
 
-    On a fresh deploy (e.g. Render, where `chroma_db/` is not persisted) the
-    collection is empty, so build it from the PDFs in `regs/`. Idempotent: if
-    the corpus is already present, this is a fast no-op.
+    On a fresh deploy the table is empty, so build it with the CocoIndex flow
+    (which sets up the table/index and embeds regs/*.pdf). If already populated,
+    this is a fast no-op — CocoIndex detects no source changes.
     """
     existing = _corpus_count()
     if existing > 0:
-        print(f"RAG corpus ready ({existing} chunks).")
+        print(f"RAG corpus ready ({existing} chunks, CocoIndex/pgvector).")
         return
 
-    print("Building RAG corpus from regs/...", flush=True)
-    from rag.ingest import ingest_all
+    print("Building RAG corpus via CocoIndex/pgvector...", flush=True)
+    from rag.cocoindex_flow import init_cocoindex, vigil_regulatory_corpus
 
-    ingest_all()
-    print(f"Building RAG corpus from regs/... done ({_corpus_count()} chunks)", flush=True)
+    init_cocoindex()
+    vigil_regulatory_corpus.setup()
+    vigil_regulatory_corpus.update()
+    print(f"Building RAG corpus via CocoIndex/pgvector... done ({_corpus_count()} chunks)", flush=True)
 
 
 @asynccontextmanager
