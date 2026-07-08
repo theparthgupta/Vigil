@@ -18,6 +18,8 @@ networkx
 cocoindex==0.3.39
 psycopg2-binary
 pgvector
+# Dev-only: anonymous download of the SAML-D benchmark dataset (benchmarks/saml_d.py)
+kagglehub
 # opensanctions pip package requires pyicu (ICU C lib, not installable on Windows without
 # extra tooling). The OpenSanctions /match endpoint is plain REST — use httpx directly.
 # See tools/sanctions.py in Phase 2.

@@ -21,6 +21,9 @@ rag/chroma_db/
 # Trained Isolation Forest model (regenerates on first run/deploy)
 monitor/isolation_forest.pkl
 
+# SAML-D benchmark dataset (996MB — download via kagglehub, see benchmarks/saml_d.py)
+SAML-D.csv
+
 # Regulatory source — distribution-restricted, download manually (see README)
 regs/Reporting_Format.pdf
 
