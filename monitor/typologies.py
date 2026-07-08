@@ -24,6 +24,7 @@ stated_monthly_turnover_inr (alias: monthly_turnover_inr).
 from __future__ import annotations
 
 import re
+import statistics
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 
@@ -78,34 +79,81 @@ def _window(items: list[dict], days: int):
 
 # ── 1. Structuring ────────────────────────────────────────────────────────────
 
+# Phase 11C discriminative conditions (from SAML-D FP attribution):
+_MIN_BAND_SHARE = 0.25     # near-threshold deposits must be >=25% of window credit volume
+_MAX_CLUSTER_CV = 0.08     # amounts' pstdev must be <8% of their mean (uniformity)
+
+
+def _clustered(amounts: list[float]) -> bool:
+    mean = sum(amounts) / len(amounts)
+    if mean <= 0:
+        return False
+    return statistics.pstdev(amounts) < _MAX_CLUSTER_CV * mean
+
+
+def _band_share(grp: list[dict], all_credits: list[dict]) -> float:
+    """Share of the account's credit volume (same 30-day window) in the group."""
+    start = min(_dt(t["timestamp"]) for t in grp)
+    end = start + timedelta(days=30)
+    window_total = sum(
+        t["amount_inr"] for t in all_credits if start <= _dt(t["timestamp"]) <= end
+    )
+    if window_total <= 0:
+        return 0.0
+    return sum(t["amount_inr"] for t in grp) / window_total
+
+
 def detect_structuring(transactions: list[dict], customer: dict) -> dict:
     ref = "PMLA 2002, Section 12; PMLA Rules 2005, Rule 3(1)(A)"
+    all_credits = [t for t in transactions if t["direction"] == "credit"]
 
     # Branch 1: >=3 cash deposits in the Rs.8L-9.99L band within any 30-day window.
+    # Phase 11C: count alone is not discriminative (clean accounts routinely have
+    # band-value traffic) — the deposits must also DOMINATE the account's credit
+    # volume in that window (band_share) and be suspiciously uniform (clustering).
     cash_band = [
         t for t in transactions
         if t["direction"] == "credit" and t["channel"] == "cash"
         and _BAND_LOW <= t["amount_inr"] <= _BAND_HIGH
     ]
     for grp in _window(cash_band, 30):
-        if len(grp) >= 3:
-            return _res(True, "structuring", 0.85, {
-                "deposit_amounts": [t["amount_inr"] for t in grp],
-                "dates": [t["timestamp"][:10] for t in grp],
-                "channel_count": len({t["channel"] for t in grp}),
-            }, ref)
+        if len(grp) < 3:
+            continue
+        amounts = [t["amount_inr"] for t in grp]
+        if not _clustered(amounts):
+            continue
+        if _band_share(grp, all_credits) < _MIN_BAND_SHARE:
+            continue
+        return _res(True, "structuring", 0.85, {
+            "deposit_amounts": amounts,
+            "dates": [t["timestamp"][:10] for t in grp],
+            "channel_count": len({t["channel"] for t in grp}),
+            "band_share": round(_band_share(grp, all_credits), 3),
+        }, ref)
 
     # Branch 2: total deposits > Rs.10L across >=2 channels within any 30-day window.
+    # Phase 11C: ">10L over two channels" alone fires on nearly every active
+    # account (measured on SAML-D: this branch alone put 91% of clean accounts
+    # over the triage line). Splitting-to-evade looks like SEVERAL sub-threshold
+    # credits of suspiciously similar size — so require >=3 credits, each below
+    # the CTR, with clustered amounts, alongside the original total/channel test.
     credits = [t for t in transactions if t["direction"] == "credit"]
     for grp in _window(credits, 30):
         total = sum(t["amount_inr"] for t in grp)
         channels = {t["channel"] for t in grp}
-        if total > _CTR and len(channels) >= 2:
-            return _res(True, "structuring", 0.85, {
-                "deposit_amounts": [t["amount_inr"] for t in grp],
-                "dates": [t["timestamp"][:10] for t in grp],
-                "channel_count": len(channels),
-            }, ref)
+        if total <= _CTR or len(channels) < 2:
+            continue
+        sub_ctr = [t for t in grp if t["amount_inr"] < _CTR]
+        if len(sub_ctr) < 3:
+            continue
+        amounts = [t["amount_inr"] for t in sub_ctr]
+        if not _clustered(amounts):
+            continue
+        return _res(True, "structuring", 0.85, {
+            "deposit_amounts": amounts,
+            "dates": [t["timestamp"][:10] for t in sub_ctr],
+            "channel_count": len(channels),
+        }, ref)
 
     return _res(False, "structuring", 0.0,
                 {"deposit_amounts": [], "dates": [], "channel_count": 0}, ref)
