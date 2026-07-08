@@ -308,3 +308,10 @@ at the bottom.
 **Drawbacks / risks:** Weights are calibrated to SAML-D; on genuinely different data the fallback formula may be safer — deleting the JSON reverts instantly. anomaly_score's big coefficient partly reflects SAML-D feature distributions, not validated real-world risk (the 8D caveat still applies). Sanctions indicator is unlearnable from this data (coef 0.0) — kept as a code override, documented in the JSON meta.
 **How to verify:** `python benchmarks/train_fusion.py` (feature cache makes it ~instant after first run) reproduces coefficients + both held-out tables deterministically. `pytest tests/test_fusion.py -v` → 4 passed. Full suite → 146 passed.
 ---
+
+### 2026-07-09 — Phase 11C Step 3: re-benchmark with both fixes
+**What changed:** Full SAML-D benchmark re-run (fresh two-pass rebuild from the raw CSV, not the cache) with the Phase 11C.1 structuring fix and 11C.2 learned fusion in place. `benchmarks/RESULTS_SAML_D.md` updated with the required before/after table plus the full new sweep.
+**Before/after on the full 2,450-case sample (Phase 11B → 11C):** At matched recall ~0.79-0.80: before needed thr 0.60 (precision 0.287, FPR 0.455); after reaches it at thr 0.45 (precision 0.352, FPR 0.343) — **−11 FPR points and +6.5 precision points at the same recall**. At thr 0.60: precision 0.287→0.356, recall 0.790→0.642, FPR 0.455→0.269. The score curve is now smooth and tunable (precision up to 0.58 at conservative thresholds) instead of flat-with-a-cliff.
+**Operating note:** the production threshold stays 0.60 (env-tunable); for recall-first triage on SAML-D-like data the sweep suggests ~0.45. That choice is a business rule, recorded here rather than silently hardcoded.
+**How to verify:** `python benchmarks/saml_d.py` (~15 min, deterministic seed 42) regenerates the sweep; the before column is the committed Phase 11B table. `pytest tests/ -q` → 146 passed.
+---
