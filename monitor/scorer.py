@@ -146,6 +146,13 @@ def run_detection(case: dict) -> dict:
         "graph_analysis": graph_analysis,
         "behavioral_analysis": behavioral,
         "anomaly_analysis": anomaly,
+        # Per-layer inputs to combine_scores, for UI explainability (Phase 10B).
+        "layer_scores": {
+            "typology": typology_score,
+            "graph": graph_score,
+            "behavioral": behavioral_score,
+            "anomaly": anomaly_score,
+        },
         "risk_score": risk_score,
         "above_threshold": bool(risk_score >= TRIAGE_THRESHOLD),
     }

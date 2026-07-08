@@ -29,6 +29,7 @@ def process_case(case: dict) -> dict:
         "graph_analysis": detection["graph_analysis"],
         "behavioral_analysis": detection["behavioral_analysis"],
         "anomaly_analysis": detection["anomaly_analysis"],
+        "layer_scores": detection["layer_scores"],
         "recommended_action": "INVESTIGATE" if above else "AUTO_DISMISS",
         "processing_time_ms": elapsed_ms,
     }

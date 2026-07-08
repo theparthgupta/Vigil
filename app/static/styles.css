@@ -437,3 +437,74 @@ textarea.note::placeholder { color: var(--text-faint); }
 .dism-list { list-style: none; margin: 10px 0 0; padding: 0; }
 .dism-list li { display: flex; justify-content: space-between; padding: 7px 12px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
 .dism-list .num { color: var(--text-dim); }
+
+/* ============================================================
+   Phase 10B — dashboard band, case history, layer signals
+   ============================================================ */
+:root {
+  --info:      #6da8f7;
+  --info-tint: rgba(109, 168, 247, 0.13);
+  --amber:     #e8924e;
+  --amber-tint:rgba(232, 146, 78, 0.13);
+  --violet:    #a78bfa;
+  --violet-tint:rgba(167, 139, 250, 0.13);
+}
+:root[data-theme="light"] {
+  --info:      #2f6fd0;
+  --info-tint: rgba(47, 111, 208, 0.10);
+  --amber:     #c26a1e;
+  --amber-tint:rgba(194, 106, 30, 0.10);
+  --violet:    #7c5cd6;
+  --violet-tint:rgba(124, 92, 214, 0.10);
+}
+
+/* Dashboard stats band */
+.stats-band { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 26px; }
+.stat-card { display: flex; align-items: center; gap: 13px; padding: 16px 18px; border-radius: var(--r); background: var(--surface); border: 1px solid var(--border); box-shadow: var(--card-shadow); transition: transform 0.2s var(--ease), border-color 0.2s var(--ease); }
+.stat-card:hover { transform: translateY(-2px); border-color: var(--border-2); }
+.stat-ic { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex-shrink: 0; }
+.stat-ic svg { width: 19px; height: 19px; }
+.stat-ic.gold  { background: var(--gold-tint);   color: var(--gold); }
+.stat-ic.amber { background: var(--amber-tint);  color: var(--amber); }
+.stat-ic.blue  { background: var(--info-tint);   color: var(--info); }
+.stat-ic.red   { background: var(--danger-tint); color: var(--danger); }
+.stat-ic.green { background: var(--success-tint);color: var(--success); }
+.stat-num { font-family: var(--display); font-size: 24px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; letter-spacing: 0.01em; }
+
+/* Status chips */
+.status-chip { display: inline-block; padding: 4px 11px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.status-chip.s-flagged   { background: var(--amber-tint);   color: var(--amber); }
+.status-chip.s-review    { background: var(--info-tint);    color: var(--info); }
+.status-chip.s-str       { background: var(--danger-tint);  color: var(--danger); }
+.status-chip.s-dismissed { background: var(--success-tint); color: var(--success); }
+.status-chip.s-auto      { background: var(--surface-2);    color: var(--text-dim); }
+
+/* History filters + table */
+.hist-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip { padding: 7px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-dim); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all 0.18s var(--ease); }
+.chip:hover { color: var(--text); border-color: var(--border-2); }
+.chip.active { background: var(--gold-tint); border-color: var(--gold); color: var(--gold); }
+.hist-table td { vertical-align: middle; }
+.hist-dec { font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+.hist-date { font-size: 11.5px; color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Layer signal mini-bars (T/G/B/A explainability) */
+.layers { display: flex; gap: 7px; align-items: flex-end; }
+.layer { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.layer-track { width: 9px; height: 30px; border-radius: 5px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: flex-end; overflow: hidden; }
+.layer-fill { display: block; width: 100%; border-radius: 4px 4px 0 0; }
+.lf-typology   { background: var(--gold); }
+.lf-graph      { background: var(--info); }
+.lf-behavioral { background: var(--violet); }
+.lf-anomaly    { background: var(--amber); }
+.layer-tag { font-size: 9.5px; font-weight: 700; color: var(--text-dim); }
+
+/* Reviewer input */
+.rev-input { display: block; width: 100%; margin: 12px 0 10px; padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-size: 13.5px; }
+.rev-input:focus { outline: none; border-color: var(--gold); }
+
+@media (max-width: 900px) {
+  .stats-band { grid-template-columns: repeat(2, 1fr); }
+  .stats-band .stat-card:last-child { grid-column: span 2; }
+}

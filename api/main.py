@@ -35,6 +35,7 @@ from typing import Optional
 
 from agent.graph import graph
 from agent.state import initial_state
+from api import store
 from data.schema import BusinessType, Case, Channel, Direction
 from monitor.pipeline import process_batch, process_case
 
@@ -80,8 +81,9 @@ def _ensure_corpus() -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Build the RAG corpus before the app accepts any requests.
+    # Build the RAG corpus and the case-store tables before serving requests.
     _ensure_corpus()
+    store.init_tables()
     yield
 
 
@@ -287,6 +289,18 @@ def triage_batch(req: TriageBatchRequest) -> dict:
         )
     cases = [json.loads(c.model_dump_json()) for c in req.cases]
     _last_batch_result = process_batch(cases)
+
+    # Persist every triaged case so the queue/history survive a refresh (10B).
+    try:
+        by_id = {c["case_id"]: c for c in cases}
+        for r in _last_batch_result["triage_queue"]:
+            top = r["typology_flags"][0]["typology"] if r["typology_flags"] else None
+            store.save_triage(by_id[r["case_id"]], r["risk_score"], True, top)
+        for d in _last_batch_result["dismissed_cases"]:
+            store.save_triage(by_id[d["case_id"]], d["risk_score"], False, None)
+    except Exception as e:  # persistence must never fail the triage response
+        print(f"WARN: case-store persistence failed: {e}")
+
     return _last_batch_result
 
 
@@ -296,6 +310,48 @@ def triage_queue() -> dict:
     if _last_batch_result is None:
         return {"message": "No batch processed yet", "triage_queue": []}
     return _last_batch_result
+
+
+# ── Case lifecycle (Phase 10B) ────────────────────────────────────────────────
+
+class ReviewRequest(BaseModel):
+    reviewer: str
+    action: str          # "approve" | "override"
+    rationale: str = ""
+
+
+@app.get("/dashboard/stats")
+def dashboard_stats() -> dict:
+    """Aggregate lifecycle counts for the dashboard band."""
+    return store.get_stats()
+
+
+@app.get("/cases")
+def cases_list(status: Optional[str] = None, limit: int = 50) -> dict:
+    """Most-recent-first persisted cases, optionally filtered by status."""
+    return {"cases": store.list_cases(status=status, limit=min(limit, 200))}
+
+
+@app.get("/cases/{case_id}")
+def case_detail(case_id: str) -> dict:
+    """Full case record: payload, agent result, review audit trail."""
+    try:
+        return store.get_case(case_id)
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.post("/cases/{case_id}/review")
+def case_review(case_id: str, req: ReviewRequest) -> dict:
+    """Record the human decision on an investigated case (the audit trail)."""
+    if not req.reviewer.strip():
+        raise HTTPException(400, "reviewer name is required")
+    try:
+        return store.record_review(case_id, req.reviewer.strip(), req.action, req.rationale)
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @app.post("/investigate", response_model=InvestigateResponse)
@@ -314,6 +370,14 @@ def investigate(req: InvestigateRequest) -> InvestigateResponse:
         config={"tags": ["api"], "run_name": f"api-{req.case_id}"},
     )
     latency = time.perf_counter() - t0
+
+    try:
+        store.save_investigation(
+            case_dict, result["decision"], result["confidence"],
+            result.get("detected_typology", ""), result["report"],
+        )
+    except Exception as e:
+        print(f"WARN: case-store persistence failed: {e}")
 
     return InvestigateResponse(
         case_id=req.case_id,
@@ -398,6 +462,14 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
                     if idx < len(_ORDER) - 1:
                         nxt = _ORDER[idx + 1]
                         yield _sse("status", {"stage": nxt, "message": _RUNNING_MSG[nxt]})
+
+        try:
+            store.save_investigation(
+                case_dict, final.get("decision", ""), final.get("confidence", 0.0),
+                final.get("detected_typology", ""), final.get("report", ""),
+            )
+        except Exception as e:
+            print(f"WARN: case-store persistence failed: {e}")
 
         yield _sse("done", {
             "case_id": req.case_id,

@@ -7,6 +7,37 @@ const $ = (sel) => document.querySelector(sel);
 let currentCase = null;
 let agentDecision = null;
 let lastReport = "";
+let lastCaseId = null;   // case_id of the investigation on screen (for reviews)
+
+// ---- Dashboard stats band (Phase 10B) ----
+function animateNum(el, target, suffix = "") {
+  const start = parseFloat(el.dataset.val || "0");
+  const t0 = performance.now();
+  const dur = 600;
+  const tick = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    const v = start + (target - start) * (1 - Math.pow(1 - p, 3));
+    el.textContent = (suffix === "%" ? v.toFixed(1) : Math.round(v)) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+    else el.dataset.val = target;
+  };
+  requestAnimationFrame(tick);
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch("/dashboard/stats");
+    if (!res.ok) return;
+    const s = await res.json();
+    if (!s.total_cases) return;              // nothing screened yet — keep band hidden
+    $("#statsBand").classList.remove("hidden");
+    animateNum($("#st-total"), s.total_cases);
+    animateNum($("#st-flagged"), s.flagged);
+    animateNum($("#st-review"), s.in_review);
+    animateNum($("#st-str"), s.str_filed);
+    animateNum($("#st-noise"), s.noise_reduction_pct, "%");
+  } catch { /* dashboard is a nicety — never block the app on it */ }
+}
 
 // ---- Theme ----
 function initTheme() {
@@ -149,7 +180,7 @@ async function runInvestigation(caseObj, detectionResult = null) {
     }
 
     stopLoadingAnimation();
-    if (result) renderResult(result);
+    if (result) { renderResult(result); loadStats(); }
     else showToast("No result received from the agent", true);
   } catch (e) {
     stopLoadingAnimation();
@@ -193,6 +224,7 @@ function renderReportMarkdown(md) {
 
 function renderResult(data) {
   agentDecision = data.decision;
+  lastCaseId = data.case_id || null;
   const esc8 = data.decision === "ESCALATE";
   const pct = Math.round((data.confidence || 0) * 100);
   const circ = 2 * Math.PI * 26;
@@ -267,6 +299,7 @@ function renderResult(data) {
           <button class="active" data-act="approve">Approve agent decision</button>
           <button class="override" data-act="override">Override → ${esc8 ? "DISMISS" : "ESCALATE"}</button>
         </div>
+        <input id="reviewerName" class="rev-input" type="text" placeholder="Reviewer name — e.g. R. Mehta, MLRO" />
         <textarea class="note" id="reviewNote" placeholder="Rationale for your decision (optional)…"></textarea>
         <button class="btn btn-primary" id="recordBtn" style="width:auto">Record review</button>
       </div>
@@ -293,12 +326,24 @@ function wireResult(esc8) {
       action = b.dataset.act;
     });
   });
-  $("#recordBtn").addEventListener("click", () => {
-    if (action === "approve") {
-      showToast(`Recorded: reviewer approved the agent decision (${agentDecision}).`);
-    } else {
-      const overridden = esc8 ? "DISMISS" : "ESCALATE";
-      showToast(`Recorded: reviewer overrode the agent → ${overridden}.`, true);
+  $("#recordBtn").addEventListener("click", async () => {
+    const reviewer = $("#reviewerName").value.trim();
+    if (!reviewer) { showToast("Reviewer name is required for the audit trail", true); return; }
+    if (!lastCaseId) { showToast("No case to review", true); return; }
+    try {
+      const res = await fetch(`/cases/${encodeURIComponent(lastCaseId)}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviewer, action, rationale: $("#reviewNote").value.trim() }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.detail || "HTTP " + res.status);
+      const label = body.final_status === "str_filed" ? "STR FILED" : "DISMISSED";
+      showToast(`Review recorded by ${reviewer} → case ${label}. Logged to audit trail.`);
+      $("#recordBtn").disabled = true;
+      loadStats();
+    } catch (e) {
+      showToast("Could not record review: " + e.message, true);
     }
   });
 }
@@ -409,10 +454,13 @@ function setMode(m) {
   $("#sampleMode").classList.toggle("hidden", m !== "sample");
   $("#customMode").classList.toggle("hidden", m !== "custom");
   $("#batchMode").classList.toggle("hidden", m !== "batch");
+  $("#historyMode").classList.toggle("hidden", m !== "history");
   $("#resultPanel").classList.add("hidden");
-  // Batch mode has its own action buttons; hide the shared investigate button.
-  $("#investigateBtn").classList.toggle("hidden", m === "batch");
+  // Batch/history modes have their own actions; hide the shared investigate button.
+  $("#investigateBtn").classList.toggle("hidden", m === "batch" || m === "history");
   $("#investigateBtn").disabled = m === "sample" ? !currentCase : false;
+  if (m === "history") loadHistory();
+  if (m === "batch" && !parsedCases && $("#batchResults").classList.contains("hidden")) restoreBatch();
 }
 
 // ---- Toast ----
@@ -436,6 +484,25 @@ let batchQueue = [];
 
 const typoLabel = (t) => (t || "—").replace(/_/g, " ");
 const riskTier = (s) => (s >= 0.85 ? "red" : s >= 0.70 ? "orange" : "yellow");
+
+// Four mini-bars showing what each detection layer contributed (explainability).
+const _LAYERS = [
+  ["typology",   "T", "Typology rules"],
+  ["graph",      "G", "Graph analysis"],
+  ["behavioral", "B", "Behavioral baseline"],
+  ["anomaly",    "A", "ML anomaly"],
+];
+function layerBars(ls) {
+  if (!ls) return "—";
+  return `<div class="layers">` + _LAYERS.map(([key, tag, name]) => {
+    const v = ls[key] || 0;
+    const h = Math.max(8, Math.round(v * 100));
+    return `<div class="layer" title="${name}: ${v.toFixed(2)}">
+      <div class="layer-track"><span class="layer-fill lf-${key}" style="height:${h}%"></span></div>
+      <span class="layer-tag">${tag}</span>
+    </div>`;
+  }).join("") + `</div>`;
+}
 
 async function handleCsvFile(file) {
   if (!file) return;
@@ -521,6 +588,7 @@ function renderBatchResults(data) {
       <td><div class="risk"><div class="risk-bar"><span class="risk-fill ${tier}" style="width:${pct}%"></span></div><span class="risk-num ${tier}">${r.risk_score.toFixed(2)}</span></div></td>
       <td>${esc(r.customer_name)}</td>
       <td><span class="typ-pill ${tier}">${esc(typoLabel(top))}</span></td>
+      <td>${layerBars(r.layer_scores)}</td>
       <td><button class="btn btn-ghost btn-row-inv" data-i="${i}">Investigate →</button></td>
     </tr>`;
   }).join("");
@@ -535,7 +603,7 @@ function renderBatchResults(data) {
       <b>${data.auto_dismissed}</b> auto-dismissed · <b class="hi">${data.false_positive_reduction_pct}%</b> noise reduction
     </div>
     ${batchQueue.length
-      ? `<table class="queue"><thead><tr><th>Risk score</th><th>Customer</th><th>Top typology</th><th></th></tr></thead><tbody>${queueRows}</tbody></table>`
+      ? `<table class="queue"><thead><tr><th>Risk score</th><th>Customer</th><th>Top typology</th><th>Layer signals</th><th></th></tr></thead><tbody>${queueRows}</tbody></table>`
       : `<p class="muted">No cases cleared the triage threshold.</p>`}
     ${dismissed.length
       ? `<details class="dismissed"><summary>Auto-dismissed (${dismissed.length} cases)</summary><ul class="dism-list">${dismRows}</ul></details>`
@@ -544,13 +612,24 @@ function renderBatchResults(data) {
   $("#batchResults").querySelectorAll(".btn-row-inv").forEach((b) =>
     b.addEventListener("click", () => investigateFromQueue(parseInt(b.dataset.i, 10)))
   );
+  loadStats();
 }
 
-function investigateFromQueue(i) {
+async function investigateFromQueue(i) {
   const row = batchQueue[i];
   if (!row) return;
-  const caseObj = (parsedCases || []).find((c) => c.case_id === row.case_id);
-  if (!caseObj) { showToast("Case not found in parsed batch", true); return; }
+  let caseObj = (parsedCases || []).find((c) => c.case_id === row.case_id);
+  if (!caseObj) {
+    // Restored batch (page was refreshed): pull the persisted payload instead.
+    try {
+      const res = await fetch(`/cases/${encodeURIComponent(row.case_id)}`);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      caseObj = (await res.json()).payload;
+    } catch (e) {
+      showToast("Case not found in parsed batch or store", true);
+      return;
+    }
+  }
   // Reuse the detection already computed during the batch (Phase 8E gate).
   const detectionResult = {
     typology_flags: row.typology_flags,
@@ -561,6 +640,85 @@ function investigateFromQueue(i) {
     above_threshold: row.above_threshold,
   };
   runInvestigation(caseObj, detectionResult);
+}
+
+// Restore the last server-side batch (survives a page refresh).
+async function restoreBatch() {
+  try {
+    const res = await fetch("/triage-queue");
+    const data = await res.json();
+    if (data.total_cases) {
+      $("#batchResults").classList.remove("hidden");
+      renderBatchResults(data);
+      showToast("Restored the last batch from the server");
+    }
+  } catch { /* no cached batch — nothing to restore */ }
+}
+
+// ============================================================
+//  Case history (Phase 10B)
+// ============================================================
+const STATUS_META = {
+  flagged:        { label: "Flagged",        cls: "s-flagged" },
+  in_review:      { label: "In review",      cls: "s-review" },
+  str_filed:      { label: "STR filed",      cls: "s-str" },
+  dismissed:      { label: "Dismissed",      cls: "s-dismissed" },
+  auto_dismissed: { label: "Auto-dismissed", cls: "s-auto" },
+};
+let histFilter = "";
+
+async function loadHistory() {
+  const url = histFilter ? `/cases?status=${histFilter}&limit=100` : "/cases?limit=100";
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    renderHistory((await res.json()).cases);
+  } catch (e) {
+    $("#historyBody").innerHTML = `<p style="color:var(--danger)">Could not load history: ${esc(e.message)}</p>`;
+  }
+}
+
+function renderHistory(cases) {
+  if (!cases.length) {
+    $("#historyBody").innerHTML = `<p class="muted">No cases here yet. Run a batch triage or investigate a case — everything is persisted.</p>`;
+    return;
+  }
+  const rows = cases.map((c) => {
+    const sm = STATUS_META[c.status] || { label: c.status, cls: "" };
+    const risk = c.risk_score != null ? c.risk_score.toFixed(2) : "—";
+    const tier = c.risk_score != null ? riskTier(c.risk_score) : "";
+    const conf = c.agent_confidence != null ? Math.round(c.agent_confidence * 100) + "%" : "";
+    const decision = c.agent_decision ? `${c.agent_decision} ${conf}` : "—";
+    const act = c.status === "flagged"
+      ? `<button class="btn btn-ghost btn-row-inv" data-cid="${esc(c.case_id)}">Investigate →</button>` : "";
+    return `<tr>
+      <td><span class="status-chip ${sm.cls}">${sm.label}</span></td>
+      <td>${esc(c.customer_name)}</td>
+      <td><span class="risk-num ${tier}">${risk}</span></td>
+      <td>${esc(typoLabel(c.top_typology))}</td>
+      <td class="hist-dec">${esc(decision)}</td>
+      <td class="hist-date">${esc(c.updated_at.slice(0, 16).replace("T", " "))}</td>
+      <td>${act}</td>
+    </tr>`;
+  }).join("");
+  $("#historyBody").innerHTML = `
+    <table class="queue hist-table">
+      <thead><tr><th>Status</th><th>Customer</th><th>Risk</th><th>Typology</th><th>Agent decision</th><th>Updated</th><th></th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  $("#historyBody").querySelectorAll(".btn-row-inv").forEach((b) =>
+    b.addEventListener("click", () => investigateFromHistory(b.dataset.cid)));
+}
+
+async function investigateFromHistory(caseId) {
+  try {
+    const res = await fetch(`/cases/${encodeURIComponent(caseId)}`);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const detail = await res.json();
+    runInvestigation(detail.payload);
+  } catch (e) {
+    showToast("Could not load case: " + e.message, true);
+  }
 }
 
 function wireBatch() {
@@ -579,6 +737,16 @@ function wireBatch() {
 // ---- Init ----
 initTheme();
 wireBatch();
+loadStats();
+$("#refreshHistory").addEventListener("click", loadHistory);
+$("#histFilters").querySelectorAll(".chip").forEach((c) =>
+  c.addEventListener("click", () => {
+    $("#histFilters").querySelectorAll(".chip").forEach((x) => x.classList.remove("active"));
+    c.classList.add("active");
+    histFilter = c.dataset.status;
+    loadHistory();
+  })
+);
 $("#loadSample").addEventListener("click", loadSample);
 
 document.querySelectorAll("#caseTabs .tab").forEach((t) =>
