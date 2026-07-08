@@ -36,6 +36,10 @@ async function loadStats() {
     animateNum($("#st-review"), s.in_review);
     animateNum($("#st-str"), s.str_filed);
     animateNum($("#st-noise"), s.noise_reduction_pct, "%");
+    $("#st-spend").textContent = "₹" + (s.llm_spend_inr || 0).toFixed(2);
+    $("#st-spend").title = `Avg ₹${(s.avg_cost_per_investigation_inr || 0).toFixed(2)} per LLM investigation (${s.investigated_with_llm || 0} runs)`;
+    $("#st-saved").textContent = "₹" + (s.est_saved_by_triage_inr || 0).toFixed(2);
+    $("#st-saved").title = `${s.auto_dismissed} auto-dismissed cases × avg investigation cost — LLM runs the triage layers avoided`;
   } catch { /* dashboard is a nicety — never block the app on it */ }
 }
 
@@ -247,6 +251,8 @@ function renderResult(data) {
 
   const typChip = (esc8 && data.detected_typology)
     ? `<span class="typ-chip">typology: ${esc(data.detected_typology)}</span>` : "";
+  const costChip = data.tokens_used
+    ? `<span class="typ-chip cost-chip" title="${data.tokens_used.toLocaleString()} tokens · gpt-4o-mini, deterministic price math">cost: ₹${(data.cost_inr || 0).toFixed(2)} · ${(data.latency_seconds || 0).toFixed(0)}s</span>` : "";
 
   $("#resultPanel").innerHTML = `
     <div class="banner ${esc8 ? "escalate" : "dismiss"}">
@@ -255,7 +261,7 @@ function renderResult(data) {
         <div class="banner-main">
           <div class="banner-verdict">${verdictText}</div>
           <div class="banner-sub">${subText}</div>
-          ${typChip}
+          ${typChip}${costChip}
         </div>
         <div class="conf-ring">
           <svg width="64" height="64">

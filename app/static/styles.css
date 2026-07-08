@@ -508,3 +508,8 @@ textarea.note::placeholder { color: var(--text-faint); }
   .stats-band { grid-template-columns: repeat(2, 1fr); }
   .stats-band .stat-card:last-child { grid-column: span 2; }
 }
+
+/* Phase 11 — cost economics */
+.stats-band { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.stat-ic.violet { background: var(--violet-tint); color: var(--violet); }
+.cost-chip { margin-left: 8px; background: var(--violet-tint); color: var(--violet); }

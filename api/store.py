@@ -51,6 +51,9 @@ CREATE TABLE IF NOT EXISTS vigil_reviews (
     rationale    TEXT NOT NULL DEFAULT '',
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+-- Phase 11: per-investigation LLM cost (tokens counted by callback, ₹ math in Python).
+ALTER TABLE vigil_cases ADD COLUMN IF NOT EXISTS tokens_used BIGINT;
+ALTER TABLE vigil_cases ADD COLUMN IF NOT EXISTS cost_inr DOUBLE PRECISION;
 """
 
 
@@ -111,6 +114,8 @@ def save_investigation(
     confidence: float,
     typology: str,
     report: str,
+    tokens_used: int | None = None,
+    cost_inr: float | None = None,
 ) -> None:
     """Record a completed agent investigation; the case moves to in_review."""
     init_tables()
@@ -118,8 +123,9 @@ def save_investigation(
         cur.execute(
             """
             INSERT INTO vigil_cases (case_id, customer_name, payload, top_typology,
-                                     status, agent_decision, agent_confidence, report)
-            VALUES (%s, %s, %s, %s, 'in_review', %s, %s, %s)
+                                     status, agent_decision, agent_confidence, report,
+                                     tokens_used, cost_inr)
+            VALUES (%s, %s, %s, %s, 'in_review', %s, %s, %s, %s, %s)
             ON CONFLICT (case_id) DO UPDATE SET
                 top_typology     = COALESCE(NULLIF(EXCLUDED.top_typology, ''),
                                             vigil_cases.top_typology),
@@ -127,6 +133,8 @@ def save_investigation(
                 agent_decision   = EXCLUDED.agent_decision,
                 agent_confidence = EXCLUDED.agent_confidence,
                 report           = EXCLUDED.report,
+                tokens_used      = COALESCE(EXCLUDED.tokens_used, vigil_cases.tokens_used),
+                cost_inr         = COALESCE(EXCLUDED.cost_inr, vigil_cases.cost_inr),
                 updated_at       = now()
             """,
             (
@@ -137,6 +145,8 @@ def save_investigation(
                 decision,
                 confidence,
                 report,
+                tokens_used,
+                cost_inr,
             ),
         )
 
@@ -202,6 +212,13 @@ def get_stats() -> dict:
         total, flagged, auto_dism, in_review, str_filed, dismissed = cur.fetchone()
         cur.execute("SELECT count(*) FROM vigil_reviews")
         reviews = cur.fetchone()[0]
+        cur.execute(
+            """
+            SELECT COALESCE(SUM(cost_inr), 0), COALESCE(AVG(cost_inr), 0), COUNT(*)
+            FROM vigil_cases WHERE cost_inr IS NOT NULL
+            """
+        )
+        spend, avg_cost, investigated = cur.fetchone()
 
     return {
         "total_cases": total,
@@ -212,6 +229,12 @@ def get_stats() -> dict:
         "dismissed": dismissed,
         "reviews_recorded": reviews,
         "noise_reduction_pct": round(auto_dism / total * 100, 1) if total else 0.0,
+        # Triage economics: what was spent on LLM investigations, and what the
+        # auto-dismissed cases would have cost at the same average rate.
+        "investigated_with_llm": investigated,
+        "llm_spend_inr": round(spend, 2),
+        "avg_cost_per_investigation_inr": round(avg_cost, 2),
+        "est_saved_by_triage_inr": round(auto_dism * avg_cost, 2),
     }
 
 

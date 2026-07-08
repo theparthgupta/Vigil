@@ -33,6 +33,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 
+from agent.costing import TokenUsageHandler
 from agent.graph import graph
 from agent.state import initial_state
 from api import store
@@ -116,6 +117,8 @@ class InvestigateResponse(BaseModel):
     report: str
     investigation_steps: list[str]
     latency_seconds: float
+    tokens_used: int = 0
+    cost_inr: float = 0.0
 
 
 class TriageBatchRequest(BaseModel):
@@ -364,17 +367,21 @@ def investigate(req: InvestigateRequest) -> InvestigateResponse:
     """
     case_dict = json.loads(req.model_dump_json(exclude={"detection_result"}))
 
+    usage = TokenUsageHandler()
     t0 = time.perf_counter()
     result = graph.invoke(
         initial_state(case_dict, detection_result=req.detection_result),
-        config={"tags": ["api"], "run_name": f"api-{req.case_id}"},
+        config={"tags": ["api"], "run_name": f"api-{req.case_id}",
+                "callbacks": [usage]},
     )
     latency = time.perf_counter() - t0
+    cost = usage.summary()
 
     try:
         store.save_investigation(
             case_dict, result["decision"], result["confidence"],
             result.get("detected_typology", ""), result["report"],
+            tokens_used=cost["total_tokens"], cost_inr=cost["cost_inr"],
         )
     except Exception as e:
         print(f"WARN: case-store persistence failed: {e}")
@@ -387,6 +394,8 @@ def investigate(req: InvestigateRequest) -> InvestigateResponse:
         report=result["report"],
         investigation_steps=result["investigation_steps"],
         latency_seconds=round(latency, 2),
+        tokens_used=cost["total_tokens"],
+        cost_inr=cost["cost_inr"],
     )
 
 
@@ -444,6 +453,7 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
     case_dict = json.loads(req.model_dump_json(exclude={"detection_result"}))
 
     def gen():
+        usage = TokenUsageHandler()
         t0 = time.perf_counter()
         final: dict = {}
         # announce the first node as "running"
@@ -451,7 +461,8 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
 
         for update in graph.stream(
             initial_state(case_dict, detection_result=req.detection_result),
-            config={"tags": ["api", "stream"], "run_name": f"api-stream-{req.case_id}"},
+            config={"tags": ["api", "stream"], "run_name": f"api-stream-{req.case_id}",
+                    "callbacks": [usage]},
             stream_mode="updates",
         ):
             for node, delta in update.items():
@@ -463,10 +474,12 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
                         nxt = _ORDER[idx + 1]
                         yield _sse("status", {"stage": nxt, "message": _RUNNING_MSG[nxt]})
 
+        cost = usage.summary()
         try:
             store.save_investigation(
                 case_dict, final.get("decision", ""), final.get("confidence", 0.0),
                 final.get("detected_typology", ""), final.get("report", ""),
+                tokens_used=cost["total_tokens"], cost_inr=cost["cost_inr"],
             )
         except Exception as e:
             print(f"WARN: case-store persistence failed: {e}")
@@ -479,6 +492,8 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
             "report": final.get("report", ""),
             "investigation_steps": final.get("investigation_steps", []),
             "latency_seconds": round(time.perf_counter() - t0, 2),
+            "tokens_used": cost["total_tokens"],
+            "cost_inr": cost["cost_inr"],
         })
 
     return StreamingResponse(gen(), media_type="text/event-stream")
