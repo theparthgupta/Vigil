@@ -7,7 +7,10 @@ No LLM. Pure aggregation over the deterministic detectors in typologies.py.
 
 from __future__ import annotations
 
+import json
+import math
 import os
+from pathlib import Path
 
 from monitor.anomaly import detect_anomaly, load_or_train_model
 from monitor.behavioral import detect_behavioral_anomaly
@@ -58,6 +61,25 @@ TRIAGE_THRESHOLD = float(os.getenv("VIGIL_THRESHOLD", "0.60"))
 # Load the Isolation Forest once (trains + persists on first import if absent).
 _ANOMALY_MODEL = load_or_train_model()
 
+# ── Learned score fusion (Phase 11C) ──────────────────────────────────────────
+# Logistic-regression weights trained on the SAML-D benchmark split
+# (benchmarks/train_fusion.py). Plain JSON — readable and auditable, no pickle.
+# If the file is absent the scorer falls back to the hand-tuned formula below.
+_FUSION_PATH = Path(__file__).parent.parent / "benchmarks" / "fusion_weights.json"
+
+
+def _load_fusion() -> dict | None:
+    try:
+        d = json.loads(_FUSION_PATH.read_text(encoding="utf-8"))
+        return {"names": d["feature_names"],
+                "coefs": d["coefficients"],
+                "intercept": d["intercept"]}
+    except Exception:
+        return None
+
+
+_FUSION = _load_fusion()
+
 
 def _typology_flags(case: dict) -> list[dict]:
     """Run all 10 typology detectors over a case; return only the flagged results."""
@@ -97,24 +119,51 @@ def combine_scores(
     behavioral_score: float,
     anomaly_score: float = 0.0,
     has_sanctions: bool = False,
+    flags: set[str] | None = None,
 ) -> float:
     """
     Blend the four detection layers into a single 0.0-1.0 risk score.
 
-    Weighted sum (typology 0.45 / graph 0.20 / behavioral 0.15 / anomaly 0.20), then:
-      OVERRIDE: a sanctions hit forces 1.0.
-      FLOOR:    a strong typology score (>=0.85) keeps the result at >=0.75.
+    Learned path (flags given + fusion weights present): logistic regression
+    trained on the SAML-D split — sigmoid over the four layer scores plus
+    per-typology indicators. Fully readable coefficients in
+    benchmarks/fusion_weights.json.
+
+    Fallback path (flags omitted or weights file missing): the original
+    hand-tuned weighted sum (typology 0.45 / graph 0.20 / behavioral 0.15 /
+    anomaly 0.20) with the typology>=0.85 -> >=0.75 floor.
+
+    Either way, OVERRIDE: a sanctions hit forces 1.0 (applied after fusion —
+    sanctions never fire in the training data, so it cannot be learned there).
     """
-    combined = min(1.0, (
-        typology_score * 0.45
-        + graph_score * 0.20
-        + behavioral_score * 0.15
-        + anomaly_score * 0.20
-    ))
+    if flags is not None and _FUSION is not None:
+        feats = {
+            "typology_score": typology_score,
+            "graph_score": graph_score,
+            "behavioral_score": behavioral_score,
+            "anomaly_score": anomaly_score,
+            "flag_structuring": float("structuring" in flags),
+            "flag_fan_out": float("fan_out" in flags),
+            "flag_velocity_spike": float("velocity_spike" in flags),
+            "flag_sanctions_hit": float("sanctions_hit" in flags),
+            "flag_rapid_passthrough": float("rapid_passthrough" in flags),
+        }
+        z = _FUSION["intercept"] + sum(
+            _FUSION["coefs"][name] * feats[name] for name in _FUSION["names"]
+        )
+        combined = 1.0 / (1.0 + math.exp(-z))
+    else:
+        combined = min(1.0, (
+            typology_score * 0.45
+            + graph_score * 0.20
+            + behavioral_score * 0.15
+            + anomaly_score * 0.20
+        ))
+        if typology_score >= 0.85:
+            combined = max(combined, 0.75)
+
     if has_sanctions:
         combined = 1.0
-    if typology_score >= 0.85:
-        combined = max(combined, 0.75)
     return round(combined, 4)
 
 
@@ -137,8 +186,13 @@ def run_detection(case: dict) -> dict:
     anomaly_score = anomaly["anomaly_score"] if anomaly["flagged"] else 0.0
     has_sanctions = any(f["typology"] == "sanctions_hit" for f in flags)
 
+    fired = {f["typology"] for f in flags}
+    if graph_analysis["fan_out"]["flagged"]:
+        fired.add("fan_out")
+
     risk_score = combine_scores(
-        typology_score, graph_score, behavioral_score, anomaly_score, has_sanctions
+        typology_score, graph_score, behavioral_score, anomaly_score,
+        has_sanctions, flags=fired,
     )
 
     return {

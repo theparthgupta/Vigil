@@ -1,0 +1,33 @@
+{
+  "feature_names": [
+    "typology_score",
+    "graph_score",
+    "behavioral_score",
+    "anomaly_score",
+    "flag_structuring",
+    "flag_fan_out",
+    "flag_velocity_spike",
+    "flag_sanctions_hit",
+    "flag_rapid_passthrough"
+  ],
+  "coefficients": {
+    "typology_score": 4.0848,
+    "graph_score": -0.5669,
+    "behavioral_score": -0.3818,
+    "anomaly_score": 4.2158,
+    "flag_structuring": -1.8278,
+    "flag_fan_out": -0.7559,
+    "flag_velocity_spike": -0.6125,
+    "flag_sanctions_hit": 0.0,
+    "flag_rapid_passthrough": -1.6633
+  },
+  "intercept": -3.6127,
+  "meta": {
+    "trained_on": "SAML-D sample (Phase 11B, seed 42), 70% train split",
+    "variant": "class_weight=balanced (recall-first: triage-gate operating profile)",
+    "train_cases": 1715,
+    "test_cases": 735,
+    "date": "2026-07-09",
+    "note": "Logistic regression; scorer falls back to hand-tuned weights if this file is missing. Sanctions override to 1.0 is applied AFTER fusion, in code."
+  }
+}
