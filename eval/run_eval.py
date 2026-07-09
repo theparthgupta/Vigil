@@ -59,7 +59,7 @@ def _run_case(case: dict, tag: str) -> dict:
             "latency_s": round(latency, 2),
             "error": None,
         }
-    except Exception as exc:        # noqa: BLE001 — record, don't abort the batch
+    except Exception as exc:  # noqa: BLE001 — record, don't abort the batch
         latency = time.perf_counter() - t0
         return {
             "case_id": case["case_id"],
@@ -75,8 +75,9 @@ def _run_case(case: dict, tag: str) -> dict:
         }
 
 
-def run_eval(tag: str, out_path: Path, workers: int, limit: int | None,
-             cases_path: Path | None = None) -> dict:
+def run_eval(
+    tag: str, out_path: Path, workers: int, limit: int | None, cases_path: Path | None = None
+) -> dict:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
@@ -86,8 +87,7 @@ def run_eval(tag: str, out_path: Path, workers: int, limit: int | None,
     if limit:
         cases = cases[:limit]
 
-    print(f"Running {len(cases)} cases through the agent "
-          f"(tag='{tag}', workers={workers})...")
+    print(f"Running {len(cases)} cases through the agent (tag='{tag}', workers={workers})...")
     t0 = time.perf_counter()
 
     results: list[dict] = []
@@ -111,11 +111,10 @@ def run_eval(tag: str, out_path: Path, workers: int, limit: int | None,
         for e in errors[:5]:
             print(f"  {e['case_id']}: {e['error']}")
 
-    out_path.write_text(
-        json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
+    out_path.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(
+        f"Saved {len(results)} results -> {out_path}  (wall clock {time.perf_counter() - t0:.1f}s)"
     )
-    print(f"Saved {len(results)} results -> {out_path}  "
-          f"(wall clock {time.perf_counter() - t0:.1f}s)")
 
     metrics = compute_metrics([r for r in results if r["error"] is None])
     print()
@@ -129,9 +128,11 @@ if __name__ == "__main__":
     parser.add_argument("--out", default="eval/results_baseline.json")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--cases", default=None,
-                        help="Path to a cases JSON (defaults to cases_train.json)")
+    parser.add_argument(
+        "--cases", default=None, help="Path to a cases JSON (defaults to cases_train.json)"
+    )
     args = parser.parse_args()
 
-    run_eval(args.tag, Path(args.out), args.workers, args.limit,
-             Path(args.cases) if args.cases else None)
+    run_eval(
+        args.tag, Path(args.out), args.workers, args.limit, Path(args.cases) if args.cases else None
+    )

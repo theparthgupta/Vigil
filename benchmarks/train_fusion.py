@@ -26,9 +26,15 @@ from benchmarks.fp_attribution import load_cases
 from benchmarks.saml_d import fmt_table, metrics
 
 FEATURES = [
-    "typology_score", "graph_score", "behavioral_score", "anomaly_score",
-    "flag_structuring", "flag_fan_out", "flag_velocity_spike",
-    "flag_sanctions_hit", "flag_rapid_passthrough",
+    "typology_score",
+    "graph_score",
+    "behavioral_score",
+    "anomaly_score",
+    "flag_structuring",
+    "flag_fan_out",
+    "flag_velocity_spike",
+    "flag_sanctions_hit",
+    "flag_rapid_passthrough",
 ]
 _SEED = 42
 _OUT = Path(__file__).parent / "fusion_weights.json"
@@ -40,14 +46,19 @@ def featurize(det: dict) -> list[float]:
     if det["graph_analysis"]["fan_out"]["flagged"]:
         fired.add("fan_out")
     return [
-        ls["typology"], ls["graph"], ls["behavioral"], ls["anomaly"],
-        float("structuring" in fired), float("fan_out" in fired),
-        float("velocity_spike" in fired), float("sanctions_hit" in fired),
+        ls["typology"],
+        ls["graph"],
+        ls["behavioral"],
+        ls["anomaly"],
+        float("structuring" in fired),
+        float("fan_out" in fired),
+        float("velocity_spike" in fired),
+        float("sanctions_hit" in fired),
         float("rapid_passthrough" in fired),
     ]
 
 
-_FEAT_CACHE = Path(__file__).parent / "_saml_features_cache.json"   # gitignored
+_FEAT_CACHE = Path(__file__).parent / "_saml_features_cache.json"  # gitignored
 
 
 def _featurize_all() -> tuple[list[list[float]], list[int], list[float]]:
@@ -69,8 +80,9 @@ def _featurize_all() -> tuple[list[list[float]], list[int], list[float]]:
         hand_scores.append(det["risk_score"])
         if (i + 1) % 500 == 0:
             print(f"  {i + 1}/{len(cases)} ({time.perf_counter() - t0:.0f}s)", flush=True)
-    _FEAT_CACHE.write_text(json.dumps({"X": X, "y": y, "hand_scores": hand_scores}),
-                           encoding="utf-8")
+    _FEAT_CACHE.write_text(
+        json.dumps({"X": X, "y": y, "hand_scores": hand_scores}), encoding="utf-8"
+    )
     return X, y, hand_scores
 
 
@@ -112,21 +124,27 @@ def main() -> None:
         if label == "balanced":
             chosen_coefs, chosen_intercept = coefs, intercept
 
-    _OUT.write_text(json.dumps({
-        "feature_names": FEATURES,
-        "coefficients": chosen_coefs,
-        "intercept": chosen_intercept,
-        "meta": {
-            "trained_on": "SAML-D sample (Phase 11B, seed 42), 70% train split",
-            "variant": "class_weight=balanced (recall-first: triage-gate operating profile)",
-            "train_cases": len(tr),
-            "test_cases": len(te),
-            "date": date.today().isoformat(),
-            "note": "Logistic regression; scorer falls back to hand-tuned "
+    _OUT.write_text(
+        json.dumps(
+            {
+                "feature_names": FEATURES,
+                "coefficients": chosen_coefs,
+                "intercept": chosen_intercept,
+                "meta": {
+                    "trained_on": "SAML-D sample (Phase 11B, seed 42), 70% train split",
+                    "variant": "class_weight=balanced (recall-first: triage-gate operating profile)",
+                    "train_cases": len(tr),
+                    "test_cases": len(te),
+                    "date": date.today().isoformat(),
+                    "note": "Logistic regression; scorer falls back to hand-tuned "
                     "weights if this file is missing. Sanctions override to "
                     "1.0 is applied AFTER fusion, in code.",
-        },
-    }, indent=2), encoding="utf-8")
+                },
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     print(f"\nWrote {_OUT} (balanced variant)")
 
 

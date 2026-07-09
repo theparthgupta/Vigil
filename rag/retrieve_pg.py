@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 sys.path.insert(0, str(Path(__file__).parent.parent))
 load_dotenv()
 
-from rag.ingest import _DOCS
+from rag.ingest import _DOCS  # noqa: E402  (import needs the sys.path bootstrap above)
 
 _TABLE = "vigil_regulatory_chunks"
 # Map PDF filename -> human-readable citation (table stores only `source`).
@@ -96,14 +96,16 @@ def retrieve(
 
     passages = []
     for text, source, section, page, score in rows:
-        passages.append({
-            "text":     text,
-            "citation": _CITATION_BY_SOURCE.get(source, source),
-            "source":   source,
-            "section":  section,
-            "page":     page,
-            "score":    round(float(score), 4),
-        })
+        passages.append(
+            {
+                "text": text,
+                "citation": _CITATION_BY_SOURCE.get(source, source),
+                "source": source,
+                "section": section,
+                "page": page,
+                "score": round(float(score), 4),
+            }
+        )
     return passages
 
 

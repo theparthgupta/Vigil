@@ -44,12 +44,14 @@ def _cleanup():
 
 # ── 1. Table init is idempotent ───────────────────────────────────────────────
 
+
 def test_init_tables_idempotent():
     init_tables()
     init_tables()  # second call must not raise
 
 
 # ── 2. Triage persists and lists with the right status ────────────────────────
+
 
 def test_triage_persists_and_lists():
     save_triage(_case("flag"), 0.82, True, "structuring")
@@ -64,6 +66,7 @@ def test_triage_persists_and_lists():
 
 # ── 3. Investigation moves the case to in_review ──────────────────────────────
 
+
 def test_investigation_sets_in_review():
     save_triage(_case("inv"), 0.9, True, "sanctions_hit")
     save_investigation(_case("inv"), "ESCALATE", 0.85, "sanctions_hit", "STR text")
@@ -77,6 +80,7 @@ def test_investigation_sets_in_review():
 
 
 # ── 4. Review closes the case and writes the audit row ────────────────────────
+
 
 def test_review_approve_escalate_files_str():
     save_investigation(_case("rev"), "ESCALATE", 0.9, "structuring", "STR")
@@ -101,6 +105,7 @@ def test_review_override_dismiss_files_str():
 
 # ── 5. Guard rails: unknown case, uninvestigated case, bad input ──────────────
 
+
 def test_review_unknown_case_404():
     r = client.post(
         f"/cases/{_PFX}_missing/review",
@@ -120,13 +125,27 @@ def test_review_uninvestigated_400():
 
 # ── 6. Stats shape and consistency ────────────────────────────────────────────
 
+
 def test_stats_shape():
     stats = get_stats()
-    for key in ("total_cases", "flagged", "auto_dismissed", "in_review",
-                "str_filed", "dismissed", "reviews_recorded", "noise_reduction_pct"):
+    for key in (
+        "total_cases",
+        "flagged",
+        "auto_dismissed",
+        "in_review",
+        "str_filed",
+        "dismissed",
+        "reviews_recorded",
+        "noise_reduction_pct",
+    ):
         assert key in stats
-    buckets = (stats["flagged"] + stats["auto_dismissed"] + stats["in_review"]
-               + stats["str_filed"] + stats["dismissed"])
+    buckets = (
+        stats["flagged"]
+        + stats["auto_dismissed"]
+        + stats["in_review"]
+        + stats["str_filed"]
+        + stats["dismissed"]
+    )
     assert buckets == stats["total_cases"]
 
     r = client.get("/dashboard/stats")

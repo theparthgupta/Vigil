@@ -11,7 +11,6 @@ document chunk count from the resulting table as a sanity check.
 from __future__ import annotations
 
 import sys
-from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))

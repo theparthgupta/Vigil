@@ -28,6 +28,7 @@ def test_detect_shape(train_cases):
 
 # ── Test 7: batch size limit ──────────────────────────────────────────────────
 
+
 def test_triage_batch_size_limit(train_cases):
     payload = {"cases": [train_cases[0]] * 501}
     r = client.post("/triage-batch", json=payload)
@@ -45,8 +46,10 @@ def test_triage_queue_empty_then_populated(train_cases):
 
 # ── Phase 10A: CSV batch upload (/parse-csv) ──────────────────────────────────
 
-_HEADER = ("customer_name,business_type,monthly_turnover_lakhs,prior_flags,"
-           "account_opened,txn_date,amount_inr,direction,channel,counterparty")
+_HEADER = (
+    "customer_name,business_type,monthly_turnover_lakhs,prior_flags,"
+    "account_opened,txn_date,amount_inr,direction,channel,counterparty"
+)
 
 
 def _csv_upload(text: str):

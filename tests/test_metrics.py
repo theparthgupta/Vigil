@@ -1,7 +1,5 @@
 """Tests for eval/metrics.py — pure computation, no LLM."""
 
-import pytest
-
 from eval.metrics import compute_metrics
 
 
@@ -72,7 +70,7 @@ def test_per_typology_breakdown():
         _row("suspicious", "structuring", "ESCALATE"),
         _row("suspicious", "structuring", "DISMISS"),  # missed
         _row("suspicious", "sanctions_hit", "ESCALATE"),
-        _row("clean", None, "ESCALATE"),               # false positive
+        _row("clean", None, "ESCALATE"),  # false positive
         _row("clean", None, "DISMISS"),
     ]
     m = compute_metrics(results)

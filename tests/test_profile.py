@@ -4,13 +4,18 @@ Tool 4 tests: customer risk profile summariser.
 Tests use both synthetic fixtures and actual train-split cases.
 """
 
-import pytest
-
 from tools.profile import summarize_profile
 
 _REQUIRED_KEYS = {
-    "customer_id", "name", "business_type", "stated_monthly_turnover_inr",
-    "account_age_days", "prior_flags", "risk_factors", "risk_level", "summary",
+    "customer_id",
+    "name",
+    "business_type",
+    "stated_monthly_turnover_inr",
+    "account_age_days",
+    "prior_flags",
+    "risk_factors",
+    "risk_level",
+    "summary",
 }
 _VALID_LEVELS = {"low", "medium", "high"}
 
@@ -39,8 +44,7 @@ _RETAIL_LOW_RISK = {
 def test_high_risk_profile_scores_high():
     result = summarize_profile(_JEWELRY_HIGH_RISK)
     assert result["risk_level"] == "high", (
-        f"Expected 'high', got '{result['risk_level']}'. "
-        f"risk_factors={result['risk_factors']}"
+        f"Expected 'high', got '{result['risk_level']}'. risk_factors={result['risk_factors']}"
     )
 
 
@@ -71,6 +75,7 @@ def test_summary_is_non_empty_string():
 
 
 # ── Train-case tests ──────────────────────────────────────────────────────────
+
 
 def test_profile_from_structuring_case(cases_by_typology):
     case = cases_by_typology["structuring"][0]

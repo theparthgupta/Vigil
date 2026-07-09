@@ -33,6 +33,7 @@ def _dt(ts: str) -> datetime:
 
 # ── Step 1: feature extraction ────────────────────────────────────────────────
 
+
 def extract_features(case: dict) -> list[float]:
     """12 numerical features from a case. Returns [0.0]*12 for no transactions."""
     txns = case.get("transactions", [])
@@ -45,22 +46,23 @@ def extract_features(case: dict) -> list[float]:
     times = sorted(_dt(t["timestamp"]) for t in txns)
 
     return [
-        float(n),                                                              # 1
-        float(sum(amounts)),                                                   # 2
-        sum(amounts) / n,                                                      # 3
-        float(statistics.pstdev(amounts)) if n > 1 else 0.0,                  # 4
-        sum(1 for t in txns if t["channel"] == "cash") / n,                  # 5
-        sum(1 for t in txns if t["channel"] == "UPI") / n,                   # 6
-        sum(1 for t in txns if t["channel"] in ("RTGS", "NEFT")) / n,        # 7
-        sum(1 for t in txns if t["direction"] == "credit") / n,             # 8
-        float(len({t["counterparty_name"] for t in txns})),                  # 9
-        float(max(amounts)),                                                  # 10
-        float((times[-1] - times[0]).days) if n > 1 else 0.0,                # 11
-        float(customer.get("prior_flags", 0)),                               # 12
+        float(n),  # 1
+        float(sum(amounts)),  # 2
+        sum(amounts) / n,  # 3
+        float(statistics.pstdev(amounts)) if n > 1 else 0.0,  # 4
+        sum(1 for t in txns if t["channel"] == "cash") / n,  # 5
+        sum(1 for t in txns if t["channel"] == "UPI") / n,  # 6
+        sum(1 for t in txns if t["channel"] in ("RTGS", "NEFT")) / n,  # 7
+        sum(1 for t in txns if t["direction"] == "credit") / n,  # 8
+        float(len({t["counterparty_name"] for t in txns})),  # 9
+        float(max(amounts)),  # 10
+        float((times[-1] - times[0]).days) if n > 1 else 0.0,  # 11
+        float(customer.get("prior_flags", 0)),  # 12
     ]
 
 
 # ── Step 2: training ──────────────────────────────────────────────────────────
+
 
 def train_isolation_forest(train_data_path: str = _DEFAULT_TRAIN):
     """Train an Isolation Forest on the synthetic train split and persist it."""
@@ -75,7 +77,7 @@ def train_isolation_forest(train_data_path: str = _DEFAULT_TRAIN):
 
     model = IsolationForest(
         n_estimators=200,
-        contamination=0.25,   # matches the ~25% synthetic suspicious rate
+        contamination=0.25,  # matches the ~25% synthetic suspicious rate
         random_state=42,
     )
     model.fit(features)
@@ -96,13 +98,14 @@ def load_or_train_model():
 
 # ── Step 3: detection ─────────────────────────────────────────────────────────
 
+
 def detect_anomaly(case: dict, model=None) -> dict:
     if model is None:
         model = load_or_train_model()
 
     features = extract_features(case)
     decision_score = float(model.decision_function([features])[0])
-    prediction = int(model.predict([features])[0])     # -1 = anomaly, 1 = normal
+    prediction = int(model.predict([features])[0])  # -1 = anomaly, 1 = normal
 
     anomaly_score = float(max(0.0, min(1.0, 0.5 - decision_score)))
     flagged = bool(prediction == -1)

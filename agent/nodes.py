@@ -11,7 +11,6 @@ All LLM calls use gpt-4o-mini at temperature=0 for reproducibility.
 
 from __future__ import annotations
 
-import os
 from typing import Literal, Optional
 
 from dotenv import load_dotenv
@@ -34,8 +33,8 @@ load_dotenv()
 
 _MODEL = "gpt-4o-mini"
 _CONFIDENCE_THRESHOLD = 0.6
-_MAX_PASSES = 2                       # original pass + at most one widened re-pass
-_HIGH_VALUE_INR = 1_000_000          # ₹10L — names above this warrant adverse-media
+_MAX_PASSES = 2  # original pass + at most one widened re-pass
+_HIGH_VALUE_INR = 1_000_000  # ₹10L — names above this warrant adverse-media
 
 ALL_TOOLS = ["profile", "patterns", "sanctions", "adverse_media"]
 
@@ -46,8 +45,10 @@ def _llm(temperature: float = 0.0) -> ChatOpenAI:
 
 # ── Structured-output schemas ─────────────────────────────────────────────────
 
+
 class ToolPlan(BaseModel):
     """Planner output: ordered tool names to run."""
+
     tools: list[str] = Field(
         description="Ordered subset of: profile, patterns, sanctions, adverse_media"
     )
@@ -55,6 +56,7 @@ class ToolPlan(BaseModel):
 
 class ReasonerOutput(BaseModel):
     """Reasoner decision."""
+
     decision: Literal["ESCALATE", "DISMISS"]
     confidence: float = Field(ge=0.0, le=1.0, description="Confidence in the decision")
     typology: Optional[str] = Field(
@@ -67,23 +69,25 @@ class ReasonerOutput(BaseModel):
 
 # ── 1. Planner ────────────────────────────────────────────────────────────────
 
+
 def planner(state: VigilState) -> dict:
     case = state["case"]
     summary = _case_summary(case)
 
     llm = _llm().with_structured_output(ToolPlan)
-    plan = llm.invoke([
-        {"role": "system", "content": PLANNER_SYSTEM_PROMPT},
-        {"role": "user", "content": summary},
-    ])
+    plan = llm.invoke(
+        [
+            {"role": "system", "content": PLANNER_SYSTEM_PROMPT},
+            {"role": "user", "content": summary},
+        ]
+    )
 
     # Keep only valid tool names, preserving the LLM's order; fall back to all tools
-    tools = [t for t in plan.tools if t in ALL_TOOLS] or list(ALL_TOOLS)
+    tools = [t for t in plan.tools if t in ALL_TOOLS] or list(ALL_TOOLS)  # type: ignore[union-attr]
 
     return {
         "tool_plan": tools,
-        "investigation_steps": state["investigation_steps"]
-        + [f"Planner: tool plan = {tools}"],
+        "investigation_steps": state["investigation_steps"] + [f"Planner: tool plan = {tools}"],
     }
 
 
@@ -94,13 +98,11 @@ def _case_summary(case: dict) -> str:
     channels = {t["channel"] for t in txns}
     near_threshold = sum(1 for a in amounts if 800_000 <= a <= 999_999)
     over_threshold = sum(1 for a in amounts if a >= _HIGH_VALUE_INR)
-    cash_credits = sum(
-        1 for t in txns if t["channel"] == "cash" and t["direction"] == "credit"
-    )
+    cash_credits = sum(1 for t in txns if t["channel"] == "cash" and t["direction"] == "credit")
     return (
         f"Customer: {cust['name']} ({cust['business_type']}), "
         f"prior_flags={cust['prior_flags']}, "
-        f"stated_monthly_turnover=Rs.{cust['stated_monthly_turnover_inr']/1e5:.1f}L.\n"
+        f"stated_monthly_turnover=Rs.{cust['stated_monthly_turnover_inr'] / 1e5:.1f}L.\n"
         f"Transactions: {len(txns)} total; channels={sorted(channels)}; "
         f"cash credits={cash_credits}; "
         f"deposits in Rs.8L-10L band={near_threshold}; "
@@ -110,13 +112,14 @@ def _case_summary(case: dict) -> str:
 
 # ── 2. Investigator ───────────────────────────────────────────────────────────
 
+
 def investigator(state: VigilState) -> dict:
     case = state["case"]
     txns = case["transactions"]
     plan = state["tool_plan"] or list(ALL_TOOLS)
     is_widen_pass = state["investigation_passes"] >= 1
 
-    evidence = dict(state["evidence"])   # copy; merge so a re-pass augments, not replaces
+    evidence = dict(state["evidence"])  # copy; merge so a re-pass augments, not replaces
     counterparties = sorted({t["counterparty_name"] for t in txns})
 
     # If the case came pre-screened through the monitor triage gate, reuse that
@@ -135,8 +138,11 @@ def investigator(state: VigilState) -> dict:
         # that clean result and skip re-running check_sanctions. A pre-screened
         # hit still re-runs here to capture the full match shape downstream.
         if pre is not None and not _pre_has_sanctions(pre):
-            evidence["sanctions"] = {"hits": [], "checked": len(counterparties),
-                                     "source": "pre_screening"}
+            evidence["sanctions"] = {
+                "hits": [],
+                "checked": len(counterparties),
+                "source": "pre_screening",
+            }
             pre_skips.append("sanctions (clean from pre-screening)")
         else:
             # Synthetic cases (suspicious/clean) screen against the local list so results
@@ -161,9 +167,7 @@ def investigator(state: VigilState) -> dict:
                 t["counterparty_name"] for t in txns if t["amount_inr"] >= _HIGH_VALUE_INR
             }
             targets = sorted(flagged | high_value | {case["customer"]["name"]})
-        evidence["adverse_media"] = {
-            name: search_adverse_media(name) for name in targets
-        }
+        evidence["adverse_media"] = {name: search_adverse_media(name) for name in targets}
 
     pass_label = "widened re-pass" if is_widen_pass else "initial pass"
     skip_note = f"; reused pre-screening: {', '.join(pre_skips)}" if pre_skips else ""
@@ -171,19 +175,21 @@ def investigator(state: VigilState) -> dict:
         "evidence": evidence,
         "investigation_passes": state["investigation_passes"] + 1,
         "investigation_steps": state["investigation_steps"]
-        + [f"Investigator ({pass_label}): ran {plan}; "
-           f"{len(evidence.get('sanctions', {}).get('hits', []))} sanctions hit(s)"
-           f"{skip_note}"],
+        + [
+            f"Investigator ({pass_label}): ran {plan}; "
+            f"{len(evidence.get('sanctions', {}).get('hits', []))} sanctions hit(s)"
+            f"{skip_note}"
+        ],
     }
 
 
 def _pre_has_sanctions(pre: dict) -> bool:
     """True if the monitor pre-screening flagged a sanctions hit."""
-    return any(f.get("typology") == "sanctions_hit"
-               for f in pre.get("typology_flags", []))
+    return any(f.get("typology") == "sanctions_hit" for f in pre.get("typology_flags", []))
 
 
 # ── 3. Reasoner ───────────────────────────────────────────────────────────────
+
 
 def reasoner(state: VigilState) -> dict:
     evidence = state["evidence"]
@@ -199,10 +205,12 @@ def reasoner(state: VigilState) -> dict:
 
     user_msg = _reasoner_user_message(state["case"], evidence, passages)
     llm = _llm().with_structured_output(ReasonerOutput)
-    out: ReasonerOutput = llm.invoke([
-        {"role": "system", "content": REASONER_SYSTEM_PROMPT},
-        {"role": "user", "content": user_msg},
-    ])
+    out: ReasonerOutput = llm.invoke(  # type: ignore[assignment]
+        [
+            {"role": "system", "content": REASONER_SYSTEM_PROMPT},
+            {"role": "user", "content": user_msg},
+        ]
+    )
 
     return {
         "retrieved_passages": passages,
@@ -210,8 +218,10 @@ def reasoner(state: VigilState) -> dict:
         "confidence": out.confidence,
         "detected_typology": out.typology or "",
         "investigation_steps": state["investigation_steps"]
-        + [f"Reasoner: {out.decision} (confidence={out.confidence:.2f}, "
-           f"typology={out.typology}). {out.reasoning[:160]}"],
+        + [
+            f"Reasoner: {out.decision} (confidence={out.confidence:.2f}, "
+            f"typology={out.typology}). {out.reasoning[:160]}"
+        ],
     }
 
 
@@ -251,8 +261,9 @@ def _reasoner_user_message(case: dict, evidence: dict, passages: list[dict]) -> 
         f"out of {san.get('checked', 0)} counterparties checked.",
     ]
     for h in san.get("hits", []):
-        lines.append(f"  - {h['name_queried']} matched {h['matched_entity']} "
-                     f"(score {h['match_score']})")
+        lines.append(
+            f"  - {h['name_queried']} matched {h['matched_entity']} (score {h['match_score']})"
+        )
 
     lines += ["", "RETRIEVED REGULATORY PASSAGES (cite these by source + section + page):"]
     for i, p in enumerate(passages, 1):
@@ -265,12 +276,15 @@ def _reasoner_user_message(case: dict, evidence: dict, passages: list[dict]) -> 
 
 # ── 4. Reporter ───────────────────────────────────────────────────────────────
 
+
 def reporter(state: VigilState) -> dict:
     user_msg = _reporter_user_message(state)
-    out = _llm().invoke([
-        {"role": "system", "content": REPORTER_SYSTEM_PROMPT},
-        {"role": "user", "content": user_msg},
-    ])
+    out = _llm().invoke(
+        [
+            {"role": "system", "content": REPORTER_SYSTEM_PROMPT},
+            {"role": "user", "content": user_msg},
+        ]
+    )
     report = out.content if hasattr(out, "content") else str(out)
     return {
         "report": report,
@@ -291,11 +305,11 @@ def _reporter_user_message(state: VigilState) -> str:
         "",
         f"CUSTOMER: {cust['name']} | {cust['business_type']} | "
         f"prior_flags={cust['prior_flags']} | "
-        f"stated_monthly_turnover=Rs.{cust['stated_monthly_turnover_inr']/1e5:.1f}L",
+        f"stated_monthly_turnover=Rs.{cust['stated_monthly_turnover_inr'] / 1e5:.1f}L",
         "",
         "TRANSACTION FEATURES (use these figures verbatim):",
         f"  {pat.get('total_transactions')} transactions; "
-        f"cash credits total Rs.{pat.get('cash_credit_total_inr', 0)/1e5:.1f}L",
+        f"cash credits total Rs.{pat.get('cash_credit_total_inr', 0) / 1e5:.1f}L",
         f"  structuring: {pat.get('structuring_indicator')}",
         f"  rapid_passthrough: {pat.get('rapid_passthrough_indicator')}",
         f"  sanctions hits: {san.get('hits', [])}",
@@ -312,11 +326,9 @@ def _reporter_user_message(state: VigilState) -> str:
 
 # ── Conditional edge ──────────────────────────────────────────────────────────
 
+
 def route_after_reasoner(state: VigilState) -> Literal["investigate", "report"]:
     """Loop back for one widened evidence pass if confidence is low."""
-    if (
-        state["confidence"] < _CONFIDENCE_THRESHOLD
-        and state["investigation_passes"] < _MAX_PASSES
-    ):
+    if state["confidence"] < _CONFIDENCE_THRESHOLD and state["investigation_passes"] < _MAX_PASSES:
         return "investigate"
     return "report"

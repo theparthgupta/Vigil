@@ -41,13 +41,17 @@ def tx(amount, direction, channel, name, day, hour=10):
 
 def cust(business_type="sme", turnover=4_500_000):
     return {
-        "id": "c1", "name": "Test Co", "business_type": business_type,
+        "id": "c1",
+        "name": "Test Co",
+        "business_type": business_type,
         "account_open_date": "2020-01-01T00:00:00",
-        "stated_monthly_turnover_inr": float(turnover), "prior_flags": 0,
+        "stated_monthly_turnover_inr": float(turnover),
+        "prior_flags": 0,
     }
 
 
 # ── 1. structuring ────────────────────────────────────────────────────────────
+
 
 def test_structuring_fires():
     txns = [
@@ -67,6 +71,7 @@ def test_structuring_quiet():
 
 
 # ── 2. rapid_passthrough ──────────────────────────────────────────────────────
+
 
 def test_rapid_passthrough_fires():
     txns = [
@@ -90,6 +95,7 @@ def test_rapid_passthrough_quiet():
 
 # ── 3. sanctions_hit ──────────────────────────────────────────────────────────
 
+
 def test_sanctions_hit_fires():
     txns = [tx(600_000, "debit", "NEFT", "Ali Hassan Mousa", 0)]
     assert detect_sanctions_hit(txns, cust())["flagged"] is True
@@ -101,6 +107,7 @@ def test_sanctions_hit_quiet():
 
 
 # ── 4. round_trip ─────────────────────────────────────────────────────────────
+
 
 def test_round_trip_fires():
     txns = [
@@ -120,8 +127,9 @@ def test_round_trip_quiet():
 
 # ── 5. velocity_spike ─────────────────────────────────────────────────────────
 
+
 def test_velocity_spike_fires():
-    txns = [tx(10_000, "credit", "UPI", f"H{d}", d) for d in range(7)]      # old history
+    txns = [tx(10_000, "credit", "UPI", f"H{d}", d) for d in range(7)]  # old history
     txns += [tx(10_000, "credit", "UPI", f"R{k}", 100 + (k % 7)) for k in range(15)]  # recent burst
     out = detect_velocity_spike(txns, cust())
     assert out["flagged"] is True
@@ -129,13 +137,14 @@ def test_velocity_spike_fires():
 
 
 def test_velocity_spike_quiet():
-    txns = [tx(10_000, "credit", "UPI", f"T{d}", d) for d in range(5)]      # < 20 → no baseline
+    txns = [tx(10_000, "credit", "UPI", f"T{d}", d) for d in range(5)]  # < 20 → no baseline
     out = detect_velocity_spike(txns, cust())
     assert out["flagged"] is False
     assert out["evidence"]["reason"] == "insufficient_history"
 
 
 # ── 6. dormant_reactivation ───────────────────────────────────────────────────
+
 
 def test_dormant_reactivation_fires():
     txns = [
@@ -157,6 +166,7 @@ def test_dormant_reactivation_quiet():
 
 
 # ── 7. smurfing_network ───────────────────────────────────────────────────────
+
 
 def test_smurfing_network_fires():
     txns = [
@@ -180,6 +190,7 @@ def test_smurfing_network_quiet():
 
 # ── 8. high_risk_sector_spike ─────────────────────────────────────────────────
 
+
 def test_high_risk_sector_spike_fires():
     txns = [tx(2_500_000, "credit", "RTGS", "Buyer", 0)]
     out = detect_high_risk_sector_spike(txns, cust("jewelry", turnover=1_000_000))
@@ -190,10 +201,13 @@ def test_high_risk_sector_spike_fires():
 def test_high_risk_sector_spike_quiet():
     txns = [tx(2_500_000, "credit", "RTGS", "Buyer", 0)]
     # retail is not a high-risk sector → no flag even with high volume
-    assert detect_high_risk_sector_spike(txns, cust("retail", turnover=1_000_000))["flagged"] is False
+    assert (
+        detect_high_risk_sector_spike(txns, cust("retail", turnover=1_000_000))["flagged"] is False
+    )
 
 
 # ── 9. upi_micro_structuring ──────────────────────────────────────────────────
+
 
 def test_upi_micro_structuring_fires():
     senders = [f"S{i}" for i in range(8)]
@@ -209,6 +223,7 @@ def test_upi_micro_structuring_quiet():
 
 
 # ── 10. geographic_anomaly ────────────────────────────────────────────────────
+
 
 def test_geographic_anomaly_fires():
     txns = [
@@ -234,9 +249,15 @@ def test_geographic_anomaly_quiet():
 
 # ── Scoring + threshold ───────────────────────────────────────────────────────
 
+
 def _flag(typology):
-    return {"flagged": True, "typology": typology, "confidence": 0.9,
-            "evidence": {}, "regulatory_ref": ""}
+    return {
+        "flagged": True,
+        "typology": typology,
+        "confidence": 0.9,
+        "evidence": {},
+        "regulatory_ref": "",
+    }
 
 
 def test_score_single_flag_equals_weight():
@@ -253,10 +274,16 @@ def test_score_sanctions_is_one():
 
 
 def test_score_five_flags_capped_at_one():
-    flags = [_flag(t) for t in (
-        "structuring", "round_trip", "velocity_spike",
-        "dormant_reactivation", "geographic_anomaly",
-    )]
+    flags = [
+        _flag(t)
+        for t in (
+            "structuring",
+            "round_trip",
+            "velocity_spike",
+            "dormant_reactivation",
+            "geographic_anomaly",
+        )
+    ]
     assert compute_risk_score(flags) == 1.0
 
 

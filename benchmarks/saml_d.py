@@ -43,7 +43,7 @@ _DATASET = Path.home() / (
     ".cache/kagglehub/datasets/berkanoztas/"
     "synthetic-transaction-monitoring-dataset-aml/versions/2/SAML-D.csv"
 )
-_GBP_INR = 100.0          # threshold-semantics scaling (see module docstring)
+_GBP_INR = 100.0  # threshold-semantics scaling (see module docstring)
 _SEED = 42
 _N_SUSPICIOUS = 500
 _N_CLEAN = 2000
@@ -62,6 +62,7 @@ _CHANNEL_MAP = {
 
 
 # ── Pass 1: find laundering accounts + reservoir-sample clean accounts ────────
+
 
 def scan_accounts() -> tuple[set[str], list[str]]:
     rng = random.Random(_SEED)
@@ -88,19 +89,22 @@ def scan_accounts() -> tuple[set[str], list[str]]:
 
 # ── Pass 2: collect transactions for the sampled accounts ─────────────────────
 
+
 def collect_transactions(accounts: set[str]) -> dict[str, list[dict]]:
     txns: dict[str, list[dict]] = defaultdict(list)
 
     def add(acct: str, row: dict, direction: str, counterparty: str) -> None:
         if len(txns[acct]) >= _MAX_TXNS_PER_ACCOUNT:
             return
-        txns[acct].append({
-            "amount_inr": float(row["Amount"]) * _GBP_INR,
-            "timestamp": f"{row['Date']}T{row['Time']}",
-            "channel": _CHANNEL_MAP.get(row["Payment_type"], "NEFT"),
-            "direction": direction,
-            "counterparty_name": counterparty,
-        })
+        txns[acct].append(
+            {
+                "amount_inr": float(row["Amount"]) * _GBP_INR,
+                "timestamp": f"{row['Date']}T{row['Time']}",
+                "channel": _CHANNEL_MAP.get(row["Payment_type"], "NEFT"),
+                "direction": direction,
+                "counterparty_name": counterparty,
+            }
+        )
 
     with open(_DATASET, encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -133,6 +137,7 @@ def build_case(acct: str, transactions: list[dict]) -> dict:
 
 # ── Metrics ────────────────────────────────────────────────────────────────────
 
+
 def metrics(scored: list[tuple[float, int]], threshold: float) -> dict:
     tp = sum(1 for s, y in scored if s >= threshold and y == 1)
     fp = sum(1 for s, y in scored if s >= threshold and y == 0)
@@ -142,9 +147,17 @@ def metrics(scored: list[tuple[float, int]], threshold: float) -> dict:
     rec = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * prec * rec / (prec + rec) if prec + rec else 0.0
     fpr = fp / (fp + tn) if fp + tn else 0.0
-    return {"threshold": threshold, "tp": tp, "fp": fp, "fn": fn, "tn": tn,
-            "precision": round(prec, 4), "recall": round(rec, 4),
-            "f1": round(f1, 4), "fpr": round(fpr, 4)}
+    return {
+        "threshold": threshold,
+        "tp": tp,
+        "fp": fp,
+        "fn": fn,
+        "tn": tn,
+        "precision": round(prec, 4),
+        "recall": round(rec, 4),
+        "f1": round(f1, 4),
+        "fpr": round(fpr, 4),
+    }
 
 
 def evaluate(cases: list[tuple[dict, int]], label: str) -> list[dict]:
@@ -155,8 +168,10 @@ def evaluate(cases: list[tuple[dict, int]], label: str) -> list[dict]:
     for i, (case, y) in enumerate(cases):
         scored.append((run_detection(case)["risk_score"], y))
         if (i + 1) % 250 == 0:
-            print(f"  [{label}] {i + 1}/{len(cases)} cases "
-                  f"({time.perf_counter() - t0:.0f}s)", flush=True)
+            print(
+                f"  [{label}] {i + 1}/{len(cases)} cases ({time.perf_counter() - t0:.0f}s)",
+                flush=True,
+            )
     rows = [metrics(scored, t / 100) for t in range(30, 95, 5)]
     return rows
 
@@ -174,11 +189,14 @@ def fmt_table(rows: list[dict]) -> str:
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--retrain-if", action="store_true",
-                        help="also evaluate with an Isolation Forest retrained "
-                             "on a SAML-D train split")
+    parser.add_argument(
+        "--retrain-if",
+        action="store_true",
+        help="also evaluate with an Isolation Forest retrained on a SAML-D train split",
+    )
     args = parser.parse_args()
 
     if not _DATASET.exists():
@@ -204,9 +222,13 @@ def main() -> None:
     n_sus = sum(y for _, y in cases)
     print(f"  usable cases: {len(cases)} ({n_sus} suspicious, {len(cases) - n_sus} clean)")
 
-    out = ["# SAML-D benchmark — Vigil monitor stack (no LLM)", "",
-           f"Sampled cases: {len(cases)} ({n_sus} suspicious / {len(cases) - n_sus} clean); "
-           f"seed {_SEED}; GBP→INR ×{_GBP_INR:.0f}; base rate in full dataset: 0.104%.", ""]
+    out = [
+        "# SAML-D benchmark — Vigil monitor stack (no LLM)",
+        "",
+        f"Sampled cases: {len(cases)} ({n_sus} suspicious / {len(cases) - n_sus} clean); "
+        f"seed {_SEED}; GBP→INR ×{_GBP_INR:.0f}; base rate in full dataset: 0.104%.",
+        "",
+    ]
 
     print("Evaluating baseline (synthetic-trained Isolation Forest)...", flush=True)
     baseline = evaluate(cases, "baseline")
@@ -223,35 +245,44 @@ def main() -> None:
         half = len(shuffled) // 2
         train, test = shuffled[:half], shuffled[half:]
         contamination = max(0.01, sum(y for _, y in train) / len(train))
-        model = IsolationForest(n_estimators=200, contamination=contamination,
-                                random_state=_SEED)
+        model = IsolationForest(n_estimators=200, contamination=contamination, random_state=_SEED)
         model.fit([extract_features(c) for c, _ in train])
 
         original = scorer._ANOMALY_MODEL
         try:
-            scorer._ANOMALY_MODEL = model      # swap for this evaluation only
+            scorer._ANOMALY_MODEL = model  # swap for this evaluation only
             retrained = evaluate(test, "retrained-IF")
         finally:
-            scorer._ANOMALY_MODEL = original   # never touch the app's model
+            scorer._ANOMALY_MODEL = original  # never touch the app's model
 
         # Same test half under the baseline model, for a fair comparison.
         base_test = evaluate(test, "baseline-on-test")
-        out += [f"## Test half only ({len(test)} cases) — baseline IF", "",
-                fmt_table(base_test), "",
-                f"## Test half only — IF retrained on SAML-D train split "
-                f"(contamination={contamination:.3f})", "", fmt_table(retrained), ""]
+        out += [
+            f"## Test half only ({len(test)} cases) — baseline IF",
+            "",
+            fmt_table(base_test),
+            "",
+            f"## Test half only — IF retrained on SAML-D train split "
+            f"(contamination={contamination:.3f})",
+            "",
+            fmt_table(retrained),
+            "",
+        ]
 
-    out += ["## Honest caveats", "",
-            "- SAML-D is itself synthetic (simulator-generated), but independently "
-            "authored — Vigil's detectors were not written against it.",
-            "- Channel/currency mappings are proxies (see benchmarks/saml_d.py "
-            "docstring); UK geography disables the India-specific detectors "
-            "(geographic anomaly, sanctions list), so recall here comes from "
-            "structural + behavioral layers only.",
-            "- Account histories are capped at 300 transactions; accounts with "
-            "<3 transactions are dropped.",
-            "- The sample is enriched (20% suspicious vs 0.104% in the wild): "
-            "precision here does NOT transfer to production base rates."]
+    out += [
+        "## Honest caveats",
+        "",
+        "- SAML-D is itself synthetic (simulator-generated), but independently "
+        "authored — Vigil's detectors were not written against it.",
+        "- Channel/currency mappings are proxies (see benchmarks/saml_d.py "
+        "docstring); UK geography disables the India-specific detectors "
+        "(geographic anomaly, sanctions list), so recall here comes from "
+        "structural + behavioral layers only.",
+        "- Account histories are capped at 300 transactions; accounts with "
+        "<3 transactions are dropped.",
+        "- The sample is enriched (20% suspicious vs 0.104% in the wild): "
+        "precision here does NOT transfer to production base rates.",
+    ]
 
     results = Path(__file__).parent / "RESULTS_SAML_D.md"
     results.write_text("\n".join(out), encoding="utf-8")

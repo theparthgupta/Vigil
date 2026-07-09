@@ -22,9 +22,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 _OPENSANCTIONS_URL = "https://api.opensanctions.org/match/default"
-_MATCH_THRESHOLD = 0.6       # local fuzzy match: at/above this = positive hit
+_MATCH_THRESHOLD = 0.6  # local fuzzy match: at/above this = positive hit
 _MATCH_THRESHOLD_API = 0.85  # live API: stricter, to cut common-name false positives
-_REQUEST_TIMEOUT = 10.0      # seconds
+_REQUEST_TIMEOUT = 10.0  # seconds
 
 # Mirrors SANCTIONED_NAMES in data/generator.py — used when API key is absent
 _LOCAL_LIST: list[str] = [
@@ -78,19 +78,18 @@ def check_sanctions(name: str, use_api: bool = False) -> dict:
 
 # ── OpenSanctions REST API ────────────────────────────────────────────────────
 
+
 def _via_api(name: str, api_key: str) -> dict:
-    payload = {
-        "queries": {
-            "q0": {"schema": "Thing", "properties": {"name": [name]}}
-        }
-    }
+    payload = {"queries": {"q0": {"schema": "Thing", "properties": {"name": [name]}}}}
     headers = {
         "Authorization": f"ApiKey {api_key}",
         "Content-Type": "application/json",
     }
     try:
         resp = httpx.post(
-            _OPENSANCTIONS_URL, json=payload, headers=headers,
+            _OPENSANCTIONS_URL,
+            json=payload,
+            headers=headers,
             timeout=_REQUEST_TIMEOUT,
         )
         resp.raise_for_status()
@@ -115,6 +114,7 @@ def _via_api(name: str, api_key: str) -> dict:
 
 
 # ── Local fuzzy fallback ──────────────────────────────────────────────────────
+
 
 def _via_local_list(name: str) -> dict:
     name_lower = name.lower().strip()

@@ -25,8 +25,14 @@ from typing import Optional
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from data.schema import (
-    BusinessType, Case, Channel, CustomerProfile,
-    Direction, Label, TransactionRecord, Typology,
+    BusinessType,
+    Case,
+    Channel,
+    CustomerProfile,
+    Direction,
+    Label,
+    TransactionRecord,
+    Typology,
 )
 
 SEED = 42
@@ -57,49 +63,146 @@ SANCTIONED_NAMES: list[str] = [
 ]
 
 _FIRST_NAMES = [
-    "Rajesh", "Suresh", "Mukesh", "Ramesh", "Mahesh", "Dinesh",
-    "Priya", "Sunita", "Anita", "Kavita", "Geeta", "Meena",
-    "Amit", "Sumit", "Rohit", "Mohit", "Ankit", "Vikas",
-    "Pooja", "Neha", "Asha", "Rekha", "Sita", "Radha",
-    "Harish", "Girish", "Manish", "Naresh", "Paresh", "Yogesh",
-    "Arun", "Varun", "Tarun", "Kiran", "Milan", "Nitin",
-    "Deepa", "Seema", "Reema", "Nisha", "Usha", "Sudha",
-    "Ajay", "Vijay", "Sanjay", "Manoj", "Saroj", "Pankaj",
+    "Rajesh",
+    "Suresh",
+    "Mukesh",
+    "Ramesh",
+    "Mahesh",
+    "Dinesh",
+    "Priya",
+    "Sunita",
+    "Anita",
+    "Kavita",
+    "Geeta",
+    "Meena",
+    "Amit",
+    "Sumit",
+    "Rohit",
+    "Mohit",
+    "Ankit",
+    "Vikas",
+    "Pooja",
+    "Neha",
+    "Asha",
+    "Rekha",
+    "Sita",
+    "Radha",
+    "Harish",
+    "Girish",
+    "Manish",
+    "Naresh",
+    "Paresh",
+    "Yogesh",
+    "Arun",
+    "Varun",
+    "Tarun",
+    "Kiran",
+    "Milan",
+    "Nitin",
+    "Deepa",
+    "Seema",
+    "Reema",
+    "Nisha",
+    "Usha",
+    "Sudha",
+    "Ajay",
+    "Vijay",
+    "Sanjay",
+    "Manoj",
+    "Saroj",
+    "Pankaj",
 ]
 
 _LAST_NAMES = [
-    "Sharma", "Verma", "Gupta", "Agarwal", "Singh", "Kumar",
-    "Patel", "Shah", "Mehta", "Joshi", "Mishra", "Tiwari",
-    "Pandey", "Shukla", "Dubey", "Yadav", "Chauhan", "Thakur",
-    "Reddy", "Rao", "Nair", "Pillai", "Menon", "Iyer",
-    "Banerjee", "Chatterjee", "Mukherjee", "Bose", "Das", "Sen",
-    "Desai", "Jain", "Choudhury", "Saxena", "Srivastava", "Kapoor",
+    "Sharma",
+    "Verma",
+    "Gupta",
+    "Agarwal",
+    "Singh",
+    "Kumar",
+    "Patel",
+    "Shah",
+    "Mehta",
+    "Joshi",
+    "Mishra",
+    "Tiwari",
+    "Pandey",
+    "Shukla",
+    "Dubey",
+    "Yadav",
+    "Chauhan",
+    "Thakur",
+    "Reddy",
+    "Rao",
+    "Nair",
+    "Pillai",
+    "Menon",
+    "Iyer",
+    "Banerjee",
+    "Chatterjee",
+    "Mukherjee",
+    "Bose",
+    "Das",
+    "Sen",
+    "Desai",
+    "Jain",
+    "Choudhury",
+    "Saxena",
+    "Srivastava",
+    "Kapoor",
 ]
 
 # 20 distinct city-branches for structuring cases (each deposit = different branch)
 _CITY_BRANCHES = [
-    "Mumbai-Andheri", "Delhi-Connaught Place", "Bangalore-Koramangala",
-    "Chennai-T Nagar", "Hyderabad-Banjara Hills", "Pune-Kothrud",
-    "Ahmedabad-CG Road", "Kolkata-Park Street", "Jaipur-MI Road",
-    "Lucknow-Hazratganj", "Chandigarh-Sector 17", "Surat-Ring Road",
-    "Nagpur-Dharampeth", "Indore-Vijay Nagar", "Bhopal-MP Nagar",
-    "Kochi-MG Road", "Coimbatore-RS Puram", "Visakhapatnam-Dwaraka",
-    "Patna-Fraser Road", "Ranchi-Main Road",
+    "Mumbai-Andheri",
+    "Delhi-Connaught Place",
+    "Bangalore-Koramangala",
+    "Chennai-T Nagar",
+    "Hyderabad-Banjara Hills",
+    "Pune-Kothrud",
+    "Ahmedabad-CG Road",
+    "Kolkata-Park Street",
+    "Jaipur-MI Road",
+    "Lucknow-Hazratganj",
+    "Chandigarh-Sector 17",
+    "Surat-Ring Road",
+    "Nagpur-Dharampeth",
+    "Indore-Vijay Nagar",
+    "Bhopal-MP Nagar",
+    "Kochi-MG Road",
+    "Coimbatore-RS Puram",
+    "Visakhapatnam-Dwaraka",
+    "Patna-Fraser Road",
+    "Ranchi-Main Road",
 ]
 
 # Recurring payees used in clean cases (utility bills, salaries, suppliers, etc.)
 _REGULAR_PAYEES = [
-    "City Power Supply Co", "Municipal Water Board", "Office Depot India",
-    "Gati Courier Services", "Reliance Retail Ltd", "D-Mart Wholesale",
-    "BSNL Telecom", "LIC Premium Portal", "Employee Salary Pool",
-    "Raw Materials Supplier", "Tata Communications", "GST Payment Portal",
-    "Rent – Commercial Premises", "Security Services Pvt Ltd",
-    "Housekeeping Crew", "Professional Tax Dept", "EPF Contribution",
-    "Cloud Services (AWS)", "Newspaper & Stationery", "Internet Provider",
+    "City Power Supply Co",
+    "Municipal Water Board",
+    "Office Depot India",
+    "Gati Courier Services",
+    "Reliance Retail Ltd",
+    "D-Mart Wholesale",
+    "BSNL Telecom",
+    "LIC Premium Portal",
+    "Employee Salary Pool",
+    "Raw Materials Supplier",
+    "Tata Communications",
+    "GST Payment Portal",
+    "Rent – Commercial Premises",
+    "Security Services Pvt Ltd",
+    "Housekeeping Crew",
+    "Professional Tax Dept",
+    "EPF Contribution",
+    "Cloud Services (AWS)",
+    "Newspaper & Stationery",
+    "Internet Provider",
 ]
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
 
 def _rand_name() -> str:
     return f"{_rng.choice(_FIRST_NAMES)} {_rng.choice(_LAST_NAMES)}"
@@ -111,14 +214,14 @@ def _rand_account() -> str:
 
 def _rand_business_name(btype: BusinessType) -> str:
     suffixes = {
-        BusinessType.retail:      ["Traders", "General Store", "Mart", "Emporium"],
-        BusinessType.sme:         ["Enterprises", "Industries", "Works", "Pvt Ltd"],
-        BusinessType.individual:  [""],
+        BusinessType.retail: ["Traders", "General Store", "Mart", "Emporium"],
+        BusinessType.sme: ["Enterprises", "Industries", "Works", "Pvt Ltd"],
+        BusinessType.individual: [""],
         BusinessType.real_estate: ["Properties", "Realtors", "Builders & Developers"],
         BusinessType.hospitality: ["Hotels", "Resorts", "Caterers"],
-        BusinessType.logistics:   ["Logistics", "Cargo Services", "Transport"],
-        BusinessType.textile:     ["Textiles", "Fabrics", "Garments"],
-        BusinessType.jewelry:     ["Jewellers", "Gems & Ornaments", "Gold House"],
+        BusinessType.logistics: ["Logistics", "Cargo Services", "Transport"],
+        BusinessType.textile: ["Textiles", "Fabrics", "Garments"],
+        BusinessType.jewelry: ["Jewellers", "Gems & Ornaments", "Gold House"],
     }
     last = _rng.choice(_LAST_NAMES)
     suffix = _rng.choice(suffixes[btype])
@@ -132,7 +235,7 @@ def _base_date() -> datetime:
 
 def _make_customer(cid: str, btype: Optional[BusinessType] = None) -> CustomerProfile:
     btype = btype or _rng.choice(list(BusinessType))
-    turnover = float(_rng.randint(5, 200) * 100_000)   # ₹5L – ₹2Cr
+    turnover = float(_rng.randint(5, 200) * 100_000)  # ₹5L – ₹2Cr
     return CustomerProfile(
         id=cid,
         name=_rand_business_name(btype),
@@ -185,6 +288,7 @@ def _unique_payee(used: set[str]) -> str:
 
 # ── Typology generators ───────────────────────────────────────────────────────
 
+
 def _gen_structuring(idx: int) -> Case:
     """
     ≥3 cash deposits between ₹8.5L–₹9.9L, each from a different branch,
@@ -203,30 +307,33 @@ def _gen_structuring(idx: int) -> Case:
     for branch in branches:
         amount = float(_rng.randint(850_000, 990_000))
         day_off = _rng.randint(0, 29)
-        txns.append(_make_txn(
-            cid,
-            amount_inr=amount,
-            timestamp=base + timedelta(days=day_off, hours=_rng.randint(9, 17)),
-            counterparty_name=f"Cash Deposit – {branch} Branch",
-            direction=Direction.credit,
-            channel=Channel.cash,
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=amount,
+                timestamp=base + timedelta(days=day_off, hours=_rng.randint(9, 17)),
+                counterparty_name=f"Cash Deposit – {branch} Branch",
+                direction=Direction.credit,
+                channel=Channel.cash,
+            )
+        )
 
     # Background noise: normal UPI/NEFT activity
     for _ in range(_rng.randint(3, 8)):
-        txns.append(_make_txn(
-            cid,
-            amount_inr=float(_rng.randint(10_000, 200_000)),
-            timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
-            counterparty_name=_rand_name(),
-            direction=_rng.choice([Direction.credit, Direction.debit]),
-            channel=_rng.choice([Channel.upi, Channel.neft]),
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=float(_rng.randint(10_000, 200_000)),
+                timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
+                counterparty_name=_rand_name(),
+                direction=_rng.choice([Direction.credit, Direction.debit]),
+                channel=_rng.choice([Channel.upi, Channel.neft]),
+            )
+        )
 
     txns.sort(key=lambda t: t.timestamp)
     cash_total = sum(
-        t.amount_inr for t in txns
-        if t.direction == Direction.credit and t.channel == Channel.cash
+        t.amount_inr for t in txns if t.direction == Direction.credit and t.channel == Channel.cash
     )
     return Case(
         case_id=f"case_str_{idx:03d}",
@@ -235,7 +342,7 @@ def _gen_structuring(idx: int) -> Case:
         ground_truth_label=Label.suspicious,
         typology=Typology.structuring,
         notes=(
-            f"{n_deposits} cash deposits totalling ₹{cash_total/1e5:.1f}L "
+            f"{n_deposits} cash deposits totalling ₹{cash_total / 1e5:.1f}L "
             f"across {n_deposits} branches within 30 days. "
             f"Each deposit below ₹10L CTR threshold (PMLA s.12)."
         ),
@@ -256,24 +363,28 @@ def _gen_sanctions_hit(idx: int) -> Case:
 
     txns: list[TransactionRecord] = []
     for name in sanctioned:
-        txns.append(_make_txn(
-            cid,
-            amount_inr=float(_rng.randint(50_000, 2_000_000)),
-            timestamp=base + timedelta(days=_rng.randint(0, 30), hours=_rng.randint(9, 18)),
-            counterparty_name=name,
-            direction=_rng.choice([Direction.credit, Direction.debit]),
-            channel=_rng.choice([Channel.neft, Channel.rtgs, Channel.upi]),
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=float(_rng.randint(50_000, 2_000_000)),
+                timestamp=base + timedelta(days=_rng.randint(0, 30), hours=_rng.randint(9, 18)),
+                counterparty_name=name,
+                direction=_rng.choice([Direction.credit, Direction.debit]),
+                channel=_rng.choice([Channel.neft, Channel.rtgs, Channel.upi]),
+            )
+        )
 
     for _ in range(_rng.randint(5, 15)):
-        txns.append(_make_txn(
-            cid,
-            amount_inr=float(_rng.randint(5_000, 500_000)),
-            timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
-            counterparty_name=_rand_name(),
-            direction=_rng.choice([Direction.credit, Direction.debit]),
-            channel=_rng.choice([Channel.upi, Channel.neft, Channel.rtgs]),
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=float(_rng.randint(5_000, 500_000)),
+                timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
+                counterparty_name=_rand_name(),
+                direction=_rng.choice([Direction.credit, Direction.debit]),
+                channel=_rng.choice([Channel.upi, Channel.neft, Channel.rtgs]),
+            )
+        )
 
     txns.sort(key=lambda t: t.timestamp)
     return Case(
@@ -300,14 +411,16 @@ def _gen_rapid_passthrough(idx: int) -> Case:
     credit_amount = float(_rng.randint(1_500_000, 5_000_000))
     credit_ts = base + timedelta(hours=_rng.randint(9, 12))
 
-    txns: list[TransactionRecord] = [_make_txn(
-        cid,
-        amount_inr=credit_amount,
-        timestamp=credit_ts,
-        counterparty_name=f"{_rng.choice(_LAST_NAMES)} {_rng.choice(['Ltd', 'Corp', 'Pvt Ltd'])}",
-        direction=Direction.credit,
-        channel=_rng.choice([Channel.rtgs, Channel.neft]),
-    )]
+    txns: list[TransactionRecord] = [
+        _make_txn(
+            cid,
+            amount_inr=credit_amount,
+            timestamp=credit_ts,
+            counterparty_name=f"{_rng.choice(_LAST_NAMES)} {_rng.choice(['Ltd', 'Corp', 'Pvt Ltd'])}",
+            direction=Direction.credit,
+            channel=_rng.choice([Channel.rtgs, Channel.neft]),
+        )
+    ]
 
     n_debits = _rng.randint(5, 9)
     total_debit = credit_amount * _rng.uniform(0.80, 0.95)
@@ -316,14 +429,16 @@ def _gen_rapid_passthrough(idx: int) -> Case:
 
     for amt in debit_amounts:
         payee = _unique_payee(used_payees)
-        txns.append(_make_txn(
-            cid,
-            amount_inr=round(amt, 2),
-            timestamp=credit_ts + timedelta(hours=_rng.uniform(0.5, 71.5)),
-            counterparty_name=payee,
-            direction=Direction.debit,
-            channel=_rng.choice([Channel.upi, Channel.neft, Channel.rtgs]),
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=round(amt, 2),
+                timestamp=credit_ts + timedelta(hours=_rng.uniform(0.5, 71.5)),
+                counterparty_name=payee,
+                direction=Direction.debit,
+                channel=_rng.choice([Channel.upi, Channel.neft, Channel.rtgs]),
+            )
+        )
 
     txns.sort(key=lambda t: t.timestamp)
     return Case(
@@ -333,9 +448,9 @@ def _gen_rapid_passthrough(idx: int) -> Case:
         ground_truth_label=Label.suspicious,
         typology=Typology.rapid_passthrough,
         notes=(
-            f"Credit of ₹{credit_amount/1e5:.1f}L followed by {n_debits} debits "
-            f"to new payees within 72h, totalling ₹{total_debit/1e5:.1f}L "
-            f"({total_debit/credit_amount*100:.0f}% pass-through)."
+            f"Credit of ₹{credit_amount / 1e5:.1f}L followed by {n_debits} debits "
+            f"to new payees within 72h, totalling ₹{total_debit / 1e5:.1f}L "
+            f"({total_debit / credit_amount * 100:.0f}% pass-through)."
         ),
     )
 
@@ -346,10 +461,14 @@ def _gen_clean(idx: int) -> Case:
     consistent with stated business type and monthly turnover.
     """
     cid = f"cust_cln_{idx:03d}"
-    btype = _rng.choice([
-        BusinessType.retail, BusinessType.sme,
-        BusinessType.individual, BusinessType.hospitality,
-    ])
+    btype = _rng.choice(
+        [
+            BusinessType.retail,
+            BusinessType.sme,
+            BusinessType.individual,
+            BusinessType.hospitality,
+        ]
+    )
     customer = _make_customer(cid, btype)
     base = _base_date()
     monthly = customer.stated_monthly_turnover_inr
@@ -367,14 +486,16 @@ def _gen_clean(idx: int) -> Case:
             if is_income
             else _rng.choice(regular_payees)
         )
-        txns.append(_make_txn(
-            cid,
-            amount_inr=amount,
-            timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
-            counterparty_name=counterparty,
-            direction=Direction.credit if is_income else Direction.debit,
-            channel=_rng.choice([Channel.upi, Channel.upi, Channel.neft, Channel.rtgs]),
-        ))
+        txns.append(
+            _make_txn(
+                cid,
+                amount_inr=amount,
+                timestamp=base + timedelta(days=_rng.randint(0, 60), hours=_rng.randint(9, 18)),
+                counterparty_name=counterparty,
+                direction=Direction.credit if is_income else Direction.debit,
+                channel=_rng.choice([Channel.upi, Channel.upi, Channel.neft, Channel.rtgs]),
+            )
+        )
 
     txns.sort(key=lambda t: t.timestamp)
     return Case(
@@ -385,19 +506,20 @@ def _gen_clean(idx: int) -> Case:
         typology=None,
         notes=(
             f"Normal {btype.value} activity. {n_txns} txns over ~60 days. "
-            f"Consistent with stated turnover ₹{monthly/1e5:.1f}L/month."
+            f"Consistent with stated turnover ₹{monthly / 1e5:.1f}L/month."
         ),
     )
 
 
 # ── Main generation + split ───────────────────────────────────────────────────
 
+
 def generate_all() -> list[Case]:
     cases: list[Case] = []
-    cases += [_gen_structuring(i)     for i in range(50)]
-    cases += [_gen_sanctions_hit(i)   for i in range(50)]
+    cases += [_gen_structuring(i) for i in range(50)]
+    cases += [_gen_sanctions_hit(i) for i in range(50)]
     cases += [_gen_rapid_passthrough(i) for i in range(50)]
-    cases += [_gen_clean(i)           for i in range(50)]
+    cases += [_gen_clean(i) for i in range(50)]
     return cases
 
 
@@ -464,7 +586,7 @@ def eyeball(cases: list[Case], n: int = 10) -> None:
             print(f"  Label      : {c.ground_truth_label.value}")
             print(f"  Txns       : {len(c.transactions)}")
             print(f"  Notes      : {c.notes}")
-            print(f"  Sample txns:")
+            print("  Sample txns:")
             for t in c.transactions[:3]:
                 print(
                     f"    {t.timestamp.date()} | {t.direction.value:<6} | "

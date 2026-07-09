@@ -13,7 +13,6 @@ Usage:
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 
@@ -71,13 +70,13 @@ def retrieve(
     collection, embedder = _get_clients()
 
     query_vec = embedder.embed_query(query)
-    where     = {"source": source_filter} if source_filter else None
+    where = {"source": source_filter} if source_filter else None
 
     results = collection.query(
-        query_embeddings = [query_vec],
-        n_results        = k,
-        where            = where,
-        include          = ["documents", "metadatas", "distances"],
+        query_embeddings=[query_vec],
+        n_results=k,
+        where=where,
+        include=["documents", "metadatas", "distances"],
     )
 
     passages = []
@@ -86,14 +85,16 @@ def retrieve(
         results["metadatas"][0],
         results["distances"][0],
     ):
-        passages.append({
-            "text":     text,
-            "citation": meta["citation"],
-            "source":   meta["source"],
-            "section":  meta["section"],
-            "page":     meta["page"],
-            "score":    round(1.0 - dist, 4),
-        })
+        passages.append(
+            {
+                "text": text,
+                "citation": meta["citation"],
+                "source": meta["source"],
+                "section": meta["section"],
+                "page": meta["page"],
+                "score": round(1.0 - dist, 4),
+            }
+        )
 
     return passages
 

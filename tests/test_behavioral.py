@@ -16,17 +16,25 @@ _BASE = datetime(2024, 1, 1)
 
 def tx(amount, direction, channel, name, day):
     return {
-        "id": f"t{day}_{name}", "customer_id": "c1", "amount_inr": float(amount),
+        "id": f"t{day}_{name}",
+        "customer_id": "c1",
+        "amount_inr": float(amount),
         "timestamp": (_BASE + timedelta(days=day)).isoformat(),
-        "counterparty_name": name, "counterparty_account": "00000000000000",
-        "direction": direction, "channel": channel,
+        "counterparty_name": name,
+        "counterparty_account": "00000000000000",
+        "direction": direction,
+        "channel": channel,
     }
 
 
 def case_of(txns, business_type="sme"):
     return {
-        "customer": {"name": "X", "business_type": business_type,
-                     "stated_monthly_turnover_inr": 4_500_000, "prior_flags": 0},
+        "customer": {
+            "name": "X",
+            "business_type": business_type,
+            "stated_monthly_turnover_inr": 4_500_000,
+            "prior_flags": 0,
+        },
         "transactions": txns,
     }
 
@@ -36,6 +44,7 @@ _KNOWN = ["Reliance", "Gati", "DMart"]
 
 # ── 1. Insufficient history ───────────────────────────────────────────────────
 
+
 def test_insufficient_history():
     txns = [tx(100_000, "debit", "UPI", _KNOWN[i % 3], i * 5) for i in range(8)]
     out = detect_behavioral_anomaly(case_of(txns))
@@ -44,6 +53,7 @@ def test_insufficient_history():
 
 
 # ── 2. Amount spike ───────────────────────────────────────────────────────────
+
 
 def test_amount_spike_fires():
     hist = [tx(100_000 + (i % 3) * 1_000, "debit", "UPI", _KNOWN[i % 3], i * 5) for i in range(20)]
@@ -55,6 +65,7 @@ def test_amount_spike_fires():
 
 # ── 3. Stable customer ────────────────────────────────────────────────────────
 
+
 def test_stable_customer_not_flagged():
     txns = [tx(100_000 + (i % 3) * 1_000, "debit", "UPI", _KNOWN[i % 3], i * 10) for i in range(25)]
     out = detect_behavioral_anomaly(case_of(txns))
@@ -62,6 +73,7 @@ def test_stable_customer_not_flagged():
 
 
 # ── 4. New counterparty surge ─────────────────────────────────────────────────
+
 
 def test_new_counterparty_ratio_fires():
     hist = [tx(100_000, "debit", "UPI", _KNOWN[i % 3], i * 5) for i in range(20)]
@@ -73,6 +85,7 @@ def test_new_counterparty_ratio_fires():
 
 # ── 5. Channel shift ──────────────────────────────────────────────────────────
 
+
 def test_channel_shift_fires():
     hist = [tx(100_000, "debit", "UPI", _KNOWN[i % 3], i * 5) for i in range(20)]
     recent = [tx(100_000, "debit", "cash", _KNOWN[i % 3], 200 + i) for i in range(5)]
@@ -83,6 +96,7 @@ def test_channel_shift_fires():
 
 # ── 6. run_detection exposes behavioral_analysis ──────────────────────────────
 
+
 def test_run_detection_has_behavioral_key(cases_by_typology):
     out = run_detection(cases_by_typology["structuring"][0])
     assert "behavioral_analysis" in out
@@ -90,6 +104,7 @@ def test_run_detection_has_behavioral_key(cases_by_typology):
 
 
 # ── 7. Sanctions override forces 1.0 ──────────────────────────────────────────
+
 
 def test_sanctions_override():
     txns = [
@@ -101,6 +116,7 @@ def test_sanctions_override():
 
 
 # ── 8. Score formula (anomaly layer defaults to 0 here) ───────────────────────
+
 
 def test_combine_scores_formula():
     # 0.5*0.45 + 0.4*0.20 + 0.3*0.15 + 0.0*0.20 = 0.35

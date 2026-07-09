@@ -28,7 +28,7 @@ from monitor.scorer import run_detection
 THRESHOLD = 0.60
 
 
-_CACHE = Path(__file__).parent / "_saml_cases_cache.json"   # gitignored diagnostic cache
+_CACHE = Path(__file__).parent / "_saml_cases_cache.json"  # gitignored diagnostic cache
 
 
 def load_cases() -> list[tuple[dict, int]]:
@@ -78,8 +78,12 @@ def main() -> None:
             if det["graph_analysis"][k]["flagged"]:
                 gcount[det["graph_analysis"][k]["typology"]] += 1
         ls = det["layer_scores"]
-        driver = max(ls, key=lambda k: {"typology": 0.45, "graph": 0.20,
-                                        "behavioral": 0.15, "anomaly": 0.20}[k] * ls[k])
+        driver = max(
+            ls,
+            key=lambda k: (
+                {"typology": 0.45, "graph": 0.20, "behavioral": 0.15, "anomaly": 0.20}[k] * ls[k]
+            ),
+        )
         if is_fp:
             n_fp += 1
             fp_layer_driver[driver] += 1
@@ -91,16 +95,16 @@ def main() -> None:
     print(f"\n=== Cases >= {THRESHOLD}: {n_tp} TP, {n_fp} FP ===")
     print("\nTypology flags on FALSE POSITIVES (what fires on clean accounts):")
     for t, c in fp_typologies.most_common():
-        print(f"  {t:<28} {c:>5}  ({c / max(n_fp,1) * 100:.0f}% of FPs)")
+        print(f"  {t:<28} {c:>5}  ({c / max(n_fp, 1) * 100:.0f}% of FPs)")
     print("\nGraph flags on FALSE POSITIVES:")
     for t, c in fp_graph.most_common():
-        print(f"  {t:<28} {c:>5}  ({c / max(n_fp,1) * 100:.0f}% of FPs)")
+        print(f"  {t:<28} {c:>5}  ({c / max(n_fp, 1) * 100:.0f}% of FPs)")
     print("\nTypology flags on TRUE POSITIVES (what carries recall):")
     for t, c in tp_typologies.most_common():
-        print(f"  {t:<28} {c:>5}  ({c / max(n_tp,1) * 100:.0f}% of TPs)")
+        print(f"  {t:<28} {c:>5}  ({c / max(n_tp, 1) * 100:.0f}% of TPs)")
     print("\nGraph flags on TRUE POSITIVES:")
     for t, c in tp_graph.most_common():
-        print(f"  {t:<28} {c:>5}  ({c / max(n_tp,1) * 100:.0f}% of TPs)")
+        print(f"  {t:<28} {c:>5}  ({c / max(n_tp, 1) * 100:.0f}% of TPs)")
     print("\nDominant weighted layer on FALSE POSITIVES:")
     for t, c in fp_layer_driver.most_common():
         print(f"  {t:<28} {c:>5}")

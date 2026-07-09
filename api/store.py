@@ -163,9 +163,7 @@ def record_review(case_id: str, reviewer: str, action: str, rationale: str = "")
         raise ValueError(f"action must be one of {VALID_REVIEW_ACTIONS}")
 
     with _connect() as conn, conn.cursor() as cur:
-        cur.execute(
-            "SELECT agent_decision FROM vigil_cases WHERE case_id = %s", (case_id,)
-        )
+        cur.execute("SELECT agent_decision FROM vigil_cases WHERE case_id = %s", (case_id,))
         row = cur.fetchone()
         if row is None:
             raise LookupError(f"case '{case_id}' not found")

@@ -36,8 +36,9 @@ def _trace_url(run) -> str:
         return url
     try:
         from langsmith import Client
+
         return Client().get_run_url(run=run)
-    except Exception as exc:        # noqa: BLE001 — diagnostics only
+    except Exception as exc:  # noqa: BLE001 — diagnostics only
         return f"(could not resolve trace URL: {exc}; run_id={getattr(run, 'id', '?')})"
 
 
@@ -49,13 +50,13 @@ def main(index: int = 0) -> None:
 
     # Default: first structuring case (clear, interpretable typology)
     if index == 0:
-        index = next(
-            (i for i, c in enumerate(cases) if c["typology"] == "structuring"), 0
-        )
+        index = next((i for i, c in enumerate(cases) if c["typology"] == "structuring"), 0)
     case = cases[index]
 
-    print(f"Running case #{index}: {case['case_id']} "
-          f"(ground truth: {case['ground_truth_label']} / {case['typology']})")
+    print(
+        f"Running case #{index}: {case['case_id']} "
+        f"(ground truth: {case['ground_truth_label']} / {case['typology']})"
+    )
     print("=" * 72)
 
     with collect_runs() as cb:

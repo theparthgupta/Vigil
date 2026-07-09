@@ -43,16 +43,16 @@ _DETECTORS = [
 
 # Severity weight per typology (used as the base of the risk score).
 _WEIGHTS = {
-    "sanctions_hit":          1.00,
-    "structuring":            0.85,
-    "rapid_passthrough":      0.85,
-    "smurfing_network":       0.80,
-    "round_trip":             0.75,
-    "upi_micro_structuring":  0.75,
-    "velocity_spike":         0.65,
-    "dormant_reactivation":   0.65,
+    "sanctions_hit": 1.00,
+    "structuring": 0.85,
+    "rapid_passthrough": 0.85,
+    "smurfing_network": 0.80,
+    "round_trip": 0.75,
+    "upi_micro_structuring": 0.75,
+    "velocity_spike": 0.65,
+    "dormant_reactivation": 0.65,
     "high_risk_sector_spike": 0.60,
-    "geographic_anomaly":     0.55,
+    "geographic_anomaly": 0.55,
 }
 
 # Cases scoring at/above this are routed to the LLM investigation agent.
@@ -71,9 +71,11 @@ _FUSION_PATH = Path(__file__).parent.parent / "benchmarks" / "fusion_weights.jso
 def _load_fusion() -> dict | None:
     try:
         d = json.loads(_FUSION_PATH.read_text(encoding="utf-8"))
-        return {"names": d["feature_names"],
-                "coefs": d["coefficients"],
-                "intercept": d["intercept"]}
+        return {
+            "names": d["feature_names"],
+            "coefs": d["coefficients"],
+            "intercept": d["intercept"],
+        }
     except Exception:
         return None
 
@@ -153,12 +155,15 @@ def combine_scores(
         )
         combined = 1.0 / (1.0 + math.exp(-z))
     else:
-        combined = min(1.0, (
-            typology_score * 0.45
-            + graph_score * 0.20
-            + behavioral_score * 0.15
-            + anomaly_score * 0.20
-        ))
+        combined = min(
+            1.0,
+            (
+                typology_score * 0.45
+                + graph_score * 0.20
+                + behavioral_score * 0.15
+                + anomaly_score * 0.20
+            ),
+        )
         if typology_score >= 0.85:
             combined = max(combined, 0.75)
 
@@ -169,14 +174,14 @@ def combine_scores(
 
 # Human-readable names for the fusion features (UI waterfall labels).
 _FEATURE_LABELS = {
-    "typology_score":         "Typology rules score",
-    "graph_score":            "Graph structure score",
-    "behavioral_score":       "Behavioral deviation",
-    "anomaly_score":          "ML anomaly score",
-    "flag_structuring":       "Structuring flag",
-    "flag_fan_out":           "Fan-out flag",
-    "flag_velocity_spike":    "Velocity-spike flag",
-    "flag_sanctions_hit":     "Sanctions flag",
+    "typology_score": "Typology rules score",
+    "graph_score": "Graph structure score",
+    "behavioral_score": "Behavioral deviation",
+    "anomaly_score": "ML anomaly score",
+    "flag_structuring": "Structuring flag",
+    "flag_fan_out": "Fan-out flag",
+    "flag_velocity_spike": "Velocity-spike flag",
+    "flag_sanctions_hit": "Sanctions flag",
     "flag_rapid_passthrough": "Pass-through flag",
 }
 
@@ -237,9 +242,15 @@ def explain_scores(
         "mode": "hand_tuned",
         "intercept": 0.0,
         "items": [
-            {"feature": n, "label": _FEATURE_LABELS[n], "value": round(v, 4),
-             "weight": w, "contribution": round(v * w, 4)}
-            for n, v, w in hand if v != 0.0
+            {
+                "feature": n,
+                "label": _FEATURE_LABELS[n],
+                "value": round(v, 4),
+                "weight": w,
+                "contribution": round(v * w, 4),
+            }
+            for n, v, w in hand
+            if v != 0.0
         ],
         "sanctions_override": has_sanctions,
         "risk_score": risk_score,
@@ -270,8 +281,12 @@ def run_detection(case: dict) -> dict:
         fired.add("fan_out")
 
     risk_score = combine_scores(
-        typology_score, graph_score, behavioral_score, anomaly_score,
-        has_sanctions, flags=fired,
+        typology_score,
+        graph_score,
+        behavioral_score,
+        anomaly_score,
+        has_sanctions,
+        flags=fired,
     )
 
     return {
@@ -288,8 +303,13 @@ def run_detection(case: dict) -> dict:
         },
         # Per-feature contribution breakdown for the UI waterfall (Phase 12).
         "score_explanation": explain_scores(
-            typology_score, graph_score, behavioral_score, anomaly_score,
-            has_sanctions, fired, risk_score,
+            typology_score,
+            graph_score,
+            behavioral_score,
+            anomaly_score,
+            has_sanctions,
+            fired,
+            risk_score,
         ),
         "risk_score": risk_score,
         "above_threshold": bool(risk_score >= TRIAGE_THRESHOLD),

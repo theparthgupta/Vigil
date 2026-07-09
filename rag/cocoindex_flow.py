@@ -45,6 +45,7 @@ _INITIALISED = False
 
 # ── Chunk row type (the columns of the target table, minus embedding) ─────────
 
+
 @dataclasses.dataclass
 class RegChunk:
     chunk_id: str
@@ -54,9 +55,7 @@ class RegChunk:
     text: str
 
 
-def _extract_pages_from_bytes(
-    content: bytes, max_pages: Optional[int]
-) -> list[tuple[int, str]]:
+def _extract_pages_from_bytes(content: bytes, max_pages: Optional[int]) -> list[tuple[int, str]]:
     """Mirror rag.ingest.extract_pages, but from in-memory PDF bytes."""
     reader = PdfReader(io.BytesIO(content))
     pages = reader.pages[:max_pages] if max_pages else reader.pages
@@ -93,17 +92,13 @@ def vigil_regulatory_corpus(
 ) -> None:
     """Embed all regs/*.pdf into pgvector, incrementally maintained."""
     data_scope["documents"] = flow_builder.add_source(
-        cocoindex.sources.LocalFile(
-            path=str(_REGS_DIR), binary=True, included_patterns=["*.pdf"]
-        )
+        cocoindex.sources.LocalFile(path=str(_REGS_DIR), binary=True, included_patterns=["*.pdf"])
     )
 
     collector = data_scope.add_collector()
 
     with data_scope["documents"].row() as doc:
-        doc["chunks"] = flow_builder.transform(
-            chunk_pdf_file, doc["content"], doc["filename"]
-        )
+        doc["chunks"] = flow_builder.transform(chunk_pdf_file, doc["content"], doc["filename"])
         with doc["chunks"].row() as chunk:
             chunk["embedding"] = chunk["text"].transform(
                 cocoindex.functions.EmbedText(
@@ -140,7 +135,5 @@ def init_cocoindex() -> None:
         return
     load_dotenv()
     url = os.environ["DATABASE_URL"]
-    cocoindex.init(
-        cocoindex.Settings(database=cocoindex.DatabaseConnectionSpec(url=url))
-    )
+    cocoindex.init(cocoindex.Settings(database=cocoindex.DatabaseConnectionSpec(url=url)))
     _INITIALISED = True

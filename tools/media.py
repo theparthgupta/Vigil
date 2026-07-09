@@ -14,8 +14,8 @@ from __future__ import annotations
 
 import httpx
 
-_DDG_URL     = "https://api.duckduckgo.com/"
-_TIMEOUT     = 6.0   # seconds — adversarial media search is best-effort
+_DDG_URL = "https://api.duckduckgo.com/"
+_TIMEOUT = 6.0  # seconds — adversarial media search is best-effort
 
 
 def search_adverse_media(name: str, max_results: int = 5) -> dict:
@@ -30,14 +30,15 @@ def search_adverse_media(name: str, max_results: int = 5) -> dict:
     """
     results = _fetch_results(name, max_results)
     return {
-        "name_queried":  name,
-        "results":       results,
-        "result_count":  len(results),
-        "is_stub":       len(results) == 0,
+        "name_queried": name,
+        "results": results,
+        "result_count": len(results),
+        "is_stub": len(results) == 0,
     }
 
 
 # ── Provider ──────────────────────────────────────────────────────────────────
+
 
 def _fetch_results(name: str, max_results: int) -> list[dict]:
     """
@@ -45,10 +46,10 @@ def _fetch_results(name: str, max_results: int) -> list[dict]:
     Returns [] on any network/parse error rather than raising.
     """
     params = {
-        "q":              f"{name} money laundering fraud sanctions",
-        "format":         "json",
-        "no_html":        "1",
-        "skip_disambig":  "1",
+        "q": f"{name} money laundering fraud sanctions",
+        "format": "json",
+        "no_html": "1",
+        "skip_disambig": "1",
     }
     try:
         resp = httpx.get(_DDG_URL, params=params, timeout=_TIMEOUT)
@@ -61,11 +62,13 @@ def _fetch_results(name: str, max_results: int) -> list[dict]:
 
     # Abstract (Wikipedia-style summary)
     if data.get("Abstract") and data.get("AbstractURL"):
-        results.append({
-            "title":   data.get("Heading", name),
-            "snippet": data["Abstract"][:300],
-            "url":     data["AbstractURL"],
-        })
+        results.append(
+            {
+                "title": data.get("Heading", name),
+                "snippet": data["Abstract"][:300],
+                "url": data["AbstractURL"],
+            }
+        )
 
     # Related topics
     for topic in data.get("RelatedTopics", []):
@@ -73,10 +76,12 @@ def _fetch_results(name: str, max_results: int) -> list[dict]:
             break
         # Topics are either flat dicts or nested {Topics: [...]}
         if "Text" in topic and "FirstURL" in topic:
-            results.append({
-                "title":   topic["Text"][:80],
-                "snippet": topic["Text"],
-                "url":     topic["FirstURL"],
-            })
+            results.append(
+                {
+                    "title": topic["Text"][:80],
+                    "snippet": topic["Text"],
+                    "url": topic["FirstURL"],
+                }
+            )
 
     return results[:max_results]

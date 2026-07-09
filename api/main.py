@@ -50,6 +50,7 @@ _STATIC = _ROOT / "app" / "static"
 def _corpus_count() -> int:
     """How many chunks are in the pgvector table (0 if it doesn't exist yet)."""
     from rag.retrieve_pg import _TABLE, _connect
+
     try:
         with _connect() as conn, conn.cursor() as cur:
             cur.execute(f"SELECT COUNT(*) FROM {_TABLE}")
@@ -77,7 +78,9 @@ def _ensure_corpus() -> None:
     init_cocoindex()
     vigil_regulatory_corpus.setup()
     vigil_regulatory_corpus.update()
-    print(f"Building RAG corpus via CocoIndex/pgvector... done ({_corpus_count()} chunks)", flush=True)
+    print(
+        f"Building RAG corpus via CocoIndex/pgvector... done ({_corpus_count()} chunks)", flush=True
+    )
 
 
 @asynccontextmanager
@@ -106,6 +109,7 @@ class InvestigateRequest(Case):
     """A Case plus optional pre-computed monitor detection (from /detect or the
     triage queue). Backwards-compatible: callers that POST a bare Case still work
     — detection_result defaults to None and the agent runs exactly as before."""
+
     detection_result: Optional[dict] = None
 
 
@@ -145,8 +149,16 @@ def sample() -> dict:
 # ── CSV batch upload ──────────────────────────────────────────────────────────
 
 _REQUIRED_CSV_COLS = [
-    "customer_name", "business_type", "monthly_turnover_lakhs", "prior_flags",
-    "account_opened", "txn_date", "amount_inr", "direction", "channel", "counterparty",
+    "customer_name",
+    "business_type",
+    "monthly_turnover_lakhs",
+    "prior_flags",
+    "account_opened",
+    "txn_date",
+    "amount_inr",
+    "direction",
+    "channel",
+    "counterparty",
 ]
 _VALID_CHANNELS = {c.value for c in Channel}
 _VALID_DIRECTIONS = {d.value for d in Direction}
@@ -194,12 +206,16 @@ async def parse_csv(file: UploadFile = File(...)) -> dict:
         try:
             amount = float(amt_raw)
         except ValueError:
-            warnings.append(f"Row {i} ({name}): non-numeric amount_inr '{row.get('amount_inr')}', skipped")
+            warnings.append(
+                f"Row {i} ({name}): non-numeric amount_inr '{row.get('amount_inr')}', skipped"
+            )
             continue
 
         direction = (row.get("direction") or "").strip().lower()
         if direction not in _VALID_DIRECTIONS:
-            warnings.append(f"Row {i} ({name}): invalid direction '{row.get('direction')}', skipped")
+            warnings.append(
+                f"Row {i} ({name}): invalid direction '{row.get('direction')}', skipped"
+            )
             continue
 
         channel = (row.get("channel") or "").strip()
@@ -211,7 +227,9 @@ async def parse_csv(file: UploadFile = File(...)) -> dict:
             order.append(name)
             btype = (row.get("business_type") or "").strip().lower()
             if btype not in _VALID_BTYPES:
-                warnings.append(f"Row {i} ({name}): unknown business_type '{row.get('business_type')}', defaulted to 'other'")
+                warnings.append(
+                    f"Row {i} ({name}): unknown business_type '{row.get('business_type')}', defaulted to 'other'"
+                )
                 btype = "other"
             try:
                 turnover = float((row.get("monthly_turnover_lakhs") or "0").strip())
@@ -238,30 +256,34 @@ async def parse_csv(file: UploadFile = File(...)) -> dict:
 
         g = grouped[name]
         date = (row.get("txn_date") or "").strip() or "2024-01-01"
-        g["txns"].append({
-            "id": f"txn_csv_{g['slug']}_{len(g['txns'])}",
-            "customer_id": g["customer"]["id"],
-            "amount_inr": amount,
-            "timestamp": date + "T00:00:00",
-            "counterparty_name": (row.get("counterparty") or "").strip() or "Unknown",
-            "counterparty_account": "".join(random.choices("0123456789", k=14)),
-            "direction": direction,
-            "channel": channel,
-        })
+        g["txns"].append(
+            {
+                "id": f"txn_csv_{g['slug']}_{len(g['txns'])}",
+                "customer_id": g["customer"]["id"],
+                "amount_inr": amount,
+                "timestamp": date + "T00:00:00",
+                "counterparty_name": (row.get("counterparty") or "").strip() or "Unknown",
+                "counterparty_account": "".join(random.choices("0123456789", k=14)),
+                "direction": direction,
+                "channel": channel,
+            }
+        )
 
     cases = []
     for idx, name in enumerate(order):
         g = grouped[name]
         if not g["txns"]:
             continue
-        cases.append({
-            "case_id": f"csv_{g['slug']}_{idx}",
-            "customer": g["customer"],
-            "transactions": g["txns"],
-            "ground_truth_label": "custom",
-            "typology": None,
-            "notes": "Imported from CSV batch upload.",
-        })
+        cases.append(
+            {
+                "case_id": f"csv_{g['slug']}_{idx}",
+                "customer": g["customer"],
+                "transactions": g["txns"],
+                "ground_truth_label": "custom",
+                "typology": None,
+                "notes": "Imported from CSV batch upload.",
+            }
+        )
 
     # Round-trip through the Pydantic schema so downstream endpoints accept them as-is.
     validated = [json.loads(Case(**c).model_dump_json()) for c in cases]
@@ -317,9 +339,10 @@ def triage_queue() -> dict:
 
 # ── Case lifecycle (Phase 10B) ────────────────────────────────────────────────
 
+
 class ReviewRequest(BaseModel):
     reviewer: str
-    action: str          # "approve" | "override"
+    action: str  # "approve" | "override"
     rationale: str = ""
 
 
@@ -371,17 +394,20 @@ def investigate(req: InvestigateRequest) -> InvestigateResponse:
     t0 = time.perf_counter()
     result = graph.invoke(
         initial_state(case_dict, detection_result=req.detection_result),
-        config={"tags": ["api"], "run_name": f"api-{req.case_id}",
-                "callbacks": [usage]},
+        config={"tags": ["api"], "run_name": f"api-{req.case_id}", "callbacks": [usage]},
     )
     latency = time.perf_counter() - t0
     cost = usage.summary()
 
     try:
         store.save_investigation(
-            case_dict, result["decision"], result["confidence"],
-            result.get("detected_typology", ""), result["report"],
-            tokens_used=cost["total_tokens"], cost_inr=cost["cost_inr"],
+            case_dict,
+            result["decision"],
+            result["confidence"],
+            result.get("detected_typology", ""),
+            result["report"],
+            tokens_used=cost["total_tokens"],
+            cost_inr=cost["cost_inr"],
         )
     except Exception as e:
         print(f"WARN: case-store persistence failed: {e}")
@@ -424,8 +450,10 @@ def _done_message(node: str, delta: dict, final: dict) -> str:
         san = final.get("evidence", {}).get("sanctions", {})
         hits = len(san.get("hits", []))
         ran = list(final.get("evidence", {}).keys())
-        return (f"Evidence gathered. Sanctions: {hits} hit(s) of "
-                f"{san.get('checked', 0)} screened; ran {', '.join(ran)}")
+        return (
+            f"Evidence gathered. Sanctions: {hits} hit(s) of "
+            f"{san.get('checked', 0)} screened; ran {', '.join(ran)}"
+        )
     if node == "reasoner":
         # name the regulatory sources actually read
         srcs, seen = [], set()
@@ -461,8 +489,11 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
 
         for update in graph.stream(
             initial_state(case_dict, detection_result=req.detection_result),
-            config={"tags": ["api", "stream"], "run_name": f"api-stream-{req.case_id}",
-                    "callbacks": [usage]},
+            config={
+                "tags": ["api", "stream"],
+                "run_name": f"api-stream-{req.case_id}",
+                "callbacks": [usage],
+            },
             stream_mode="updates",
         ):
             for node, delta in update.items():
@@ -477,24 +508,31 @@ def investigate_stream(req: InvestigateRequest) -> StreamingResponse:
         cost = usage.summary()
         try:
             store.save_investigation(
-                case_dict, final.get("decision", ""), final.get("confidence", 0.0),
-                final.get("detected_typology", ""), final.get("report", ""),
-                tokens_used=cost["total_tokens"], cost_inr=cost["cost_inr"],
+                case_dict,
+                final.get("decision", ""),
+                final.get("confidence", 0.0),
+                final.get("detected_typology", ""),
+                final.get("report", ""),
+                tokens_used=cost["total_tokens"],
+                cost_inr=cost["cost_inr"],
             )
         except Exception as e:
             print(f"WARN: case-store persistence failed: {e}")
 
-        yield _sse("done", {
-            "case_id": req.case_id,
-            "decision": final.get("decision", ""),
-            "confidence": round(final.get("confidence", 0.0), 4),
-            "detected_typology": final.get("detected_typology", ""),
-            "report": final.get("report", ""),
-            "investigation_steps": final.get("investigation_steps", []),
-            "latency_seconds": round(time.perf_counter() - t0, 2),
-            "tokens_used": cost["total_tokens"],
-            "cost_inr": cost["cost_inr"],
-        })
+        yield _sse(
+            "done",
+            {
+                "case_id": req.case_id,
+                "decision": final.get("decision", ""),
+                "confidence": round(final.get("confidence", 0.0), 4),
+                "detected_typology": final.get("detected_typology", ""),
+                "report": final.get("report", ""),
+                "investigation_steps": final.get("investigation_steps", []),
+                "latency_seconds": round(time.perf_counter() - t0, 2),
+                "tokens_used": cost["total_tokens"],
+                "cost_inr": cost["cost_inr"],
+            },
+        )
 
     return StreamingResponse(gen(), media_type="text/event-stream")
 

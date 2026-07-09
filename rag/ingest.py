@@ -12,7 +12,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import os
 import re
 import sys
 from pathlib import Path
@@ -24,7 +23,7 @@ from pypdf import PdfReader
 sys.path.insert(0, str(Path(__file__).parent.parent))
 load_dotenv()
 
-_REGS_DIR   = Path(__file__).parent.parent / "regs"
+_REGS_DIR = Path(__file__).parent.parent / "regs"
 _CHROMA_DIR = Path(__file__).parent / "chroma_db"
 _COLLECTION = "vigil_regs"
 
@@ -44,7 +43,7 @@ _DOCS: list[dict] = [
     dict(
         filename="Reporting_Format.pdf",
         citation="FIU-IND Reporting Format v1.14 (FINnet 2.0)",
-        max_pages=23,    # pages 1-10 = TOC; 11-23 = intro + format overview; 24+ = schema tables (noise)
+        max_pages=23,  # pages 1-10 = TOC; 11-23 = intro + format overview; 24+ = schema tables (noise)
     ),
     dict(
         filename="2024_APG_Typologies_Report.pdf",
@@ -63,55 +62,54 @@ _DOCS: list[dict] = [
 # All patterns anchored to start-of-line (re.MULTILINE).
 _SECTION_PATTERNS = [
     # PMLA all-caps chapters: "CHAPTER I", "CHAPTER IV"
-    r'CHAPTER\s+[IVXLCD]+\b',
+    r"CHAPTER\s+[IVXLCD]+\b",
     # RBI chapter with dash/en-dash: "Chapter I –", "Chapter IV —"
-    r'Chapter\s+[IVXLCD\d]+\s*[–—\-]',
+    r"Chapter\s+[IVXLCD\d]+\s*[–—\-]",
     # PMLA/RBI numbered sections with optional letter suffix:
     # "12.", "12A.", "12AA.", "11A."  followed by a capital-word
-    r'\d{1,3}[A-Z]{0,2}\.\s+[A-Z][a-z]',
+    r"\d{1,3}[A-Z]{0,2}\.\s+[A-Z][a-z]",
     # RBI lettered subsections: "A. Short Title", "B. Applicability"
-    r'[A-Z]\.\s+[A-Z][a-z]',
+    r"[A-Z]\.\s+[A-Z][a-z]",
     # APG/FIU decimal sections: "1.1 Overview", "2.4 India"  (max two levels deep)
-    r'\d+\.\d{1,2}\s+[A-Z][a-z]',
+    r"\d+\.\d{1,2}\s+[A-Z][a-z]",
     # APG top-level: "1 - MISUSE OF", "2 - MONEY LAUNDERING"
-    r'\d+\s+[-–]\s+[A-Z]{3,}',
+    r"\d+\s+[-–]\s+[A-Z]{3,}",
     # FIU plain-numbered section: "2 Guide to the new Reporting Formats"
-    r'\d+\s+[A-Z][a-z]{3,}',
+    r"\d+\s+[A-Z][a-z]{3,}",
 ]
 
-_SECTION_RE = re.compile(
-    r'(?m)^[ \t]*(?:' + '|'.join(_SECTION_PATTERNS) + r')'
-)
+_SECTION_RE = re.compile(r"(?m)^[ \t]*(?:" + "|".join(_SECTION_PATTERNS) + r")")
 
 # Some legal PDFs (e.g. the PMLA Rules gazette) extract as run-on text with no
 # line breaks, so the line-anchored _SECTION_RE finds no boundaries. For those,
 # detect numbered rule headers INLINE: end-of-clause punctuation, then "N." or
 # "NA." immediately followed by a Capitalised word (e.g. "...crime.8.Furnishing").
-_INLINE_RULE_RE = re.compile(r'(?<=[.\]\)])(\d{1,2}[A-Z]?\.\s?[A-Z][a-z]{3,})')
+_INLINE_RULE_RE = re.compile(r"(?<=[.\]\)])(\d{1,2}[A-Z]?\.\s?[A-Z][a-z]{3,})")
 # Apply inline splitting only when newline density is very low (run-on extraction)
-_RUNON_NEWLINE_RATIO = 0.005   # < 1 newline per 200 chars
+_RUNON_NEWLINE_RATIO = 0.005  # < 1 newline per 200 chars
 
 # Chunk size targets (chars, not tokens — ~4 chars ≈ 1 token)
-_MAX_CHUNK   = 1600   # ~400 tokens — keep chunks focused
-_MIN_CHUNK   = 120    # drop anything shorter (TOC lines, page headers)
-_OVERLAP     = 150    # carry-over context between sub-chunks of the same section
+_MAX_CHUNK = 1600  # ~400 tokens — keep chunks focused
+_MIN_CHUNK = 120  # drop anything shorter (TOC lines, page headers)
+_OVERLAP = 150  # carry-over context between sub-chunks of the same section
 
 # TOC line detection: lines with many dots (e.g. "Section 12 ......... 14")
-_TOC_RE   = re.compile(r'\.{4,}')
+_TOC_RE = re.compile(r"\.{4,}")
 # Schema-table lines: very short lines dominate schema field-definition tables
 # (e.g. "# Column Name Description Mandatory"). Filter chunks where >55% of
 # lines are short — these are format tables, not regulatory prose.
 _MAX_SHORT_LINE_RATIO = 0.55
-_SHORT_LINE_THRESHOLD = 30   # chars
+_SHORT_LINE_THRESHOLD = 30  # chars
 
 
 # ── PDF extraction ─────────────────────────────────────────────────────────────
 
+
 def extract_pages(path: Path, max_pages: Optional[int]) -> list[tuple[int, str]]:
     """Return [(page_number, text), ...] for up to max_pages pages."""
     reader = PdfReader(str(path))
-    pages  = reader.pages[:max_pages] if max_pages else reader.pages
-    out    = []
+    pages = reader.pages[:max_pages] if max_pages else reader.pages
+    out = []
     for i, page in enumerate(pages):
         text = page.extract_text() or ""
         if text.strip():
@@ -128,7 +126,7 @@ def build_corpus(pages: list[tuple[int, str]]) -> tuple[str, list[tuple[int, int
     for page_num, text in pages:
         page_map.append((pos, page_num))
         parts.append(text)
-        pos += len(text) + 1   # +1 for the joining \n
+        pos += len(text) + 1  # +1 for the joining \n
     return "\n".join(parts), page_map
 
 
@@ -144,6 +142,7 @@ def pos_to_page(pos: int, page_map: list[tuple[int, int]]) -> int:
 
 
 # ── Chunking ───────────────────────────────────────────────────────────────────
+
 
 def _is_toc_line(line: str) -> bool:
     return bool(_TOC_RE.search(line)) or line.count("...") >= 2
@@ -175,9 +174,9 @@ def _split_by_paragraphs(text: str, max_chars: int, overlap: int) -> list[str]:
     if len(text) <= max_chars:
         return [text]
 
-    paras  = re.split(r"\n{2,}", text)
+    paras = re.split(r"\n{2,}", text)
     chunks: list[str] = []
-    buf    = ""
+    buf = ""
 
     for para in paras:
         if len(buf) + len(para) + 2 <= max_chars:
@@ -185,7 +184,7 @@ def _split_by_paragraphs(text: str, max_chars: int, overlap: int) -> list[str]:
         else:
             if buf:
                 chunks.append(buf)
-                buf = buf[-overlap:].lstrip()   # carry-over
+                buf = buf[-overlap:].lstrip()  # carry-over
 
             if len(para) <= max_chars:
                 buf = (buf + "\n\n" + para).lstrip() if buf else para
@@ -229,26 +228,24 @@ def make_chunks(
     boundaries = sorted(set(boundaries))
     boundaries.append(len(corpus))
 
-    chunks     = []
-    chunk_idx  = 0
+    chunks = []
+    chunk_idx = 0
 
     for i, start in enumerate(boundaries[:-1]):
-        end          = boundaries[i + 1]
+        end = boundaries[i + 1]
         section_text = corpus[start:end].strip()
-        start_page   = pos_to_page(start, page_map)
+        start_page = pos_to_page(start, page_map)
         if run_on:
             m = _INLINE_RULE_RE.match(section_text) or re.match(
-                r'\d{1,2}[A-Z]?\.\s?[A-Z][a-z][^.]{3,60}', section_text
+                r"\d{1,2}[A-Z]?\.\s?[A-Z][a-z][^.]{3,60}", section_text
             )
-            section_hdr = (m.group().strip()[:140] if m else _first_section_header(section_text))
+            section_hdr = m.group().strip()[:140] if m else _first_section_header(section_text)
         else:
             section_hdr = _first_section_header(section_text)
 
         for part in _split_by_paragraphs(section_text, _MAX_CHUNK, _OVERLAP):
             # Drop TOC-dominated chunks and tiny stubs
-            non_toc_lines = [
-                ln for ln in part.split("\n") if not _is_toc_line(ln)
-            ]
+            non_toc_lines = [ln for ln in part.split("\n") if not _is_toc_line(ln)]
             clean = " ".join(non_toc_lines).strip()
             if len(clean) < _MIN_CHUNK:
                 continue
@@ -264,19 +261,22 @@ def make_chunks(
 
             chunk_id = f"{filename}_{chunk_idx:04d}"
             chunk_idx += 1
-            chunks.append({
-                "id":       chunk_id,
-                "text":     part,
-                "source":   filename,
-                "citation": citation,
-                "section":  section_hdr,
-                "page":     start_page,
-            })
+            chunks.append(
+                {
+                    "id": chunk_id,
+                    "text": part,
+                    "source": filename,
+                    "citation": citation,
+                    "section": section_hdr,
+                    "page": start_page,
+                }
+            )
 
     return chunks
 
 
 # ── Ingest ─────────────────────────────────────────────────────────────────────
+
 
 def ingest_all(reset: bool = False) -> int:
     """Ingest all registered documents. Returns total new chunk count."""
@@ -300,8 +300,8 @@ def ingest_all(reset: bool = False) -> int:
     existing_ids = set(collection.get(include=[])["ids"])
     print(f"Chunks already in store: {len(existing_ids)}")
 
-    embedder   = OpenAIEmbeddings(model="text-embedding-3-small")
-    total_new  = 0
+    embedder = OpenAIEmbeddings(model="text-embedding-3-small")
+    total_new = 0
 
     for doc in _DOCS:
         path = _REGS_DIR / doc["filename"]
@@ -310,11 +310,11 @@ def ingest_all(reset: bool = False) -> int:
             continue
 
         print(f"\n{doc['filename']} ({doc['citation']})")
-        pages  = extract_pages(path, doc["max_pages"])
+        pages = extract_pages(path, doc["max_pages"])
         corpus, page_map = build_corpus(pages)
         chunks = make_chunks(corpus, page_map, doc["citation"], doc["filename"])
 
-        new    = [c for c in chunks if c["id"] not in existing_ids]
+        new = [c for c in chunks if c["id"] not in existing_ids]
         print(f"  {len(chunks)} chunks total, {len(new)} new to embed")
 
         if not new:
@@ -322,20 +322,20 @@ def ingest_all(reset: bool = False) -> int:
 
         BATCH = 100
         for i in range(0, len(new), BATCH):
-            batch      = new[i : i + BATCH]
-            texts      = [c["text"] for c in batch]
+            batch = new[i : i + BATCH]
+            texts = [c["text"] for c in batch]
             embeddings = embedder.embed_documents(texts)
 
             collection.add(
-                ids        = [c["id"] for c in batch],
-                documents  = texts,
-                embeddings = embeddings,
-                metadatas  = [
+                ids=[c["id"] for c in batch],
+                documents=texts,
+                embeddings=embeddings,  # type: ignore[arg-type]
+                metadatas=[
                     {
-                        "source":   c["source"],
+                        "source": c["source"],
                         "citation": c["citation"],
-                        "section":  c["section"],
-                        "page":     c["page"],
+                        "section": c["section"],
+                        "page": c["page"],
                     }
                     for c in batch
                 ],
@@ -354,7 +354,8 @@ if __name__ == "__main__":
         sys.stdout.reconfigure(encoding="utf-8")
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--reset", action="store_true",
-                        help="Delete and rebuild the Chroma collection")
+    parser.add_argument(
+        "--reset", action="store_true", help="Delete and rebuild the Chroma collection"
+    )
     args = parser.parse_args()
     ingest_all(reset=args.reset)

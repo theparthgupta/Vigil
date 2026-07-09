@@ -12,6 +12,7 @@ _WEIGHTS = Path(__file__).parent.parent / "benchmarks" / "fusion_weights.json"
 
 # ── 1. Weights file exists, is readable JSON, and the scorer loaded it ────────
 
+
 def test_fusion_weights_loaded():
     d = json.loads(_WEIGHTS.read_text(encoding="utf-8"))
     assert set(d["coefficients"]) == set(d["feature_names"])
@@ -21,19 +22,23 @@ def test_fusion_weights_loaded():
 
 # ── 2. Legacy path is untouched when flags are omitted ────────────────────────
 
+
 def test_legacy_path_unchanged():
     assert combine_scores(0.5, 0.4, 0.3, 0.6, has_sanctions=False) == 0.47
 
 
 # ── 3. Sanctions override survives fusion ─────────────────────────────────────
 
+
 def test_sanctions_override_after_fusion():
-    fused = combine_scores(0.9, 0.5, 0.2, 0.3, has_sanctions=True,
-                           flags={"structuring", "sanctions_hit"})
+    fused = combine_scores(
+        0.9, 0.5, 0.2, 0.3, has_sanctions=True, flags={"structuring", "sanctions_hit"}
+    )
     assert fused == 1.0
 
 
 # ── 4. Fused scores are bounded, native floats, and deterministic ─────────────
+
 
 def test_fused_score_bounded_and_deterministic(cases_by_typology):
     out1 = run_detection(cases_by_typology["structuring"][0])
@@ -44,6 +49,7 @@ def test_fused_score_bounded_and_deterministic(cases_by_typology):
 
 
 # ── 5. Score explanation: contributions are Python-computed and consistent ────
+
 
 def test_score_explanation_shape(cases_by_typology):
     out = run_detection(cases_by_typology["structuring"][0])

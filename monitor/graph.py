@@ -25,6 +25,7 @@ def _dt(ts: str) -> datetime:
 
 # ── Step 1: build the graph ───────────────────────────────────────────────────
 
+
 def build_transaction_graph(case: dict) -> nx.DiGraph:
     """Money-flow DiGraph: SELF plus one node per unique counterparty."""
     G = nx.DiGraph()
@@ -38,13 +39,14 @@ def build_transaction_graph(case: dict) -> nx.DiGraph:
             "channel": t["channel"],
         }
         if t["direction"] == "credit":
-            G.add_edge(other, SELF, **attrs)   # money in
+            G.add_edge(other, SELF, **attrs)  # money in
         else:
-            G.add_edge(SELF, other, **attrs)   # money out
+            G.add_edge(SELF, other, **attrs)  # money out
     return G
 
 
 # ── Step 2: detectors ─────────────────────────────────────────────────────────
+
 
 def detect_structuring_ring(G: nx.DiGraph) -> dict:
     ref = "APG Typologies 2024 — Circular transaction networks"
@@ -54,11 +56,10 @@ def detect_structuring_ring(G: nx.DiGraph) -> dict:
         if not (3 <= len(cycle) <= 5):
             continue
         amounts = [
-            G[cycle[i]][cycle[(i + 1) % len(cycle)]]["amount_inr"]
-            for i in range(len(cycle))
+            G[cycle[i]][cycle[(i + 1) % len(cycle)]]["amount_inr"] for i in range(len(cycle))
         ]
         lo, hi = min(amounts), max(amounts)
-        if lo > 0 and hi <= 1.30 * lo:          # all within 30% of each other
+        if lo > 0 and hi <= 1.30 * lo:  # all within 30% of each other
             qualifying.append(cycle)
 
     flagged = bool(qualifying)
@@ -96,11 +97,13 @@ def detect_layering_chain(G: nx.DiGraph) -> dict:
             )
             terminal = G.in_degree(path[-1]) == 1
             if within_48h and terminal:
-                chains.append({
-                    "path": path,
-                    "amounts": [G[u][v]["amount_inr"] for u, v in edges],
-                    "hops": hops,
-                })
+                chains.append(
+                    {
+                        "path": path,
+                        "amounts": [G[u][v]["amount_inr"] for u, v in edges],
+                        "hops": hops,
+                    }
+                )
 
     return _chain_result(ref, chains)
 
@@ -122,9 +125,7 @@ def _chain_result(ref: str, chains: list[dict]) -> dict:
 
 def detect_fan_out(G: nx.DiGraph) -> dict:
     ref = "APG Typologies 2024 — Fan-out layering pattern"
-    new_recipients = (
-        [n for n in G.successors(SELF) if G.in_degree(n) == 1] if SELF in G else []
-    )
+    new_recipients = [n for n in G.successors(SELF) if G.in_degree(n) == 1] if SELF in G else []
     flagged = len(new_recipients) >= 6
     return {
         "flagged": flagged,
@@ -140,11 +141,7 @@ def detect_fan_out(G: nx.DiGraph) -> dict:
 def compute_centrality_flags(G: nx.DiGraph) -> dict:
     ref = "FATF — Intermediary account identification"
     scores = nx.betweenness_centrality(G, normalized=True)
-    high = [
-        {"node": n, "score": round(s, 3)}
-        for n, s in scores.items()
-        if n != SELF and s > 0.5
-    ]
+    high = [{"node": n, "score": round(s, 3)} for n, s in scores.items() if n != SELF and s > 0.5]
     high.sort(key=lambda d: d["score"], reverse=True)
     flagged = bool(high)
     return {

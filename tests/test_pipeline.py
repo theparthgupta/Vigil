@@ -9,13 +9,21 @@ batch edge case. No LLM, no network.
 from monitor.pipeline import process_batch, process_case
 
 _CASE_KEYS = {
-    "case_id", "customer_name", "risk_score", "above_threshold",
-    "typology_flags", "graph_analysis", "behavioral_analysis",
-    "anomaly_analysis", "recommended_action", "processing_time_ms",
+    "case_id",
+    "customer_name",
+    "risk_score",
+    "above_threshold",
+    "typology_flags",
+    "graph_analysis",
+    "behavioral_analysis",
+    "anomaly_analysis",
+    "recommended_action",
+    "processing_time_ms",
 }
 
 
 # ── 1. process_case returns the full shape ────────────────────────────────────
+
 
 def test_process_case_shape(cases_by_typology):
     out = process_case(cases_by_typology["clean"][0])
@@ -27,6 +35,7 @@ def test_process_case_shape(cases_by_typology):
 
 # ── 2. Batch counts add up ────────────────────────────────────────────────────
 
+
 def test_batch_counts_add_up(cases_by_typology):
     cases = cases_by_typology["clean"][:5] + cases_by_typology["sanctions_hit"][:5]
     assert len(cases) == 10
@@ -37,12 +46,14 @@ def test_batch_counts_add_up(cases_by_typology):
 
 # ── 3. Dismissed cases never appear in the triage queue ───────────────────────
 
+
 def test_dismissed_excluded_from_queue(train_cases):
     res = process_batch(train_cases[:30])
     assert all(r["above_threshold"] for r in res["triage_queue"])
 
 
 # ── 4. A sanctions case is always investigated ────────────────────────────────
+
 
 def test_sanctions_always_investigated(cases_by_typology):
     case = cases_by_typology["sanctions_hit"][0]
@@ -57,16 +68,16 @@ def test_sanctions_always_investigated(cases_by_typology):
 
 # ── 5. A clean case is auto-dismissed ─────────────────────────────────────────
 
+
 def test_clean_case_auto_dismissed(cases_by_typology):
     # Allow for the known fan_out false-positive: find any clean case that the
     # full stack does not flag (there are plenty).
-    dismissed = [
-        process_case(c) for c in cases_by_typology["clean"]
-    ]
+    dismissed = [process_case(c) for c in cases_by_typology["clean"]]
     assert any(r["recommended_action"] == "AUTO_DISMISS" for r in dismissed)
 
 
 # ── 6. Triage queue is sorted by risk_score, descending ───────────────────────
+
 
 def test_triage_queue_sorted_descending(train_cases):
     res = process_batch(train_cases[:40])
@@ -75,6 +86,7 @@ def test_triage_queue_sorted_descending(train_cases):
 
 
 # ── 8. Empty batch handled without crashing ───────────────────────────────────
+
 
 def test_empty_batch():
     res = process_batch([])

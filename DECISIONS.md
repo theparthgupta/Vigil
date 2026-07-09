@@ -336,3 +336,8 @@ at the bottom.
 **Why:** The README is what a reviewer reads before (or instead of) the code. It described a system three major phases out of date and led with a metric (1.0 holdout) that invites exactly the wrong scrutiny. The honest external benchmark is a stronger headline than a perfect synthetic score.
 **How to verify:** Every number in the README traces to a committed artifact: 147 = `pytest -q`; benchmark table = `benchmarks/RESULTS_SAML_D.md`; ₹0.08 = Phase 11A live run; chunk counts = `rag/run_cocoindex_ingest.py` output. Mermaid labels quoted (colons/dashes) for GitHub rendering.
 ---
+
+### 2026-07-09 — Phase 14A: lint/format/typecheck gates actually green
+**What changed:** The repo's own stated quality gates (CLAUDE.md: ruff + mypy) had never been run end-to-end. Now: `ruff check --fix` cleared 13 mechanical errors (11 unused imports, 2 placeholder-less f-strings); the one E402 in `rag/retrieve_pg.py` is a deliberate post-bootstrap import, annotated `# noqa: E402`. One-time `ruff format` pass over 39 files (mechanical whitespace/wrapping only). `benchmarks/__init__.py` added — its absence made mypy abort before checking a single file. mypy then surfaced only 3 real complaints, all third-party union-type strictness (LangChain `with_structured_output` returns `dict | BaseModel`; chromadb embeddings stub) — targeted `# type: ignore[...]` with the specific code, not blanket ignores.
+**How to verify:** `ruff check . && ruff format --check .` → clean; `mypy . --ignore-missing-imports` → "no issues found in 57 source files"; `pytest -q` → 147 passed (the reformat changed no behavior).
+---

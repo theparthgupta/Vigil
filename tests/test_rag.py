@@ -8,7 +8,6 @@ Verifies:
  - Sanctions reporting (CTR/STR) context is retrievable from RBI
 """
 
-import pytest
 from rag.retrieve_pg import retrieve
 
 

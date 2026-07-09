@@ -57,12 +57,12 @@ def compute_metrics(results: list[dict]) -> dict:
         "confusion_matrix": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
         "per_typology": _per_typology(results),
         "loop_fired_count": sum(1 for r in results if r.get("loop_fired")),
-        "avg_latency_s": round(
-            sum(r.get("latency_s", 0.0) for r in results) / total, 2
-        ) if total else 0.0,
-        "avg_confidence": round(
-            sum(r.get("confidence", 0.0) for r in results) / total, 4
-        ) if total else 0.0,
+        "avg_latency_s": round(sum(r.get("latency_s", 0.0) for r in results) / total, 2)
+        if total
+        else 0.0,
+        "avg_confidence": round(sum(r.get("confidence", 0.0) for r in results) / total, 4)
+        if total
+        else 0.0,
     }
 
 

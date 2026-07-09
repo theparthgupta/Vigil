@@ -39,6 +39,7 @@ def _fake_result(input_tokens: int, output_tokens: int) -> LLMResult:
 
 # ── 1. Handler accumulates across calls ───────────────────────────────────────
 
+
 def test_handler_accumulates():
     h = TokenUsageHandler()
     h.on_llm_end(_fake_result(1000, 200))
@@ -52,15 +53,17 @@ def test_handler_accumulates():
 
 # ── 2. Cost math is exact (deterministic Python, no LLM) ──────────────────────
 
+
 def test_cost_math_exact():
     h = TokenUsageHandler()
     h.on_llm_end(_fake_result(1_000_000, 1_000_000))  # 1M in + 1M out
     s = h.summary()
-    assert s["cost_usd"] == round(0.15 + 0.60, 6)          # $0.75
+    assert s["cost_usd"] == round(0.15 + 0.60, 6)  # $0.75
     assert s["cost_inr"] == round(0.75 * USD_INR, 4)
 
 
 # ── 3. Zero usage → zero cost ─────────────────────────────────────────────────
+
 
 def test_zero_usage():
     s = TokenUsageHandler().summary()
@@ -70,21 +73,28 @@ def test_zero_usage():
 
 # ── 4. Cost persists on the case and rolls into stats ─────────────────────────
 
+
 def test_cost_persists_and_stats_roll_up():
     case = {"case_id": f"{_PFX}_a", "customer": {"name": "Cost Test"}, "transactions": []}
-    save_investigation(case, "ESCALATE", 0.9, "structuring", "STR",
-                       tokens_used=12345, cost_inr=1.23)
+    save_investigation(
+        case, "ESCALATE", 0.9, "structuring", "STR", tokens_used=12345, cost_inr=1.23
+    )
 
     with _connect() as conn, conn.cursor() as cur:
-        cur.execute("SELECT tokens_used, cost_inr FROM vigil_cases WHERE case_id = %s",
-                    (f"{_PFX}_a",))
+        cur.execute(
+            "SELECT tokens_used, cost_inr FROM vigil_cases WHERE case_id = %s", (f"{_PFX}_a",)
+        )
         tokens, cost = cur.fetchone()
     assert tokens == 12345
     assert cost == 1.23
 
     stats = get_stats()
-    for key in ("llm_spend_inr", "avg_cost_per_investigation_inr",
-                "est_saved_by_triage_inr", "investigated_with_llm"):
+    for key in (
+        "llm_spend_inr",
+        "avg_cost_per_investigation_inr",
+        "est_saved_by_triage_inr",
+        "investigated_with_llm",
+    ):
         assert key in stats
     assert stats["investigated_with_llm"] >= 1
     assert stats["llm_spend_inr"] >= 1.23

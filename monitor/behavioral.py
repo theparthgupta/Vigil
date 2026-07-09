@@ -35,6 +35,7 @@ def _credit_ratio(txns: list[dict]) -> float:
 
 # ── Step 1: baseline ──────────────────────────────────────────────────────────
 
+
 def compute_baseline(transactions: list[dict]) -> dict | None:
     if len(transactions) < 15:
         return None
@@ -84,11 +85,14 @@ def compute_baseline(transactions: list[dict]) -> dict | None:
 
 # ── Step 2: current window ────────────────────────────────────────────────────
 
+
 def compute_current_window(transactions: list[dict], days: int = 30) -> dict:
     if not transactions:
         return {
-            "current_count": 0, "current_avg_amount_inr": 0.0,
-            "current_channel_dist": {}, "new_counterparty_ratio": 0.0,
+            "current_count": 0,
+            "current_avg_amount_inr": 0.0,
+            "current_channel_dist": {},
+            "new_counterparty_ratio": 0.0,
             "current_credit_ratio": 0.0,
         }
 
@@ -100,8 +104,10 @@ def compute_current_window(transactions: list[dict], days: int = 30) -> dict:
 
     if not current:
         return {
-            "current_count": 0, "current_avg_amount_inr": 0.0,
-            "current_channel_dist": {}, "new_counterparty_ratio": 0.0,
+            "current_count": 0,
+            "current_avg_amount_inr": 0.0,
+            "current_channel_dist": {},
+            "new_counterparty_ratio": 0.0,
             "current_credit_ratio": 0.0,
         }
 
@@ -116,6 +122,7 @@ def compute_current_window(transactions: list[dict], days: int = 30) -> dict:
 
 
 # ── Step 3: channel distance ──────────────────────────────────────────────────
+
 
 def channel_distance(dist_a: dict, dist_b: dict) -> float:
     keys = set(dist_a) | set(dist_b)
@@ -142,21 +149,33 @@ def detect_behavioral_anomaly(case: dict) -> dict:
     baseline = compute_baseline(transactions)
     if baseline is None:
         return {
-            "flagged": False, "typology": "behavioral_anomaly", "confidence": 0.0,
+            "flagged": False,
+            "typology": "behavioral_anomaly",
+            "confidence": 0.0,
             "evidence": {"reason": "insufficient_history"},
-            "behavioral_score": 0.0, "regulatory_ref": _REF,
+            "behavioral_score": 0.0,
+            "regulatory_ref": _REF,
         }
 
     current = compute_current_window(transactions, days=30)
     if current["current_count"] == 0:
         return {
-            "flagged": False, "typology": "behavioral_anomaly", "confidence": 0.0,
+            "flagged": False,
+            "typology": "behavioral_anomaly",
+            "confidence": 0.0,
             "evidence": {"reason": "no_recent_transactions"},
-            "behavioral_score": 0.0, "regulatory_ref": _REF,
+            "behavioral_score": 0.0,
+            "regulatory_ref": _REF,
         }
 
-    amount_z = abs(current["current_avg_amount_inr"] - baseline["avg_amount_inr"]) / baseline["std_amount_inr"]
-    count_z = abs(current["current_count"] - baseline["avg_monthly_txn_count"]) / baseline["std_monthly_count"]
+    amount_z = (
+        abs(current["current_avg_amount_inr"] - baseline["avg_amount_inr"])
+        / baseline["std_amount_inr"]
+    )
+    count_z = (
+        abs(current["current_count"] - baseline["avg_monthly_txn_count"])
+        / baseline["std_monthly_count"]
+    )
     ch_shift = channel_distance(baseline["channel_distribution"], current["current_channel_dist"])
     new_cp_ratio = current["new_counterparty_ratio"]
 

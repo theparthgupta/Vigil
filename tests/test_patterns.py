@@ -5,12 +5,11 @@ Tests verify that the structuring and rapid-passthrough detectors flag the
 correct train cases and do NOT fire on clean cases.
 """
 
-import pytest
-
 from tools.patterns import analyze_patterns
 
 
 # ── Structuring indicator ─────────────────────────────────────────────────────
+
 
 def test_structuring_case_is_flagged(cases_by_typology):
     case = cases_by_typology["structuring"][0]
@@ -34,6 +33,7 @@ def test_second_structuring_case_flagged(cases_by_typology):
 
 
 # ── Rapid pass-through indicator ──────────────────────────────────────────────
+
 
 def test_rapid_passthrough_case_is_flagged(cases_by_typology):
     case = cases_by_typology["rapid_passthrough"][0]
@@ -62,6 +62,7 @@ def test_second_passthrough_case_flagged(cases_by_typology):
 
 # ── Clean cases must NOT fire ─────────────────────────────────────────────────
 
+
 def test_clean_case_no_structuring_flag(cases_by_typology):
     case = cases_by_typology["clean"][0]
     result = analyze_patterns(case["transactions"])
@@ -82,6 +83,7 @@ def test_second_clean_case_clean(cases_by_typology):
 
 
 # ── Basic stats sanity ────────────────────────────────────────────────────────
+
 
 def test_basic_stats_are_populated(cases_by_typology):
     case = cases_by_typology["structuring"][0]

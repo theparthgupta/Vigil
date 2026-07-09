@@ -17,11 +17,11 @@ from __future__ import annotations
 from datetime import datetime
 
 # RBI KYC Master Directions 2016 — Table of inherently high-risk business types
-_HIGH_RISK_BTYPES   = {"jewelry", "real_estate", "logistics"}
+_HIGH_RISK_BTYPES = {"jewelry", "real_estate", "logistics"}
 _MEDIUM_RISK_BTYPES = {"hospitality", "textile", "sme"}
 
-_AGE_HIGH_DAYS   = 180   # < 6 months → elevated monitoring (new customer risk)
-_AGE_MEDIUM_DAYS = 365   # < 1 year   → moderate monitoring
+_AGE_HIGH_DAYS = 180  # < 6 months → elevated monitoring (new customer risk)
+_AGE_MEDIUM_DAYS = 365  # < 1 year   → moderate monitoring
 
 
 def summarize_profile(customer: dict) -> dict:
@@ -39,11 +39,11 @@ def summarize_profile(customer: dict) -> dict:
         risk_level                   "low" | "medium" | "high"
         summary                      str         — single-paragraph for the Reasoner
     """
-    btype         = customer["business_type"]
-    prior_flags   = customer["prior_flags"]
-    turnover      = customer["stated_monthly_turnover_inr"]
-    opened        = datetime.fromisoformat(customer["account_open_date"])
-    age_days      = (datetime.now() - opened).days
+    btype = customer["business_type"]
+    prior_flags = customer["prior_flags"]
+    turnover = customer["stated_monthly_turnover_inr"]
+    opened = datetime.fromisoformat(customer["account_open_date"])
+    age_days = (datetime.now() - opened).days
 
     risk_factors: list[str] = []
 
@@ -65,18 +65,17 @@ def summarize_profile(customer: dict) -> dict:
 
     if prior_flags >= 2:
         risk_factors.append(
-            f"{prior_flags} prior flags — enhanced due diligence mandatory "
-            "(PMLA 2002, Section 11A)"
+            f"{prior_flags} prior flags — enhanced due diligence mandatory (PMLA 2002, Section 11A)"
         )
     elif prior_flags == 1:
-        risk_factors.append(f"1 prior flag on record")
+        risk_factors.append("1 prior flag on record")
 
     risk_level = _risk_level(btype, age_days, prior_flags)
 
     summary = (
         f"{customer['name']} is a {btype} entity, "
         f"account open for {age_days} days, "
-        f"stated monthly turnover Rs.{turnover/1e5:.1f}L, "
+        f"stated monthly turnover Rs.{turnover / 1e5:.1f}L, "
         f"{prior_flags} prior flag(s). "
         f"Risk assessed as {risk_level.upper()}."
     )
@@ -84,15 +83,15 @@ def summarize_profile(customer: dict) -> dict:
         summary += " Factors: " + "; ".join(risk_factors) + "."
 
     return {
-        "customer_id":                 customer["id"],
-        "name":                        customer["name"],
-        "business_type":               btype,
+        "customer_id": customer["id"],
+        "name": customer["name"],
+        "business_type": btype,
         "stated_monthly_turnover_inr": turnover,
-        "account_age_days":            age_days,
-        "prior_flags":                 prior_flags,
-        "risk_factors":                risk_factors,
-        "risk_level":                  risk_level,
-        "summary":                     summary,
+        "account_age_days": age_days,
+        "prior_flags": prior_flags,
+        "risk_factors": risk_factors,
+        "risk_level": risk_level,
+        "summary": summary,
     }
 
 
@@ -106,7 +105,7 @@ def _risk_level(btype: str, age_days: int, prior_flags: int) -> str:
         score += 2
     elif age_days < _AGE_MEDIUM_DAYS:
         score += 1
-    score += min(prior_flags, 2)   # cap at 2 so a single field can't overwhelm
+    score += min(prior_flags, 2)  # cap at 2 so a single field can't overwhelm
 
     if score >= 4:
         return "high"

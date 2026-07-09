@@ -13,19 +13,23 @@ to keep the test suite fast and offline.
 import pytest
 
 from agent.nodes import investigator, route_after_reasoner, ALL_TOOLS
-from agent.state import initial_state, VigilState
+from agent.state import initial_state
 
 
 # ── Conditional edge truth table ──────────────────────────────────────────────
 
-@pytest.mark.parametrize("confidence,passes,expected", [
-    (0.40, 1, "investigate"),   # low conf, first pass done → loop once
-    (0.59, 1, "investigate"),   # just below threshold → loop
-    (0.60, 1, "report"),        # at threshold → report
-    (0.90, 1, "report"),        # high conf → report
-    (0.30, 2, "report"),        # low conf BUT max passes reached → report (no infinite loop)
-    (0.10, 2, "report"),        # very low conf, capped → report
-])
+
+@pytest.mark.parametrize(
+    "confidence,passes,expected",
+    [
+        (0.40, 1, "investigate"),  # low conf, first pass done → loop once
+        (0.59, 1, "investigate"),  # just below threshold → loop
+        (0.60, 1, "report"),  # at threshold → report
+        (0.90, 1, "report"),  # high conf → report
+        (0.30, 2, "report"),  # low conf BUT max passes reached → report (no infinite loop)
+        (0.10, 2, "report"),  # very low conf, capped → report
+    ],
+)
 def test_route_after_reasoner(confidence, passes, expected):
     state = initial_state({"case_id": "x"})
     state["confidence"] = confidence
@@ -46,6 +50,7 @@ def test_loop_is_bounded_to_one_extra_pass():
 
 
 # ── Investigator evidence assembly (real tools, no LLM) ───────────────────────
+
 
 def test_investigator_assembles_evidence_structuring(cases_by_typology):
     case = cases_by_typology["structuring"][0]
@@ -84,7 +89,7 @@ def test_investigator_respects_tool_plan(cases_by_typology):
     """Only planned tools run."""
     case = cases_by_typology["clean"][0]
     state = initial_state(case)
-    state["tool_plan"] = ["profile", "patterns"]   # no sanctions / media
+    state["tool_plan"] = ["profile", "patterns"]  # no sanctions / media
 
     out = investigator(state)
     ev = out["evidence"]
@@ -97,7 +102,7 @@ def test_widen_pass_increments_counter(cases_by_typology):
     case = cases_by_typology["clean"][0]
     state = initial_state(case)
     state["tool_plan"] = ["profile", "patterns"]
-    state["investigation_passes"] = 1            # simulate a re-pass
+    state["investigation_passes"] = 1  # simulate a re-pass
 
     out = investigator(state)
     assert out["investigation_passes"] == 2
@@ -105,11 +110,19 @@ def test_widen_pass_increments_counter(cases_by_typology):
 
 # ── State helper ──────────────────────────────────────────────────────────────
 
+
 def test_initial_state_has_all_fields():
     state = initial_state({"case_id": "x"})
     required = {
-        "case", "evidence", "retrieved_passages", "decision", "confidence",
-        "report", "investigation_steps", "tool_plan", "investigation_passes",
+        "case",
+        "evidence",
+        "retrieved_passages",
+        "decision",
+        "confidence",
+        "report",
+        "investigation_steps",
+        "tool_plan",
+        "investigation_passes",
     }
     assert required <= state.keys()
     assert state["decision"] == ""
@@ -119,7 +132,9 @@ def test_initial_state_has_all_fields():
 
 # ── Graph wiring (compiles, no invocation) ────────────────────────────────────
 
+
 def test_graph_compiles():
     from agent.graph import build_graph
+
     g = build_graph()
     assert g is not None
