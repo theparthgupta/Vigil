@@ -1,0 +1,28 @@
+# Never bake secrets or local state into the image
+.env
+*.env
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.git/
+.claude/
+
+# Local stores that regenerate inside the container
+chroma_db/
+rag/chroma_db/
+monitor/isolation_forest.pkl
+kuzu_db/
+
+# Benchmark dataset + caches (1GB; dev-only, see benchmarks/saml_d.py)
+SAML-D.csv
+benchmarks/_saml_cases_cache.json
+benchmarks/_saml_features_cache.json
+
+# Run artifacts
+*.output
+*.tmp
+eval/results_*.json

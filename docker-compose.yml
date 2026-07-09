@@ -1,0 +1,38 @@
+# One-command Vigil: `OPENAI_API_KEY=sk-... docker compose up`
+# (or put OPENAI_API_KEY in a .env file next to this compose file).
+#
+# db  — Postgres 17 with pgvector (RAG corpus + case store + audit trail)
+# app — FastAPI serving the API and the UI on http://localhost:8000/
+#
+# First boot embeds the regulatory corpus (a few minutes, pennies of OpenAI
+# embedding spend); subsequent boots detect the existing corpus and skip it.
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_PASSWORD: vigil
+      POSTGRES_DB: vigil
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vigil"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:vigil@db:5432/vigil
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?set OPENAI_API_KEY in the environment or a .env file}
+      OPENSANCTIONS_API_KEY: ${OPENSANCTIONS_API_KEY:-}
+      LANGSMITH_TRACING: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
