@@ -1,25 +1,32 @@
-![Python](https://img.shields.io/badge/python-3.11+-blue)
-![Tests](https://img.shields.io/badge/tests-63%20passing-brightgreen)
+![Python](https://img.shields.io/badge/python-3.12+-blue)
+![Tests](https://img.shields.io/badge/tests-147%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![LangGraph](https://img.shields.io/badge/built%20with-LangGraph-orange)
+![pgvector](https://img.shields.io/badge/RAG-pgvector%20%2B%20CocoIndex-blueviolet)
 
 # Vigil
 
-> An AI compliance analyst that takes a flagged transaction case, autonomously investigates it against live sanctions data and Indian PMLA/RBI regulations, and produces a legally-grounded **STR-format report** with a clear ESCALATE/DISMISS recommendation — turning a 40-minute manual review into a 2-minute one.
+> An AML triage and investigation platform for Indian financial institutions.
+> A four-layer deterministic/statistical/ML monitor screens whole batches of
+> customers for **fractions of a paisa per case**, a learned fusion model turns
+> the signals into an explainable risk score, and only the cases that clear the
+> gate reach the **LLM investigation agent** (~₹0.08/case) — which screens
+> sanctions, applies PMLA/RBI regulation via RAG, and drafts a citation-grounded
+> **STR report** for a human reviewer whose decision is persisted to an audit trail.
 
-**Stack:** Python · LangGraph · OpenAI GPT-4o-mini · ChromaDB (RAG) · FastAPI · vanilla JS UI · LangSmith
-**Live demo:** _deploy in progress — see [DEPLOY.md](DEPLOY.md)_ · **Traces:** LangSmith project `vigil`
+**Stack:** Python · LangGraph · OpenAI GPT-4o-mini · Postgres + pgvector (CocoIndex incremental RAG) · scikit-learn · FastAPI · vanilla JS UI
 
 ---
 
 ## The problem
 
-AML (anti-money-laundering) compliance teams drown in alerts. Industry estimates put
-**false-positive rates on automated AML alerts above 90–95%** — analysts spend most of
-their day clearing noise, and India's FIU-IND receives **millions of STRs a year**. The
-bottleneck isn't detection, it's *triage*: reading the case, checking sanctions lists,
-recalling the right PMLA section, and writing a defensible report. Vigil automates that
-investigation while keeping a human in the loop on the final call.
+AML compliance teams drown in alerts: industry false-positive rates on automated
+monitoring commonly exceed **90–95%**, and India's FIU-IND receives millions of
+STRs a year. The expensive part isn't detection — it's *triage and write-up*:
+reading the case, checking sanctions, recalling the right PMLA rule, and writing
+a defensible report. Vigil's answer is economic: spend nearly nothing on the
+obvious cases, spend an LLM on the ambiguous ones, and keep a human on the final
+call with every decision recorded.
 
 ---
 
@@ -27,180 +34,179 @@ investigation while keeping a human in the loop on the final call.
 
 ```mermaid
 flowchart TD
-    A[Flagged Case Input] --> B[🧠 Planner Node\nLLM decides tool order]
-    B --> C[🔍 Investigator Node\nRuns 4 deterministic tools]
-    C --> D[⚖️ Reasoner Node\nRAG + regulatory synthesis]
-    D -->|confidence ≥ 0.6| E[📄 Reporter Node\nGenerates STR report]
-    D -->|confidence < 0.6| C
-    E --> F[ESCALATE / DISMISS\n+ Citation-grounded STR]
+    CSV[Batch CSV / single case] --> M
 
-    subgraph Tools
-        G[Sanctions Lookup\nOpenSanctions API]
-        H[Pattern Detector\nStructuring + Passthrough]
-        I[Adverse Media\nDuckDuckGo]
-        J[Profile Scorer\nRisk tier]
+    subgraph M["Monitor — deterministic, no LLM, ~110ms/case"]
+        L1["Layer 1: 10 typology rules\nstructuring, smurfing, round-trip…"]
+        L2A["Layer 2A: transaction graph\ncycles, layering chains, fan-out"]
+        L2B["Layer 2B: behavioral baselines\nz-scores vs customer history"]
+        L2C["Layer 2C: Isolation Forest\nunsupervised anomaly"]
+        F["Learned fusion — logistic regression\nreadable JSON coefficients"]
+        L1 --> F
+        L2A --> F
+        L2B --> F
+        L2C --> F
     end
-    C --> Tools
+
+    F -->|below threshold| D["AUTO-DISMISS\npersisted, visible, ~free"]
+    F -->|above threshold| Q["Triage queue\nscore waterfall + money-flow graph"]
+    Q -->|one click| A
+
+    subgraph A["Investigation agent — LangGraph, ~Rs 0.08/case"]
+        P[Planner] --> I["Investigator\nsanctions · patterns · profile · media"]
+        I --> R["Reasoner\nRAG over PMLA / RBI / FIU-IND"]
+        R -->|confidence below 0.6| I
+        R --> W["Reporter\nSTR draft with citations"]
+    end
+
+    W --> H["Human review\napprove / override + rationale"]
+    H --> T[("Postgres audit trail\nstatus · reviewer · timestamp")]
 ```
 
----
-
-## Results
-
-Vigil is **eval-first**: a labelled synthetic benchmark and a metric harness were built
-*before* the final agent, so every change is justified by numbers, not vibes.
-
-### Train learning curve (160 cases) — one deliberate, measured change
-
-The baseline exposed a single failure: the LLM planner was skipping sanctions screening on
-domestic-looking cases. **One prompt change** (making sanctions screening mandatory) fixed it:
-
-| Metric | Baseline | Optimized | Δ |
-|---|---|---|---|
-| Precision | 1.000 | 1.000 | — |
-| **Recall** | 0.783 | **1.000** | **+0.217** |
-| **F1** | 0.879 | **1.000** | **+0.121** |
-| Accuracy | 0.838 | 1.000 | +0.162 |
-| FPR on clean (critical) | 0.000 | 0.000 | — |
-| `sanctions_hit` detection | 0.350 | **1.000** | **+0.650** |
-
-### Holdout (40 cases) — the honest final score
-
-The holdout set was **locked from the first commit** and never used for tuning.
-
-| Metric | Holdout |
-|---|---|
-| Precision | **1.000** |
-| Recall | **1.000** |
-| F1 | **1.000** |
-| Accuracy | **1.000** |
-| FPR on clean | **0.000** |
-
-Confusion matrix: 30/30 suspicious → ESCALATE, 10/10 clean → DISMISS. Per-typology detection
-100% across structuring, sanctions_hit, and rapid_passthrough.
-
-> **Read this honestly.** Perfect holdout scores mean the agent *wires its tools together
-> correctly* — not that it would perform this well on real, noisy bank data. The benchmark is
-> synthetic and cleanly separable by design. See **[Where it still fails](#where-it-still-fails)**.
+The **LLM plans, reasons, and writes — it never does arithmetic.** Every number
+(amounts, counts, scores, costs) comes from deterministic Python.
 
 ---
 
-## How it works
+## Honest results
 
-The agent is a 4-node LangGraph state machine. The **LLM plans, reasons, and writes; it never
-does arithmetic** — all numeric features come from deterministic Python tools, so the model
-can't hallucinate a transaction amount or count.
+### Independent benchmark — SAML-D (9.5M transactions, 0.104% laundering)
 
-1. **Planner** *(LLM)* — reads a case summary and chooses which tools to run. Sanctions,
-   patterns, and profile screening are mandatory; adverse-media is optional.
-2. **Investigator** *(deterministic)* — runs the chosen tools: sanctions/PEP screening,
-   transaction-pattern analysis (structuring, rapid pass-through, velocity), adverse-media
-   search, and a customer risk profile. Writes structured evidence into state.
-3. **Reasoner** *(LLM + RAG)* — retrieves the relevant regulatory passages from Chroma and
-   decides **ESCALATE / DISMISS** with a confidence score, grounded in citations. If confidence
-   < 0.6, the graph loops back once for a wider evidence pass.
-4. **Reporter** *(LLM)* — drafts a structured **FIU-IND STR** with citations down to the
-   section/rule and page.
+The monitor stack was benchmarked against
+[SAML-D](https://www.kaggle.com/datasets/berkanoztas/synthetic-transaction-monitoring-dataset-aml)
+(IEEE 2023) — a public AML dataset the detectors were **never written against**.
+2,450 sampled account-level cases (461 laundering / 1,989 clean), seed-fixed and
+reproducible. Two calibration passes (a structuring proportionality fix and the
+learned fusion) produced:
+
+| | Before | After |
+|---|---|---|
+| At matched recall ~0.80 | FPR 0.455 · precision 0.287 | **FPR 0.343 · precision 0.352** |
+| At threshold 0.60 | P 0.287 / R 0.790 / FPR 0.455 | P 0.356 / R 0.642 / **FPR 0.269** |
+
+Read as a triage gate: **~80% of laundering accounts caught while safely
+auto-dismissing a third of the book** — on foreign-shaped data with the
+India-specific detectors (sanctions list, geography) structurally disabled.
+Full sweep, methodology, and caveats: [`benchmarks/RESULTS_SAML_D.md`](benchmarks/RESULTS_SAML_D.md).
+The enriched sample means precision does **not** transfer to production base
+rates; recall and FPR do.
+
+### Synthetic holdout (agent end-to-end)
+
+A 40-case holdout locked from the first commit scores perfect —
+which honestly means the agent *wires its tools together correctly*, not that it
+survives real bank data. The synthetic benchmark is separable by design; see
+[Where it still fails](#where-it-still-fails).
+
+### Cost economics (measured, not estimated)
+
+Token usage is counted per investigation by a callback and priced in Python:
+**~5,000 tokens ≈ ₹0.08 per LLM investigation**; monitor triage is ~110ms of CPU.
+The dashboard shows live spend and the amount saved by auto-dismissal.
 
 ---
 
-## Why this is different
+## What the UI does
 
-- **India-specific regulatory grounding.** Cites exact PMLA 2002 sections, PMLA Rules 2005
-  rules, RBI KYC Master Direction paragraphs, and the FIU-IND STR format — not generic AML
-  boilerplate. It correctly distinguishes the **statutory STR deadline ("promptly", Rule 8(2))**
-  from the commonly-quoted-but-wrong "7 working days" industry norm.
-- **Eval-first benchmark.** The labelled dataset and the precision/recall/F1/FPR harness ship
-  *before* the final agent. The baseline→optimized→holdout story is metric-driven and reproducible.
-- **Honest failure documentation.** The limits below are stated up front, not buried.
+- **Batch triage** — upload a transaction CSV (sample provided), screen every
+  customer through all four layers in seconds, and get a risk-sorted queue with
+  a noise-reduction headline.
+- **Explainability on every case** — click a queue row: a **score waterfall**
+  shows each feature's exact contribution (the fusion is linear, so the chart is
+  the actual math, not a post-hoc explanation), beside a **money-flow graph**
+  with detected rings/fan-outs highlighted.
+- **One-click investigation** — flagged cases go to the LangGraph agent with
+  their monitor evidence attached (no re-screening); progress streams live; the
+  STR renders with citations down to rule and page.
+- **Human review + audit trail** — approve or override with a rationale; the
+  case moves `flagged → in_review → str_filed / dismissed`, and every action is
+  persisted to Postgres (PMLA record-keeping is a 5-year obligation — the audit
+  trail *is* the product).
+- **Case history & drawer** — every screened case, filterable by status, with a
+  full-detail drawer: score breakdown, money flow, report, review log.
+- **Live dashboard** — cases screened, STRs filed, noise auto-dismissed, LLM
+  spend, and estimated savings, computed from persisted history.
+
+---
+
+## Quickstart
+
+### Docker (recommended)
+
+```bash
+git clone https://github.com/theparthgupta/Vigil && cd Vigil
+OPENAI_API_KEY=sk-... docker compose up --build
+# first boot embeds the regulatory corpus (a few minutes, pennies of embedding spend)
+# then open http://localhost:8000/
+```
+
+### Manual
+
+Requires Postgres with the pgvector extension and a `vigil` database.
+
+```bash
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env    # set OPENAI_API_KEY and DATABASE_URL
+uvicorn api.main:app --reload                      # http://localhost:8000/
+```
+
+The RAG corpus and the anomaly model build themselves on first startup
+(idempotent). To rebuild the corpus explicitly: `python rag/run_cocoindex_ingest.py`
+— CocoIndex tracks source lineage and re-embeds **only changed files**.
+
+### Reproduce the numbers
+
+```bash
+pytest -q                                          # 147 tests
+python benchmarks/saml_d.py                        # SAML-D sweep (deterministic, seed 42)
+python benchmarks/train_fusion.py                  # fusion coefficients + held-out tables
+python eval/run_eval.py --tag holdout --cases data/cases_holdout.json --out eval/results_holdout.json
+```
 
 ---
 
 ## Regulatory corpus
 
-928 section-aware chunks across 5 documents, embedded with `text-embedding-3-small` in ChromaDB.
-Chunking respects legal section boundaries so citations stay intact.
+~928 section-aware chunks across 5 Indian AML documents, embedded with
+`text-embedding-3-small` into pgvector via a declarative **CocoIndex** flow
+(incremental: only changed PDFs re-embed; deleted files' chunks are pruned).
+Chunking respects legal section boundaries so citations stay intact — including
+correctly distinguishing the **statutory STR deadline ("promptly", PMLA Rules
+Rule 8(2))** from the commonly-quoted-but-wrong "7 working days".
 
-```mermaid
-graph LR
-    A[928 chunks\n5 documents] --> B[PMLA 2002\n158 chunks]
-    A --> C[PMLA Rules 2005\n35 chunks]
-    A --> D[RBI KYC MD 2025\n226 chunks]
-    A --> E[FIU-IND FINnet 2.0\n22 chunks]
-    A --> F[APG Typologies 2024\n487 chunks]
-```
-
-### Documents and where to download them
-
-The vector store is **not** committed — build it locally with `python rag/ingest.py` after
-placing the source PDFs in `regs/`. Four of the five are public; the FIU-IND reporting
-format is distribution-restricted and **must be downloaded manually** from the official
-portal (it is not included in this repository).
-
-| # | Document | Citation | Chunks | Download |
-|---|---|---|---|---|
-| 1 | Prevention of Money-Laundering Act, 2002 | Act No. 15 of 2003 | 158 | [India Code](https://www.indiacode.nic.in) — search "Prevention of Money-laundering Act 2002" |
-| 2 | PMLA (Maintenance of Records) Rules, 2005 | G.S.R. 444(E) | 35 | [FIU-IND](https://fiuindia.gov.in) → Acts & Rules |
-| 3 | RBI KYC Master Direction, 2025 | DOR.AML.REC.No.88/14.01.002/2025-26 | 226 | [RBI](https://www.rbi.org.in) → Notifications → Master Directions → "Know Your Customer" |
-| 4 | FIU-IND Reporting Format v1.14 (FINnet 2.0) | FINnet 2.0 | 22 | [FIU-IND](https://fiuindia.gov.in) → FINGate / Reporting Format — **restricted, download manually** |
-| 5 | APG Yearly Typologies Report, 2024 | Asia/Pacific Group on Money Laundering | 487 | [APG](https://www.apgml.org) → Documents → Typologies Reports |
-
-Expected filenames in `regs/`: `A2003-15.pdf` (PMLA), `PMLA_Rules.pdf`, `169MD.pdf` (RBI),
-`Reporting_Format.pdf` (FIU-IND), `2024_APG_Typologies_Report.pdf`.
-
----
-
-## How to run locally
-
-```bash
-git clone <repo-url> && cd vigil
-python -m venv venv
-source venv/bin/activate            # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-
-cp .env.example .env                # then add OPENAI_API_KEY (+ optional LANGSMITH_API_KEY)
-
-# build the regulatory vector store (needs the PDFs in regs/ and OPENAI_API_KEY)
-python rag/ingest.py
-
-# run the app — API + UI on one server
-uvicorn api.main:app --reload       # open http://localhost:8000/
-```
-
-Reproduce the evals:
-
-```bash
-python eval/run_eval.py --tag baseline  --out eval/results_baseline.json
-python eval/run_eval.py --tag optimized --out eval/results_optimized.json
-python eval/run_eval.py --tag holdout --cases data/cases_holdout.json --out eval/results_holdout.json
-python eval/metrics.py eval/results_holdout.json
-pytest -q                            # 63 tests
-```
+| # | Document | Chunks | Source |
+|---|---|---|---|
+| 1 | Prevention of Money-Laundering Act, 2002 | 158 | committed (`regs/A2003-15.pdf`) |
+| 2 | PMLA (Maintenance of Records) Rules, 2005 | 35 | committed (`regs/PMLA_Rules.pdf`) |
+| 3 | RBI KYC Master Direction, 2025 | 226 | committed (`regs/169MD.pdf`) |
+| 4 | FIU-IND Reporting Format v1.14 (FINnet 2.0) | 22 | **restricted — download manually** from [fiuindia.gov.in](https://fiuindia.gov.in) as `regs/Reporting_Format.pdf` (ingest skips it if absent) |
+| 5 | APG Yearly Typologies Report, 2024 | 487 | committed (`regs/2024_APG_Typologies_Report.pdf`) |
 
 ---
 
 ## Where it still fails
 
-This section exists on purpose — it's the most important part for anyone evaluating the work.
+The most important section for anyone evaluating this work.
 
-1. **Perfect synthetic scores ≠ real-world proof.** The benchmark is generated by a script that
-   plants clean, separable typology signals that the deterministic tools are built to detect.
-   The holdout is held out from *tuning*, not from the *data distribution*. Real bank data is
-   noisy — transliterated names, partial records, mixed typologies, adversaries who adapt. Vigil
-   has not been tested on any of that and would certainly score lower.
-2. **Mandatory tools are prompt-enforced, not code-enforced.** The fix that took sanctions recall
-   from 0.35 → 1.00 is a *prompt instruction* telling the LLM planner to always screen sanctions.
-   An LLM can disobey a prompt; a production system should hard-code the baseline tool set in the
-   investigator node so the guarantee doesn't depend on model compliance.
-3. **Retrieval precision is imperfect.** RAG sometimes ranks off-target passages (e.g. an APG
-   case study) above the operative rule. The reasoner currently filters this, but on harder/real
-   regulation a wrong citation is a serious error. Retrieval needs reranking and evaluation in its
-   own right.
-4. **Sanctions screening is a fuzzy local fallback.** Without an OpenSanctions API key, name
-   matching is `difflib`-based — it will miss transliteration variants and alias structures that a
-   real screening engine catches.
-5. **The low-confidence loop is untested in practice.** No case in 200 dropped below the 0.6
-   confidence threshold, so the conditional re-investigation path has never actually fired on data.
+1. **Synthetic agent scores ≠ real-world proof.** The end-to-end agent benchmark
+   is separable by design. The SAML-D numbers are the honest external signal —
+   and SAML-D is itself simulator-generated.
+2. **The fusion is calibrated to SAML-D.** Its coefficients (readable in
+   [`benchmarks/fusion_weights.json`](benchmarks/fusion_weights.json)) reflect that
+   dataset; on genuinely different data the hand-tuned fallback may be safer —
+   deleting the JSON reverts instantly. The Isolation Forest layer is provably
+   weak (retraining moved metrics <2 points) and is documented as such.
+3. **Sanctions screening quality.** The local fuzzy list is a demo fallback;
+   the OpenSanctions API path exists but real Indian-name screening needs
+   transliteration-aware matching (Mohammed/Muhammad/Mohd) that `difflib` can't do.
+4. **Mandatory tools are prompt-enforced, not code-enforced** in the agent
+   planner; production should hard-code the baseline tool set.
+5. **No authentication or maker-checker.** Reviewers type their name; real
+   deployments need identity and two-person control.
+6. **Docker packaging is authored but was not executed on the dev machine**
+   (no Docker locally) — dependency wheels and startup paths were verified
+   independently; first `compose up` on a Docker machine is the real test.
 
 ---
 
@@ -208,34 +214,39 @@ This section exists on purpose — it's the most important part for anyone evalu
 
 | Layer | Choice | Why |
 |---|---|---|
-| Orchestration | **LangGraph** | Explicit state-machine agent with a conditional loop |
-| LLM | **OpenAI GPT-4o-mini** (temp 0) | Cheap, fast, deterministic enough for eval |
-| RAG | **ChromaDB** + `text-embedding-3-small` | Local, transparent, section-aware chunks |
-| Tools | **Deterministic Python** | All arithmetic out of the LLM (no hallucinated numbers) |
-| Backend | **FastAPI** + Uvicorn | Serves the API *and* the UI from one process |
-| Frontend | **Vanilla HTML/CSS/JS** | No build step; full control of the dark/light UI + animations |
-| Observability | **LangSmith** | Every run traced and tagged (baseline / optimized / holdout) |
-| Data | **Pydantic** | Schema for synthetic cases + API request validation |
+| Triage monitor | **Deterministic Python + NetworkX + scikit-learn** | 4 layers, no LLM, ~110ms/case, fully testable |
+| Score fusion | **Logistic regression → plain JSON** | Learned from data, still a readable weighted sum |
+| Orchestration | **LangGraph** | Explicit state-machine agent with a bounded loop |
+| LLM | **OpenAI GPT-4o-mini** (temp 0) | Cheap, deterministic enough for eval; ~₹0.08/case measured |
+| RAG | **Postgres + pgvector via CocoIndex** | Incremental indexing, section-aware chunks, one DB for everything |
+| Persistence | **Postgres (plain psycopg2)** | Case lifecycle + review audit trail |
+| Backend | **FastAPI** | API + UI + SSE streaming from one process |
+| Frontend | **Vanilla HTML/CSS/JS + SVG** | No build step; waterfall and force-graph are ~200 lines of SVG |
+| Observability | **LangSmith** (optional) | Traced runs, tagged per experiment |
 
 ---
 
 ## Project layout
 
 ```
-data/   synthetic case generator + labelled cases (train + locked holdout)
-tools/  4 deterministic investigative tools
-rag/    regulatory ingest + retrieval (Chroma)
-agent/  LangGraph graph, nodes, state, prompts
-eval/   evaluation harness + metrics + results
-api/    FastAPI app (serves the agent API + the UI)
-app/    static single-page UI (HTML/CSS/JS)
-regs/   source regulatory PDFs (FIU-IND doc gitignored; see Regulatory corpus)
+monitor/     4-layer detection stack + learned fusion + triage pipeline
+agent/       LangGraph graph, nodes, prompts, cost tracking
+rag/         CocoIndex flow, pgvector retrieval (Chroma legacy kept as fallback)
+tools/       deterministic investigative tools (sanctions, patterns, profile, media)
+api/         FastAPI app + case-lifecycle store (audit trail)
+app/         static single-page UI
+benchmarks/  SAML-D harness, FP attribution, fusion training, results
+eval/        synthetic eval harness + locked holdout
+data/        synthetic case generator + labelled splits
+regs/        source regulatory PDFs
 ```
 
-See **[DECISIONS.md](DECISIONS.md)** for the full engineering narrative — every significant
-decision, why it was made, the tradeoffs, and how it was verified.
+**[DECISIONS.md](DECISIONS.md)** is the full engineering narrative — every
+significant decision, its tradeoffs, its failure modes, and how it was verified,
+appended chronologically across all 13 phases.
 
 ---
 
-*Synthetic data only. Not legal advice. Built as a portfolio demonstration of agentic AI for
-regtech, not a production compliance system.*
+*Synthetic and public-benchmark data only. Not legal advice. Built as a
+portfolio demonstration of agentic AI for regtech, not a production compliance
+system.*
