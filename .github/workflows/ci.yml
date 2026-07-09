@@ -1,0 +1,55 @@
+# Vigil CI: lint + typecheck + the full offline test suite against a real
+# pgvector Postgres. tests/test_rag.py is excluded — it needs the embedded
+# regulatory corpus and an OpenAI key; everything else runs without secrets.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: vigil
+          POSTGRES_DB: vigil
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d vigil"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+
+    env:
+      DATABASE_URL: postgresql://postgres:vigil@localhost:5432/vigil
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install ruff mypy pytest
+
+      - name: Lint (ruff)
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Typecheck (mypy)
+        run: mypy . --ignore-missing-imports
+
+      - name: Tests (offline suite, real pgvector Postgres)
+        run: pytest tests/ -q --ignore=tests/test_rag.py

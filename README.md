@@ -1,3 +1,4 @@
+![CI](https://github.com/theparthgupta/Vigil/actions/workflows/ci.yml/badge.svg)
 ![Python](https://img.shields.io/badge/python-3.12+-blue)
 ![Tests](https://img.shields.io/badge/tests-147%20passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
