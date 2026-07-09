@@ -137,6 +137,9 @@ def test_stats_shape():
         "dismissed",
         "reviews_recorded",
         "noise_reduction_pct",
+        "review_approvals",
+        "review_overrides",
+        "agent_agreement_pct",
     ):
         assert key in stats
     buckets = (
@@ -147,6 +150,8 @@ def test_stats_shape():
         + stats["dismissed"]
     )
     assert buckets == stats["total_cases"]
+    # The feedback loop must reconcile: approvals + overrides == reviews.
+    assert stats["review_approvals"] + stats["review_overrides"] == stats["reviews_recorded"]
 
     r = client.get("/dashboard/stats")
     assert r.status_code == 200

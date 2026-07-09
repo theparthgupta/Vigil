@@ -352,3 +352,8 @@ at the bottom.
 **What changed:** `render.yaml` had no database at all — broken since Phase 9A made Postgres+pgvector a hard requirement; anyone following it got a boot failure. It now provisions a managed Render Postgres (`databases:` block) wired in via `fromDatabase` `DATABASE_URL`, with the 90-day free-tier expiry noted. `DEPLOY.md` rewritten: rotation warning kept and promoted to step 0, Docker Compose as the primary path, the corrected Render Blueprint flow, and a generic "anything else" section (the real requirements are just Python 3.12 + pgvector Postgres + two env vars). `.env.example` now documents `VIGIL_THRESHOLD` and `VIGIL_USD_INR` — two real tuning knobs that were invisible to anyone but the author.
 **How to verify:** `render.yaml` parses (checked); DEPLOY.md contains no ChromaDB references; `.env.example` lists every env var the code reads.
 ---
+
+### 2026-07-09 — Phase 14D: agent-agreement feedback metric
+**What changed:** `get_stats()` now reports the feedback loop from the audit trail: `review_approvals`, `review_overrides`, `agent_agreement_pct`. New dashboard card "Reviewers agree with agent" (blue check; em-dash until the first review exists; tooltip shows the approve/override split). A falling agreement rate is the operational signal to re-tune the triage threshold or fusion weights — the metric that turns the audit trail from record-keeping into feedback.
+**How to verify:** `pytest tests/test_store.py -q` → 8 passed (stats shape asserts approvals + overrides == reviews). Preview: card shows "100%" with "1 of 1 human reviews approved (0 overrides)" from the real persisted review.
+---

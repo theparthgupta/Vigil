@@ -40,6 +40,14 @@ async function loadStats() {
     $("#st-spend").title = `Avg ₹${(s.avg_cost_per_investigation_inr || 0).toFixed(2)} per LLM investigation (${s.investigated_with_llm || 0} runs)`;
     $("#st-saved").textContent = "₹" + (s.est_saved_by_triage_inr || 0).toFixed(2);
     $("#st-saved").title = `${s.auto_dismissed} auto-dismissed cases × avg investigation cost — LLM runs the triage layers avoided`;
+    // The feedback loop: falling agreement = time to re-tune the threshold/fusion.
+    if (s.reviews_recorded > 0) {
+      $("#st-agree").textContent = s.agent_agreement_pct.toFixed(0) + "%";
+      $("#st-agree").title = `${s.review_approvals} of ${s.reviews_recorded} human reviews approved the agent's decision (${s.review_overrides} override${s.review_overrides === 1 ? "" : "s"})`;
+    } else {
+      $("#st-agree").textContent = "—";
+      $("#st-agree").title = "No human reviews recorded yet";
+    }
   } catch { /* dashboard is a nicety — never block the app on it */ }
 }
 

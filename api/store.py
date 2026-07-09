@@ -208,8 +208,13 @@ def get_stats() -> dict:
             """
         )
         total, flagged, auto_dism, in_review, str_filed, dismissed = cur.fetchone()
-        cur.execute("SELECT count(*) FROM vigil_reviews")
-        reviews = cur.fetchone()[0]
+        cur.execute(
+            """
+            SELECT count(*), count(*) FILTER (WHERE action = 'approve')
+            FROM vigil_reviews
+            """
+        )
+        reviews, approvals = cur.fetchone()
         cur.execute(
             """
             SELECT COALESCE(SUM(cost_inr), 0), COALESCE(AVG(cost_inr), 0), COUNT(*)
@@ -226,6 +231,11 @@ def get_stats() -> dict:
         "str_filed": str_filed,
         "dismissed": dismissed,
         "reviews_recorded": reviews,
+        # The feedback loop: how often humans agree with the agent's call.
+        # A falling agreement rate is the signal to re-tune the threshold/fusion.
+        "review_approvals": approvals,
+        "review_overrides": reviews - approvals,
+        "agent_agreement_pct": round(approvals / reviews * 100, 1) if reviews else 0.0,
         "noise_reduction_pct": round(auto_dism / total * 100, 1) if total else 0.0,
         # Triage economics: what was spent on LLM investigations, and what the
         # auto-dismissed cases would have cost at the same average rate.
