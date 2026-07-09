@@ -7,5 +7,7 @@ line-length = 100
 target-version = "py311"
 
 [tool.mypy]
-python_version = "3.11"
+# 3.12+: newer numpy stubs use PEP-695 `type` statements, which mypy refuses
+# to parse in 3.11 mode (CI failed on exactly this).
+python_version = "3.12"
 ignore_missing_imports = true
