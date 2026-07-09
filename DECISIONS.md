@@ -347,3 +347,8 @@ at the bottom.
 **Why:** A static "tests passing" badge is an unverifiable claim; a reviewer who notices discounts every other number in the README. A live badge backed by a real Postgres in CI is the cheapest strong credibility signal the repo lacked.
 **How to verify:** locally `pytest tests/ -q --ignore=tests/test_rag.py` → 139 passed (same command CI runs). First real validation is the Actions run on this push — checked via the public API after pushing (no gh CLI on this machine).
 ---
+
+### 2026-07-09 — Phase 14C: stale deploy docs fixed
+**What changed:** `render.yaml` had no database at all — broken since Phase 9A made Postgres+pgvector a hard requirement; anyone following it got a boot failure. It now provisions a managed Render Postgres (`databases:` block) wired in via `fromDatabase` `DATABASE_URL`, with the 90-day free-tier expiry noted. `DEPLOY.md` rewritten: rotation warning kept and promoted to step 0, Docker Compose as the primary path, the corrected Render Blueprint flow, and a generic "anything else" section (the real requirements are just Python 3.12 + pgvector Postgres + two env vars). `.env.example` now documents `VIGIL_THRESHOLD` and `VIGIL_USD_INR` — two real tuning knobs that were invisible to anyone but the author.
+**How to verify:** `render.yaml` parses (checked); DEPLOY.md contains no ChromaDB references; `.env.example` lists every env var the code reads.
+---

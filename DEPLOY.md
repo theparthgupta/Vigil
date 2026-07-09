@@ -1,86 +1,55 @@
 # Deploying Vigil
 
-Vigil is a **single FastAPI service** that serves both the JSON API and the web
-UI (the old Streamlit app was removed). One deploy → one public URL that hosts
-everything. These files are included:
+Vigil is a **single FastAPI service** (API + UI) plus **Postgres with pgvector**
+(RAG corpus, case store, audit trail). Both stores self-build on first boot:
+CocoIndex embeds the regulatory corpus (needs `OPENAI_API_KEY`; a few minutes,
+pennies of embedding spend) and the anomaly model trains from the committed
+data. Restarts are fast — everything is idempotent.
 
-- `Procfile` — `web: uvicorn api.main:app --host 0.0.0.0 --port $PORT` (Railway/Heroku-style)
-- `render.yaml` — Render Blueprint (build + start + health check + env vars)
-- `runtime.txt` — pins Python 3.12 (chromadb/pyarrow/onnxruntime wheels are reliable there)
+## 0. Secrets — rotate first
 
-> I (the agent) **cannot create the live URL for you** — that requires logging
-> into your Render/Railway account. The steps below take ~5 minutes.
+Any key that has ever been committed or pasted into a chat is compromised.
+Before going public, rotate:
+- OpenAI: <https://platform.openai.com/api-keys>
+- OpenSanctions (optional): <https://www.opensanctions.org/api/>
+- LangSmith (optional): <https://smith.langchain.com/>
 
----
+## 1. Docker Compose (simplest)
 
-## 1. Secrets — rotate first
+```bash
+OPENAI_API_KEY=sk-... docker compose up --build
+# http://localhost:8000/
+```
 
-The keys committed earlier to `.env` and pasted in chat are **compromised**.
-Before going public, rotate them:
-- OpenAI: <https://platform.openai.com/api-keys> — delete the old key, create new.
-- LangSmith: <https://smith.langchain.com> → Settings → API Keys — revoke + recreate.
+Works anywhere Docker runs (a VPS, a homelab, a cloud VM). The compose file
+provisions pgvector Postgres with a persistent volume alongside the app.
 
-Never commit `.env` (it is gitignored). Set keys in the host's dashboard instead.
+## 2. Render (managed, free tier)
 
-Required env vars:
+`render.yaml` is a Blueprint that provisions the web service **and** a managed
+Postgres database wired in via `DATABASE_URL`:
 
-| Var | Value |
-|---|---|
-| `OPENAI_API_KEY` | your rotated key (secret) |
-| `LANGSMITH_API_KEY` | your rotated key (secret) |
-| `LANGSMITH_PROJECT` | `vigil` |
-| `LANGSMITH_TRACING` | `true` |
+1. Push the repo to GitHub.
+2. Render dashboard → New → Blueprint → select the repo.
+3. Set `OPENAI_API_KEY` (and optionally `LANGSMITH_API_KEY`) when prompted.
+4. First deploy takes a few minutes while the corpus embeds; `/health` goes
+   green when ready.
 
----
+Notes:
+- Render free Postgres instances **expire after 90 days** — fine for a demo,
+  use a paid plan for anything persistent.
+- Render Postgres supports the `vector` extension; CocoIndex creates it
+  automatically on first boot.
+- `Procfile` and `runtime.txt` are kept for Railway/Heroku-style platforms;
+  on those you must attach a pgvector-capable Postgres yourself and set
+  `DATABASE_URL`.
 
-## 2. The vector store — the one real gotcha
+## 3. Anything else
 
-The app needs the Chroma vector store (`rag/chroma_db/`) at runtime. It is
-**gitignored**, so it is NOT in the repo.
+Requirements are just: Python 3.12, `pip install -r requirements.txt`,
+a reachable Postgres with the pgvector extension available, and two env vars
+(`DATABASE_URL`, `OPENAI_API_KEY`). Start with
+`uvicorn api.main:app --host 0.0.0.0 --port 8000`.
 
-**This is now automatic.** On startup, `api/main.py` checks whether the Chroma
-collection has any chunks; if it is empty (a fresh Render deploy), it runs the
-ingest pipeline from the PDFs in `regs/` before the app accepts requests, and
-logs `Building RAG corpus from regs/... done (N chunks)`. So you do not need a
-persistent disk or a build step — just make sure `OPENAI_API_KEY` is set (used
-to embed the chunks) and the regulatory PDFs are present.
-
-Consequences:
-- **First boot is slow** (~30–90 s) while the corpus embeds; Render's health
-  check tolerates the startup window, but the first deploy takes longer than later
-  ones. Subsequent boots on the same instance are instant (collection already populated).
-- The four **public** PDFs are committed, so a stock deploy builds a ~900-chunk
-  corpus automatically. The FIU-IND document is gitignored (see below); with it
-  absent the corpus is slightly smaller but fully functional.
-- For a paid instance you can still add a persistent disk mounted at
-  `rag/chroma_db/` to skip the rebuild entirely.
-
-### ⚠️ Confidentiality note
-`regs/Reporting_Format.pdf` (FIU-IND) carries a **"not for general distribution"**
-clause, so it is gitignored and not deployed. The PMLA Act, PMLA Rules, RBI Master
-Directions and APG report are public and committed. If you want the FIU document in
-the live corpus, upload it to the instance out-of-band; do not commit it to a public repo.
-
----
-
-## 3. Deploy — Render (Blueprint)
-
-1. Push this repo to GitHub.
-2. Render dashboard → **New → Blueprint** → pick the repo. It reads `render.yaml`.
-3. Fill the two secret env vars when prompted.
-4. Make the vector store available (Option A or B above).
-5. Deploy. Your URL: `https://vigil-XXXX.onrender.com` (UI at `/`, API at `/health`, `/sample`, `/investigate`).
-
-### Or Railway
-1. New Project → Deploy from GitHub repo.
-2. Railway auto-detects the `Procfile`. Add the env vars.
-3. Handle the vector store (Railway volumes = Option A, or build-time ingest = Option B).
-
----
-
-## 4. Free-tier caveats
-- **Cold starts:** free instances sleep; first request after idle can take ~30–60 s.
-- **Memory:** chromadb + langchain can be heavy near the 512 MB free ceiling. If it
-  OOMs, use a small paid instance.
-- **Latency:** one `/investigate` call makes 3–4 LLM calls (~15–30 s). Synchronous
-  by design; acceptable for a demo.
+Optional tuning knobs (see `.env.example`): `VIGIL_THRESHOLD` (triage gate,
+default 0.60), `VIGIL_USD_INR` (cost display conversion, default 84).

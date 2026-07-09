@@ -1,8 +1,14 @@
-# Render Blueprint — deploys the Vigil FastAPI app (API + UI in one service).
+# Render Blueprint — Vigil web service + managed Postgres (pgvector).
 # Docs: https://render.com/docs/blueprint-spec
 #
-# Before this works you must make the vector store available at runtime
-# (see DEPLOY.md). Set the secret env vars in the Render dashboard.
+# The app hard-requires Postgres with pgvector (RAG corpus + case store).
+# CocoIndex creates the vector extension and embeds the corpus on first boot
+# (needs OPENAI_API_KEY set in the dashboard).
+databases:
+  - name: vigil-db
+    plan: free            # note: Render free Postgres instances expire after 90 days
+    databaseName: vigil
+
 services:
   - type: web
     name: vigil
@@ -14,11 +20,15 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.7"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vigil-db
+          property: connectionString
       - key: OPENAI_API_KEY
         sync: false          # set in dashboard (secret)
       - key: LANGSMITH_API_KEY
-        sync: false          # set in dashboard (secret)
+        sync: false          # optional
       - key: LANGSMITH_PROJECT
         value: vigil
       - key: LANGSMITH_TRACING
-        value: "true"
+        value: "false"
