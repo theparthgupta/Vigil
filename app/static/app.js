@@ -590,8 +590,8 @@ function renderBatchResults(data) {
     const tier = riskTier(r.risk_score);
     const pct = Math.round(r.risk_score * 100);
     const top = (r.typology_flags && r.typology_flags[0]) ? r.typology_flags[0].typology : "—";
-    return `<tr>
-      <td><div class="risk"><div class="risk-bar"><span class="risk-fill ${tier}" style="width:${pct}%"></span></div><span class="risk-num ${tier}">${r.risk_score.toFixed(2)}</span></div></td>
+    return `<tr class="q-row" data-i="${i}" title="Click to see why this case scored ${r.risk_score.toFixed(2)}">
+      <td><div class="risk"><svg class="q-chev" viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="risk-bar"><span class="risk-fill ${tier}" style="width:${pct}%"></span></div><span class="risk-num ${tier}">${r.risk_score.toFixed(2)}</span></div></td>
       <td>${esc(r.customer_name)}</td>
       <td><span class="typ-pill ${tier}">${esc(typoLabel(top))}</span></td>
       <td>${layerBars(r.layer_scores)}</td>
@@ -616,7 +616,13 @@ function renderBatchResults(data) {
       : ""}`;
 
   $("#batchResults").querySelectorAll(".btn-row-inv").forEach((b) =>
-    b.addEventListener("click", () => investigateFromQueue(parseInt(b.dataset.i, 10)))
+    b.addEventListener("click", (e) => {
+      e.stopPropagation();
+      investigateFromQueue(parseInt(b.dataset.i, 10));
+    })
+  );
+  $("#batchResults").querySelectorAll(".q-row").forEach((row) =>
+    row.addEventListener("click", () => toggleExplainRow(parseInt(row.dataset.i, 10), row))
   );
   loadStats();
 }
@@ -646,6 +652,245 @@ async function investigateFromQueue(i) {
     above_threshold: row.above_threshold,
   };
   runInvestigation(caseObj, detectionResult);
+}
+
+// ============================================================
+//  Explainability visuals (Phase 12) — all arithmetic is done
+//  server-side (monitor/scorer.explain_scores); this only renders.
+// ============================================================
+
+// "Why this score" waterfall: signed per-feature contributions from the
+// learned fusion. Red bars push toward ESCALATE, blue pull toward DISMISS.
+function renderWaterfall(exp) {
+  if (!exp || !exp.items) return "";
+  const rows = [{ label: "Baseline (intercept)", contribution: exp.intercept, base: true }]
+    .concat(exp.items);
+  const maxAbs = Math.max(...rows.map((r) => Math.abs(r.contribution)), 0.1);
+
+  const W = 460, ROW = 30, PAD_L = 168, PAD_R = 52, TOP = 26;
+  const zero = PAD_L + (W - PAD_L - PAD_R) / 2;
+  const half = (W - PAD_L - PAD_R) / 2 - 4;
+  const H = TOP + rows.length * ROW + 46;
+
+  const bars = rows.map((r, i) => {
+    const y = TOP + i * ROW;
+    const w = Math.max(2, Math.abs(r.contribution) / maxAbs * half);
+    const pos = r.contribution >= 0;
+    const x = pos ? zero : zero - w;
+    // 4px rounded data-end, square at the zero baseline
+    const rx = pos
+      ? `M${x},${y} h${Math.max(0, w - 4)} a4,4 0 0 1 4,4 v8 a4,4 0 0 1 -4,4 h-${Math.max(0, w - 4)} z`
+      : `M${x + w},${y} h-${Math.max(0, w - 4)} a4,4 0 0 0 -4,4 v8 a4,4 0 0 0 4,4 h${Math.max(0, w - 4)} z`;
+    const fill = r.base ? "var(--text-dim)" : pos ? "var(--danger)" : "var(--info)";
+    let tipX = pos ? x + w + 6 : x - 6;
+    let anchor = pos ? "start" : "end";
+    let inBar = false;
+    // A long leftward bar would push its tip label into the row-label gutter —
+    // measure, and move the value inside the bar instead of colliding.
+    if (!pos && tipX < PAD_L + 34) { tipX = x + 8; anchor = "start"; inBar = true; }
+    if (pos && tipX > W - 8) { tipX = x + w - 8; anchor = "end"; inBar = true; }
+    const val = (r.contribution >= 0 ? "+" : "") + r.contribution.toFixed(2);
+    const detail = r.base ? `Baseline ${val}`
+      : `${r.label}: value ${r.value} × weight ${r.weight >= 0 ? "+" : ""}${r.weight} = ${val}`;
+    return `<g class="wf-row">
+      <title>${esc(detail)}</title>
+      <rect x="0" y="${y - 6}" width="${W}" height="${ROW}" fill="transparent"/>
+      <text x="${PAD_L - 10}" y="${y + 12}" text-anchor="end" class="wf-label">${esc(r.label)}</text>
+      <path d="${rx}" fill="${fill}" opacity="${r.base ? 0.55 : 0.9}"/>
+      <text x="${tipX}" y="${y + 12}" text-anchor="${anchor}" class="wf-val${inBar ? " in-bar" : ""}">${val}</text>
+    </g>`;
+  }).join("");
+
+  const fy = TOP + rows.length * ROW + 14;
+  const pct = Math.round(exp.risk_score * 100);
+  const finalNote = exp.sanctions_override
+    ? `sanctions hit → overridden to 1.00`
+    : (exp.mode === "learned_fusion" ? `σ(sum) = ${exp.risk_score.toFixed(2)}` : `weighted sum = ${exp.risk_score.toFixed(2)}`);
+
+  return `
+  <div class="wf-wrap">
+    <div class="explain-head">
+      <span class="explain-title">Why this score</span>
+      <span class="wf-legend">
+        <span class="wf-key"><span class="wf-swatch raises"></span>raises risk</span>
+        <span class="wf-key"><span class="wf-swatch lowers"></span>lowers risk</span>
+      </span>
+    </div>
+    <svg viewBox="0 0 ${W} ${H}" class="wf-svg" role="img" aria-label="Score contribution breakdown">
+      <line x1="${zero}" y1="${TOP - 10}" x2="${zero}" y2="${fy - 8}" class="wf-axis"/>
+      ${bars}
+      <g>
+        <line x1="${PAD_L - 10}" y1="${fy - 4}" x2="${W - 8}" y2="${fy - 4}" class="wf-axis"/>
+        <text x="${PAD_L - 10}" y="${fy + 16}" text-anchor="end" class="wf-label">Risk score</text>
+        <circle cx="${zero}" cy="${fy + 11}" r="6" fill="var(--gold)" stroke="var(--surface)" stroke-width="2"/>
+        <text x="${zero + 12}" y="${fy + 16}" class="wf-final">${(exp.risk_score).toFixed(2)} (${pct}%)</text>
+        <text x="${W - 8}" y="${fy + 16}" text-anchor="end" class="wf-note">${esc(finalNote)}</text>
+      </g>
+    </svg>
+  </div>`;
+}
+
+// Toggleable per-row explain panel in the triage queue.
+async function toggleExplainRow(i, btnRow) {
+  const existing = document.getElementById(`explain-${i}`);
+  if (existing) { existing.remove(); btnRow.classList.remove("expanded"); return; }
+  const r = batchQueue[i];
+  if (!r) return;
+  const tr = document.createElement("tr");
+  tr.id = `explain-${i}`;
+  tr.className = "explain-tr";
+  const td = document.createElement("td");
+  td.colSpan = 5;
+  td.innerHTML = `<div class="explain-panel">${renderWaterfall(r.score_explanation)}
+    <div class="txg-slot" id="txg-${i}"><div class="muted" style="padding:20px">Loading money flow…</div></div></div>`;
+  tr.appendChild(td);
+  btnRow.after(tr);
+  btnRow.classList.add("expanded");
+  renderTxnGraphInto(`txg-${i}`, r);
+}
+
+// ---- Force-directed money-flow graph (vanilla SVG, no deps) ----
+// Nodes: the customer (gold) + counterparties (sized by volume). Red = part of
+// a detected pattern (ring / layering chain / fan-out / high centrality).
+
+function _flaggedNodeSet(ga) {
+  const s = new Set();
+  if (!ga) return s;
+  (ga.structuring_ring?.cycles_found || []).flat().forEach((n) => s.add(n));
+  (ga.layering_chain?.chains || []).forEach((c) => (c.path || []).forEach((n) => s.add(n)));
+  (ga.fan_out?.evidence?.new_recipients || []).forEach((n) => s.add(n));
+  (ga.centrality?.high_centrality_nodes || []).forEach((d) => s.add(d.node));
+  s.delete("SELF");
+  return s;
+}
+
+function buildGraphData(caseObj, ga, maxNodes = 22) {
+  const agg = {};   // counterparty -> {in, out}
+  for (const t of caseObj.transactions) {
+    const cp = t.counterparty_name;
+    agg[cp] = agg[cp] || { in: 0, out: 0 };
+    if (t.direction === "credit") agg[cp].in += t.amount_inr;
+    else agg[cp].out += t.amount_inr;
+  }
+  const flagged = _flaggedNodeSet(ga);
+  const ranked = Object.entries(agg)
+    .sort((a, b) => (flagged.has(b[0]) - flagged.has(a[0]))
+      || (b[1].in + b[1].out) - (a[1].in + a[1].out));
+  const kept = ranked.slice(0, maxNodes);
+  return {
+    nodes: kept.map(([name, v]) => ({ name, vol: v.in + v.out, in: v.in, out: v.out,
+                                      flagged: flagged.has(name) })),
+    hidden: ranked.length - kept.length,
+  };
+}
+
+function renderTxnGraphInto(slotId, row) {
+  const slot = document.getElementById(slotId);
+  if (!slot) return;
+  const caseObj = (parsedCases || []).find((c) => c.case_id === row.case_id);
+  const draw = (co) => { slot.innerHTML = renderTxnGraph(co, row.graph_analysis); };
+  if (caseObj) { draw(caseObj); return; }
+  fetch(`/cases/${encodeURIComponent(row.case_id)}`)
+    .then((r) => r.json())
+    .then((d) => draw(d.payload))
+    .catch(() => { slot.innerHTML = `<p class="muted">Money-flow view unavailable.</p>`; });
+}
+
+function renderTxnGraph(caseObj, ga) {
+  const { nodes, hidden } = buildGraphData(caseObj, ga);
+  if (!nodes.length) return `<p class="muted">No transactions to draw.</p>`;
+  const W = 460, H = 330, CX = W / 2, CY = H / 2;
+
+  // Deterministic force layout: SELF pinned center; counterparties repel each
+  // other, spring toward their ring position, and settle in ~220 iterations.
+  const N = nodes.length;
+  nodes.forEach((n, i) => {
+    const a = (i / N) * 2 * Math.PI;
+    n.x = CX + Math.cos(a) * 120; n.y = CY + Math.sin(a) * 110;
+  });
+  for (let it = 0; it < 220; it++) {
+    for (let i = 0; i < N; i++) {
+      let fx = 0, fy = 0;
+      for (let j = 0; j < N; j++) {
+        if (i === j) continue;
+        const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+        const d2 = Math.max(dx * dx + dy * dy, 40);
+        fx += (dx / d2) * 1800; fy += (dy / d2) * 1800;
+      }
+      // spring to SELF at preferred radius
+      const dx = nodes[i].x - CX, dy = nodes[i].y - CY;
+      const d = Math.max(Math.hypot(dx, dy), 1);
+      const pref = 105 + (i % 3) * 22;
+      fx -= (dx / d) * (d - pref) * 0.05; fy -= (dy / d) * (d - pref) * 0.05;
+      nodes[i].x += Math.max(-6, Math.min(6, fx));
+      nodes[i].y += Math.max(-6, Math.min(6, fy));
+      nodes[i].x = Math.max(26, Math.min(W - 26, nodes[i].x));
+      nodes[i].y = Math.max(26, Math.min(H - 26, nodes[i].y));
+    }
+  }
+
+  const maxVol = Math.max(...nodes.map((n) => n.vol));
+  const rOf = (v) => 5 + Math.sqrt(v / maxVol) * 7;
+
+  const edges = nodes.map((n) => {
+    const parts = [];
+    const r = rOf(n.vol);
+    if (n.in > 0) parts.push(_edge(n.x, n.y, CX, CY, r, 15, n.in, maxVol, n.flagged, `${n.name} → customer: ${inr(n.in)}`));
+    if (n.out > 0) parts.push(_edge(CX, CY, n.x, n.y, 15, r, n.out, maxVol, n.flagged, `customer → ${n.name}: ${inr(n.out)}`));
+    return parts.join("");
+  }).join("");
+
+  const topNames = new Set(nodes.slice(0, 3).map((n) => n.name));
+  const circles = nodes.map((n) => {
+    const r = rOf(n.vol);
+    const short = n.name.length > 18 ? n.name.slice(0, 17) + "…" : n.name;
+    const lx = Math.max(58, Math.min(W - 58, n.x));   // keep labels inside the frame
+    const label = (n.flagged || topNames.has(n.name))
+      ? `<text x="${lx}" y="${n.y - r - 5}" text-anchor="middle" class="txg-label${n.flagged ? " bad" : ""}">${esc(short)}</text>` : "";
+    return `<g class="txg-node">
+      <title>${esc(n.name)} — in ${inr(n.in)} · out ${inr(n.out)}${n.flagged ? " · part of a detected pattern" : ""}</title>
+      <circle cx="${n.x}" cy="${n.y}" r="${Math.max(12, r)}" fill="transparent"/>
+      <circle cx="${n.x}" cy="${n.y}" r="${r}" class="${n.flagged ? "txg-cp flagged" : "txg-cp"}"/>
+      ${label}</g>`;
+  }).join("");
+
+  return `
+  <div class="explain-head">
+    <span class="explain-title">Money flow</span>
+    <span class="wf-legend">
+      <span class="wf-key"><span class="wf-swatch self"></span>customer</span>
+      <span class="wf-key"><span class="wf-swatch flaggedn"></span>detected pattern</span>
+    </span>
+  </div>
+  <svg viewBox="0 0 ${W} ${H}" class="txg-svg" role="img" aria-label="Transaction network">
+    <defs>
+      <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 z" fill="var(--text-dim)"/>
+      </marker>
+      <marker id="arrbad" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,0 L8,4 L0,8 z" fill="var(--danger)"/>
+      </marker>
+    </defs>
+    ${edges}
+    ${circles}
+    <g class="txg-node"><title>${esc(caseObj.customer.name)}</title>
+      <circle cx="${CX}" cy="${CY}" r="15" class="txg-self"/>
+      <text x="${CX}" y="${CY + 30}" text-anchor="middle" class="txg-label self">${esc(caseObj.customer.name)}</text>
+    </g>
+    ${hidden > 0 ? `<text x="${W - 8}" y="${H - 8}" text-anchor="end" class="wf-note">+${hidden} smaller counterparties not shown</text>` : ""}
+  </svg>`;
+}
+
+function _edge(x1, y1, x2, y2, r1, r2, amt, maxVol, bad, tip) {
+  const dx = x2 - x1, dy = y2 - y1, d = Math.max(Math.hypot(dx, dy), 1);
+  const sx = x1 + (dx / d) * (r1 + 2), sy = y1 + (dy / d) * (r1 + 2);
+  const ex = x2 - (dx / d) * (r2 + 5), ey = y2 - (dy / d) * (r2 + 5);
+  const mx = (sx + ex) / 2 - dy / d * 14, my = (sy + ey) / 2 + dx / d * 14;
+  const w = Math.max(1.2, Math.sqrt(amt / maxVol) * 3.2);
+  return `<g class="txg-edge"><title>${esc(tip)}</title>
+    <path d="M${sx},${sy} Q${mx},${my} ${ex},${ey}" fill="none"
+      stroke="${bad ? "var(--danger)" : "var(--text-dim)"}" stroke-opacity="${bad ? 0.75 : 0.4}"
+      stroke-width="${w}" marker-end="url(#${bad ? "arrbad" : "arr"})"/></g>`;
 }
 
 // Restore the last server-side batch (survives a page refresh).
@@ -697,7 +942,7 @@ function renderHistory(cases) {
     const decision = c.agent_decision ? `${c.agent_decision} ${conf}` : "—";
     const act = c.status === "flagged"
       ? `<button class="btn btn-ghost btn-row-inv" data-cid="${esc(c.case_id)}">Investigate →</button>` : "";
-    return `<tr>
+    return `<tr class="h-row" data-cid="${esc(c.case_id)}" title="Click for full case detail">
       <td><span class="status-chip ${sm.cls}">${sm.label}</span></td>
       <td>${esc(c.customer_name)}</td>
       <td><span class="risk-num ${tier}">${risk}</span></td>
@@ -713,7 +958,71 @@ function renderHistory(cases) {
       <tbody>${rows}</tbody>
     </table>`;
   $("#historyBody").querySelectorAll(".btn-row-inv").forEach((b) =>
-    b.addEventListener("click", () => investigateFromHistory(b.dataset.cid)));
+    b.addEventListener("click", (e) => { e.stopPropagation(); investigateFromHistory(b.dataset.cid); }));
+  $("#historyBody").querySelectorAll(".h-row").forEach((row) =>
+    row.addEventListener("click", () => openCaseDrawer(row.dataset.cid)));
+}
+
+// ---- Case drawer: full detail for any persisted case (Phase 12) ----
+
+function closeDrawer() {
+  $("#caseDrawer").classList.remove("open");
+  $("#drawerBackdrop").classList.remove("show");
+  setTimeout(() => {
+    $("#caseDrawer").classList.add("hidden");
+    $("#drawerBackdrop").classList.add("hidden");
+  }, 250);
+}
+
+async function openCaseDrawer(caseId) {
+  const drawer = $("#caseDrawer");
+  const backdrop = $("#drawerBackdrop");
+  drawer.classList.remove("hidden");
+  backdrop.classList.remove("hidden");
+  requestAnimationFrame(() => { drawer.classList.add("open"); backdrop.classList.add("show"); });
+  drawer.innerHTML = `<div class="drawer-body"><p class="muted" style="padding:30px">Loading case…</p></div>`;
+
+  try {
+    const detail = await (await fetch(`/cases/${encodeURIComponent(caseId)}`)).json();
+    // Fresh sub-second monitor pass for the explainability visuals (no LLM).
+    const det = await (await fetch("/detect", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(detail.payload),
+    })).json();
+
+    const sm = STATUS_META[detail.status] || { label: detail.status, cls: "" };
+    const tier = det.risk_score != null ? riskTier(det.risk_score) : "";
+    const reviews = (detail.reviews || []).map((r) => `
+      <li><b>${esc(r.reviewer)}</b> ${r.action === "approve" ? "approved the agent decision" : "overrode the agent"}
+        → <span class="status-chip ${(STATUS_META[r.final_status] || {}).cls || ""}">${esc((STATUS_META[r.final_status] || { label: r.final_status }).label)}</span>
+        <span class="hist-date">${esc(r.created_at.slice(0, 16).replace("T", " "))}</span>
+        ${r.rationale ? `<div class="rev-rationale">"${esc(r.rationale)}"</div>` : ""}</li>`).join("");
+
+    drawer.innerHTML = `
+      <div class="drawer-body">
+        <div class="drawer-head">
+          <div>
+            <div class="drawer-title">${esc(detail.customer_name)}</div>
+            <div class="drawer-sub mono">${esc(detail.case_id)}</div>
+          </div>
+          <div class="drawer-head-right">
+            <span class="status-chip ${sm.cls}">${sm.label}</span>
+            <button class="icon-btn" id="drawerClose" aria-label="Close">✕</button>
+          </div>
+        </div>
+        <div class="drawer-risk">
+          <span class="risk-num ${tier}" style="font-size:26px">${det.risk_score.toFixed(2)}</span>
+          <span class="muted">monitor risk score · ${esc(det.recommended_action)}</span>
+        </div>
+        ${renderWaterfall(det.score_explanation)}
+        <div class="txg-slot">${renderTxnGraph(detail.payload, det.graph_analysis)}</div>
+        ${detail.report ? `<div class="drawer-section"><div class="explain-title">Agent report (${esc(detail.agent_decision || "")}${detail.agent_confidence != null ? ", " + Math.round(detail.agent_confidence * 100) + "%" : ""})</div><div class="report-doc drawer-report">${renderReportMarkdown(detail.report)}</div></div>` : ""}
+        ${reviews ? `<div class="drawer-section"><div class="explain-title">Review audit trail</div><ul class="rev-list">${reviews}</ul></div>` : ""}
+      </div>`;
+    $("#drawerClose").addEventListener("click", closeDrawer);
+  } catch (e) {
+    drawer.innerHTML = `<div class="drawer-body"><p style="color:var(--danger);padding:30px">Could not load case: ${esc(e.message)}</p></div>`;
+  }
 }
 
 async function investigateFromHistory(caseId) {
@@ -744,6 +1053,10 @@ function wireBatch() {
 initTheme();
 wireBatch();
 loadStats();
+$("#drawerBackdrop").addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && $("#caseDrawer").classList.contains("open")) closeDrawer();
+});
 $("#refreshHistory").addEventListener("click", loadHistory);
 $("#histFilters").querySelectorAll(".chip").forEach((c) =>
   c.addEventListener("click", () => {

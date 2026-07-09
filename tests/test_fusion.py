@@ -41,3 +41,15 @@ def test_fused_score_bounded_and_deterministic(cases_by_typology):
     assert isinstance(out1["risk_score"], float)
     assert 0.0 <= out1["risk_score"] <= 1.0
     assert out1["risk_score"] == out2["risk_score"]
+
+
+# ── 5. Score explanation: contributions are Python-computed and consistent ────
+
+def test_score_explanation_shape(cases_by_typology):
+    out = run_detection(cases_by_typology["structuring"][0])
+    exp = out["score_explanation"]
+    assert exp["mode"] in ("learned_fusion", "hand_tuned")
+    assert exp["risk_score"] == out["risk_score"]
+    for item in exp["items"]:
+        assert set(item) == {"feature", "label", "value", "weight", "contribution"}
+        assert item["contribution"] == round(item["value"] * item["weight"], 4)

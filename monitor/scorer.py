@@ -167,6 +167,85 @@ def combine_scores(
     return round(combined, 4)
 
 
+# Human-readable names for the fusion features (UI waterfall labels).
+_FEATURE_LABELS = {
+    "typology_score":         "Typology rules score",
+    "graph_score":            "Graph structure score",
+    "behavioral_score":       "Behavioral deviation",
+    "anomaly_score":          "ML anomaly score",
+    "flag_structuring":       "Structuring flag",
+    "flag_fan_out":           "Fan-out flag",
+    "flag_velocity_spike":    "Velocity-spike flag",
+    "flag_sanctions_hit":     "Sanctions flag",
+    "flag_rapid_passthrough": "Pass-through flag",
+}
+
+
+def explain_scores(
+    typology_score: float,
+    graph_score: float,
+    behavioral_score: float,
+    anomaly_score: float,
+    has_sanctions: bool,
+    flags: set[str],
+    risk_score: float,
+) -> dict:
+    """
+    Per-feature contribution breakdown for the UI waterfall. All arithmetic
+    here, in Python — the frontend only renders it.
+    """
+    if _FUSION is not None:
+        feats = {
+            "typology_score": typology_score,
+            "graph_score": graph_score,
+            "behavioral_score": behavioral_score,
+            "anomaly_score": anomaly_score,
+            "flag_structuring": float("structuring" in flags),
+            "flag_fan_out": float("fan_out" in flags),
+            "flag_velocity_spike": float("velocity_spike" in flags),
+            "flag_sanctions_hit": float("sanctions_hit" in flags),
+            "flag_rapid_passthrough": float("rapid_passthrough" in flags),
+        }
+        items = [
+            {
+                "feature": name,
+                "label": _FEATURE_LABELS[name],
+                "value": round(feats[name], 4),
+                "weight": _FUSION["coefs"][name],
+                "contribution": round(_FUSION["coefs"][name] * feats[name], 4),
+            }
+            for name in _FUSION["names"]
+            if feats[name] != 0.0
+        ]
+        items.sort(key=lambda d: -abs(d["contribution"]))
+        return {
+            "mode": "learned_fusion",
+            "intercept": _FUSION["intercept"],
+            "items": items,
+            "sanctions_override": has_sanctions,
+            "risk_score": risk_score,
+        }
+
+    # Hand-tuned fallback: the four weighted terms.
+    hand = [
+        ("typology_score", typology_score, 0.45),
+        ("graph_score", graph_score, 0.20),
+        ("behavioral_score", behavioral_score, 0.15),
+        ("anomaly_score", anomaly_score, 0.20),
+    ]
+    return {
+        "mode": "hand_tuned",
+        "intercept": 0.0,
+        "items": [
+            {"feature": n, "label": _FEATURE_LABELS[n], "value": round(v, 4),
+             "weight": w, "contribution": round(v * w, 4)}
+            for n, v, w in hand if v != 0.0
+        ],
+        "sanctions_override": has_sanctions,
+        "risk_score": risk_score,
+    }
+
+
 def run_detection(case: dict) -> dict:
     """
     Full Layer-1 (typologies) + Layer-2A (graph) + Layer-2B (behavioral) detection.
@@ -207,6 +286,11 @@ def run_detection(case: dict) -> dict:
             "behavioral": behavioral_score,
             "anomaly": anomaly_score,
         },
+        # Per-feature contribution breakdown for the UI waterfall (Phase 12).
+        "score_explanation": explain_scores(
+            typology_score, graph_score, behavioral_score, anomaly_score,
+            has_sanctions, fired, risk_score,
+        ),
         "risk_score": risk_score,
         "above_threshold": bool(risk_score >= TRIAGE_THRESHOLD),
     }
