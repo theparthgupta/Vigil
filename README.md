@@ -92,6 +92,30 @@ Full sweep, methodology, and caveats: [`benchmarks/RESULTS_SAML_D.md`](benchmark
 The enriched sample means precision does **not** transfer to production base
 rates; recall and FPR do.
 
+### Gate metrics vs. system metrics — read this before quoting a number
+
+The table above is the **triage gate** (the cheap monitor layer), *not* the
+whole system. Its job is recall-first filtering, so its ~0.36 precision is
+expected and not the alert precision. To avoid the exact misread this invites,
+[Phase 15](benchmarks/RESULTS_PIPELINE.md) measured the **end-to-end funnel**
+(gate → LLM Reasoner → ESCALATE) on SAML-D: precision on gate survivors,
+recall against all labeled positives, both stages reported separately and
+combined, with a 5,000-iteration bootstrap CI and precision quoted at both the
+enriched and true (0.104%) base rates.
+
+The honest result: **the full pipeline's recall on SAML-D is 0.000.** The LLM
+stage dismissed 100/100 sampled laundering survivors. It is not a bug (verified
+on real cases) — it is a **vocabulary mismatch**: the gate flags via graph
+typologies (round-trip, cycle, fan-out) that the LLM's evidence tools never
+surface, so the Reasoner sees "no structuring, no sanctions → DISMISS." The
+gate's own reason for flagging is passed along but never shown to the Reasoner's
+prompt. That is a concrete, actionable fix — surface the gate's findings to the
+LLM — and this harness (deterministic, cached) will re-measure the lift once it
+lands. **This is the single most important number in the repo, and it's
+currently bad on purpose-of-honesty**: a portfolio that reports its own
+pipeline's recall as 0.0 with the root cause is more credible than one that
+quotes a 0.36 gate number and hopes nobody asks.
+
 ### Synthetic holdout (agent end-to-end)
 
 A 40-case holdout locked from the first commit scores perfect —
