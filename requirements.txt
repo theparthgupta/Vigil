@@ -18,6 +18,9 @@ networkx
 cocoindex==0.3.39
 psycopg2-binary
 pgvector
+# Required by FastAPI's UploadFile (api/main.py POST /parse-csv) - was present
+# transitively in dev venvs but never declared; a clean install (Render) exposed it.
+python-multipart
 # Dev-only: anonymous download of the SAML-D benchmark dataset (benchmarks/saml_d.py)
 kagglehub
 # opensanctions pip package requires pyicu (ICU C lib, not installable on Windows without
