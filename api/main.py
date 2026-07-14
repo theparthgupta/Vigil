@@ -59,6 +59,10 @@ def _corpus_count() -> int:
         return 0
 
 
+_CORPUS_BUILD_RETRIES = 3
+_CORPUS_BUILD_BACKOFF_SECONDS = 8
+
+
 def _ensure_corpus() -> None:
     """
     Make sure the pgvector RAG index exists before serving requests.
@@ -66,28 +70,59 @@ def _ensure_corpus() -> None:
     On a fresh deploy the table is empty, so build it with the CocoIndex flow
     (which sets up the table/index and embeds regs/*.pdf). If already populated,
     this is a fast no-op — CocoIndex detects no source changes.
+
+    Retries a few times with backoff: CocoIndex tracks per-source progress, so a
+    transient DB hiccup mid-ingest (a dropped connection, a managed Postgres
+    restart) can usually be resumed rather than requiring a full restart.
     """
     existing = _corpus_count()
     if existing > 0:
         print(f"RAG corpus ready ({existing} chunks, CocoIndex/pgvector).")
         return
 
-    print("Building RAG corpus via CocoIndex/pgvector...", flush=True)
     from rag.cocoindex_flow import init_cocoindex, vigil_regulatory_corpus
 
-    init_cocoindex()
-    vigil_regulatory_corpus.setup()
-    vigil_regulatory_corpus.update()
+    for attempt in range(1, _CORPUS_BUILD_RETRIES + 1):
+        print(
+            f"Building RAG corpus via CocoIndex/pgvector... (attempt {attempt}/{_CORPUS_BUILD_RETRIES})",
+            flush=True,
+        )
+        try:
+            init_cocoindex()
+            vigil_regulatory_corpus.setup()
+            vigil_regulatory_corpus.update()
+            count = _corpus_count()
+            print(
+                f"Building RAG corpus via CocoIndex/pgvector... done ({count} chunks)", flush=True
+            )
+            return
+        except Exception as e:
+            print(f"RAG corpus build attempt {attempt} failed: {e}", flush=True)
+            if attempt < _CORPUS_BUILD_RETRIES:
+                time.sleep(_CORPUS_BUILD_BACKOFF_SECONDS)
+
     print(
-        f"Building RAG corpus via CocoIndex/pgvector... done ({_corpus_count()} chunks)", flush=True
+        "WARNING: RAG corpus build did not complete after retries. The app will "
+        "still start; regulatory citations will be degraded until the corpus "
+        "finishes (it will resume automatically on the next restart).",
+        flush=True,
     )
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Build the RAG corpus and the case-store tables before serving requests.
-    _ensure_corpus()
-    store.init_tables()
+    # Neither is allowed to crash the whole app: a demo with a degraded RAG
+    # corpus (or a case store that retries lazily) is far better than a service
+    # that can't even pass its health check because of a transient DB blip.
+    try:
+        _ensure_corpus()
+    except Exception as e:
+        print(f"WARNING: _ensure_corpus failed unexpectedly: {e}", flush=True)
+    try:
+        store.init_tables()
+    except Exception as e:
+        print(f"WARNING: store.init_tables failed unexpectedly: {e}", flush=True)
     yield
 
 
