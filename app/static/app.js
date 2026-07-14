@@ -1,5 +1,5 @@
 /* ============================================================
-   Vigil — frontend logic
+   Vigil - frontend logic
    ============================================================ */
 
 const $ = (sel) => document.querySelector(sel);
@@ -29,7 +29,7 @@ async function loadStats() {
     const res = await fetch("/dashboard/stats");
     if (!res.ok) return;
     const s = await res.json();
-    if (!s.total_cases) return;              // nothing screened yet — keep band hidden
+    if (!s.total_cases) return;              // nothing screened yet - keep band hidden
     $("#statsBand").classList.remove("hidden");
     animateNum($("#st-total"), s.total_cases);
     animateNum($("#st-flagged"), s.flagged);
@@ -39,16 +39,16 @@ async function loadStats() {
     $("#st-spend").textContent = "₹" + (s.llm_spend_inr || 0).toFixed(2);
     $("#st-spend").title = `Avg ₹${(s.avg_cost_per_investigation_inr || 0).toFixed(2)} per LLM investigation (${s.investigated_with_llm || 0} runs)`;
     $("#st-saved").textContent = "₹" + (s.est_saved_by_triage_inr || 0).toFixed(2);
-    $("#st-saved").title = `${s.auto_dismissed} auto-dismissed cases × avg investigation cost — LLM runs the triage layers avoided`;
+    $("#st-saved").title = `${s.auto_dismissed} auto-dismissed cases × avg investigation cost - LLM runs the triage layers avoided`;
     // The feedback loop: falling agreement = time to re-tune the threshold/fusion.
     if (s.reviews_recorded > 0) {
       $("#st-agree").textContent = s.agent_agreement_pct.toFixed(0) + "%";
       $("#st-agree").title = `${s.review_approvals} of ${s.reviews_recorded} human reviews approved the agent's decision (${s.review_overrides} override${s.review_overrides === 1 ? "" : "s"})`;
     } else {
-      $("#st-agree").textContent = "—";
+      $("#st-agree").textContent = "-";
       $("#st-agree").title = "No human reviews recorded yet";
     }
-  } catch { /* dashboard is a nicety — never block the app on it */ }
+  } catch { /* dashboard is a nicety - never block the app on it */ }
 }
 
 // ---- Theme ----
@@ -313,7 +313,7 @@ function renderResult(data) {
           <button class="active" data-act="approve">Approve agent decision</button>
           <button class="override" data-act="override">Override → ${esc8 ? "DISMISS" : "ESCALATE"}</button>
         </div>
-        <input id="reviewerName" class="rev-input" type="text" placeholder="Reviewer name — e.g. R. Mehta, MLRO" />
+        <input id="reviewerName" class="rev-input" type="text" placeholder="Reviewer name - e.g. R. Mehta, MLRO" />
         <textarea class="note" id="reviewNote" placeholder="Rationale for your decision (optional)…"></textarea>
         <button class="btn btn-primary" id="recordBtn" style="width:auto">Record review</button>
       </div>
@@ -496,7 +496,7 @@ function showToast(msg, warn = false) {
 let parsedCases = null;
 let batchQueue = [];
 
-const typoLabel = (t) => (t || "—").replace(/_/g, " ");
+const typoLabel = (t) => (t || "-").replace(/_/g, " ");
 const riskTier = (s) => (s >= 0.85 ? "red" : s >= 0.70 ? "orange" : "yellow");
 
 // Four mini-bars showing what each detection layer contributed (explainability).
@@ -507,7 +507,7 @@ const _LAYERS = [
   ["anomaly",    "A", "ML anomaly"],
 ];
 function layerBars(ls) {
-  if (!ls) return "—";
+  if (!ls) return "-";
   return `<div class="layers">` + _LAYERS.map(([key, tag, name]) => {
     const v = ls[key] || 0;
     const h = Math.max(8, Math.round(v * 100));
@@ -597,7 +597,7 @@ function renderBatchResults(data) {
   const queueRows = batchQueue.map((r, i) => {
     const tier = riskTier(r.risk_score);
     const pct = Math.round(r.risk_score * 100);
-    const top = (r.typology_flags && r.typology_flags[0]) ? r.typology_flags[0].typology : "—";
+    const top = (r.typology_flags && r.typology_flags[0]) ? r.typology_flags[0].typology : "-";
     return `<tr class="q-row" data-i="${i}" title="Click to see why this case scored ${r.risk_score.toFixed(2)}">
       <td><div class="risk"><svg class="q-chev" viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="risk-bar"><span class="risk-fill ${tier}" style="width:${pct}%"></span></div><span class="risk-num ${tier}">${r.risk_score.toFixed(2)}</span></div></td>
       <td>${esc(r.customer_name)}</td>
@@ -663,7 +663,7 @@ async function investigateFromQueue(i) {
 }
 
 // ============================================================
-//  Explainability visuals (Phase 12) — all arithmetic is done
+//  Explainability visuals (Phase 12) - all arithmetic is done
 //  server-side (monitor/scorer.explain_scores); this only renders.
 // ============================================================
 
@@ -693,7 +693,7 @@ function renderWaterfall(exp) {
     let tipX = pos ? x + w + 6 : x - 6;
     let anchor = pos ? "start" : "end";
     let inBar = false;
-    // A long leftward bar would push its tip label into the row-label gutter —
+    // A long leftward bar would push its tip label into the row-label gutter -
     // measure, and move the value inside the bar instead of colliding.
     if (!pos && tipX < PAD_L + 34) { tipX = x + 8; anchor = "start"; inBar = true; }
     if (pos && tipX > W - 8) { tipX = x + w - 8; anchor = "end"; inBar = true; }
@@ -856,7 +856,7 @@ function renderTxnGraph(caseObj, ga) {
     const label = (n.flagged || topNames.has(n.name))
       ? `<text x="${lx}" y="${n.y - r - 5}" text-anchor="middle" class="txg-label${n.flagged ? " bad" : ""}">${esc(short)}</text>` : "";
     return `<g class="txg-node">
-      <title>${esc(n.name)} — in ${inr(n.in)} · out ${inr(n.out)}${n.flagged ? " · part of a detected pattern" : ""}</title>
+      <title>${esc(n.name)} - in ${inr(n.in)} · out ${inr(n.out)}${n.flagged ? " · part of a detected pattern" : ""}</title>
       <circle cx="${n.x}" cy="${n.y}" r="${Math.max(12, r)}" fill="transparent"/>
       <circle cx="${n.x}" cy="${n.y}" r="${r}" class="${n.flagged ? "txg-cp flagged" : "txg-cp"}"/>
       ${label}</g>`;
@@ -911,7 +911,7 @@ async function restoreBatch() {
       renderBatchResults(data);
       showToast("Restored the last batch from the server");
     }
-  } catch { /* no cached batch — nothing to restore */ }
+  } catch { /* no cached batch - nothing to restore */ }
 }
 
 // ============================================================
@@ -939,15 +939,15 @@ async function loadHistory() {
 
 function renderHistory(cases) {
   if (!cases.length) {
-    $("#historyBody").innerHTML = `<p class="muted">No cases here yet. Run a batch triage or investigate a case — everything is persisted.</p>`;
+    $("#historyBody").innerHTML = `<p class="muted">No cases here yet. Run a batch triage or investigate a case - everything is persisted.</p>`;
     return;
   }
   const rows = cases.map((c) => {
     const sm = STATUS_META[c.status] || { label: c.status, cls: "" };
-    const risk = c.risk_score != null ? c.risk_score.toFixed(2) : "—";
+    const risk = c.risk_score != null ? c.risk_score.toFixed(2) : "-";
     const tier = c.risk_score != null ? riskTier(c.risk_score) : "";
     const conf = c.agent_confidence != null ? Math.round(c.agent_confidence * 100) + "%" : "";
-    const decision = c.agent_decision ? `${c.agent_decision} ${conf}` : "—";
+    const decision = c.agent_decision ? `${c.agent_decision} ${conf}` : "-";
     const act = c.status === "flagged"
       ? `<button class="btn btn-ghost btn-row-inv" data-cid="${esc(c.case_id)}">Investigate →</button>` : "";
     return `<tr class="h-row" data-cid="${esc(c.case_id)}" title="Click for full case detail">

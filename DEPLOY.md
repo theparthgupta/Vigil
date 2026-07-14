@@ -4,9 +4,9 @@ Vigil is a **single FastAPI service** (API + UI) plus **Postgres with pgvector**
 (RAG corpus, case store, audit trail). Both stores self-build on first boot:
 CocoIndex embeds the regulatory corpus (needs `OPENAI_API_KEY`; a few minutes,
 pennies of embedding spend) and the anomaly model trains from the committed
-data. Restarts are fast — everything is idempotent.
+data. Restarts are fast - everything is idempotent.
 
-## 0. Secrets — rotate first
+## 0. Secrets - rotate first
 
 Any key that has ever been committed or pasted into a chat is compromised.
 Before going public, rotate:
@@ -36,7 +36,7 @@ Postgres database wired in via `DATABASE_URL`:
    green when ready.
 
 Notes:
-- Render free Postgres instances **expire after 90 days** — fine for a demo,
+- Render free Postgres instances **expire after 90 days** - fine for a demo,
   use a paid plan for anything persistent.
 - Render Postgres supports the `vector` extension; CocoIndex creates it
   automatically on first boot.
