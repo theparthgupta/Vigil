@@ -1,5 +1,5 @@
 /* ============================================================
-   Vigil — "Gilt Intelligence"
+   Vigil - "Gilt Intelligence"
    Ink-navy + warm gold. Space Grotesk display · Inter Tight UI.
    Craft over flash: layered depth, type hierarchy, 8px spacing.
    ============================================================ */
@@ -374,7 +374,7 @@ textarea.note::placeholder { color: var(--text-faint); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
 
 /* ============================================================
-   Phase 10A — Batch triage (CSV upload, queue, risk bars)
+   Phase 10A - Batch triage (CSV upload, queue, risk bars)
    ============================================================ */
 .csv-help { font-size: 12.5px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px; }
 .csv-help code { display: block; margin-top: 8px; padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--r-sm); font-family: var(--mono, monospace); font-size: 11.5px; color: var(--text); word-break: break-word; }
@@ -439,7 +439,7 @@ textarea.note::placeholder { color: var(--text-faint); }
 .dism-list .num { color: var(--text-dim); }
 
 /* ============================================================
-   Phase 10B — dashboard band, case history, layer signals
+   Phase 10B - dashboard band, case history, layer signals
    ============================================================ */
 :root {
   --info:      #6da8f7;
@@ -509,13 +509,13 @@ textarea.note::placeholder { color: var(--text-faint); }
   .stats-band .stat-card:last-child { grid-column: span 2; }
 }
 
-/* Phase 11 — cost economics */
+/* Phase 11 - cost economics */
 .stats-band { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
 .stat-ic.violet { background: var(--violet-tint); color: var(--violet); }
 .cost-chip { margin-left: 8px; background: var(--violet-tint); color: var(--violet); }
 
 /* ============================================================
-   Phase 12 — explainability: score waterfall + money-flow graph
+   Phase 12 - explainability: score waterfall + money-flow graph
    ============================================================ */
 .q-row { cursor: pointer; }
 .q-row:hover td { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
